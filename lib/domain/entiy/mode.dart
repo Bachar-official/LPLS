@@ -1,6 +1,6 @@
 enum Mode {
-  audio(106),
-  midi(107);
+  audio(0),
+  midi(1);
 
   final int value;
   const Mode(this.value);

@@ -5,6 +5,7 @@ import 'package:flutter_application_1/domain/entiy/velocity.dart';
 import 'package:flutter_application_1/feature/MIDI/midi_holder.dart';
 import 'package:flutter_midi_command/flutter_midi_command.dart';
 
+//TODO: режимы на ланчпаде не нужны, только в программе. Воспроизводиться всё будет сразу.
 class MidiManager {
   final MidiHolder holder;
   final MidiCommand midi = MidiCommand();
