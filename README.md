@@ -1,2 +1,3 @@
-# LPLS
-Flutter app for playing lightshows on Novation Launchpad
+# flutter_application_1
+
+A new Flutter project.
