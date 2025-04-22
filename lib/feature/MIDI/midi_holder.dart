@@ -27,4 +27,8 @@ class MidiHolder extends StateNotifier<MidiState> {
   void setMode(Mode mode) {
     state = state.copyWith(mode: mode);
   }
+
+  void setIsLoading(bool isLoading) {
+    state = state.copyWith(isLoading: isLoading);
+  }
 }

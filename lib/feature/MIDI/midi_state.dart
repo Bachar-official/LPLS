@@ -6,15 +6,17 @@ class MidiState {
   final List<MidiDevice> devices;
   final int page;
   final Mode mode;
+  final bool isLoading;
 
   MidiState({
     required this.device,
     required this.devices,
     required this.page,
     required this.mode,
+    required this.isLoading,
   });
 
-  MidiState.initial() : device = null, devices = [], page = 0, mode = Mode.midi;
+  MidiState.initial() : device = null, devices = [], page = 0, mode = Mode.midi, isLoading = false;
 
   MidiState copyWith({
     MidiDevice? device,
@@ -22,12 +24,14 @@ class MidiState {
     List<MidiDevice>? devices,
     int? page,
     Mode? mode,
+    bool? isLoading,
   }) {
     return MidiState(
       device: nullableDevice ? null : device ?? this.device,
       devices: devices ?? this.devices,
       page: page ?? this.page,
       mode: mode ?? this.mode,
+      isLoading: isLoading ?? this.isLoading,
     );
   }
 }

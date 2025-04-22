@@ -1,12 +1,9 @@
-import 'package:flutter/material.dart' hide Velocity;
-import 'package:flutter/services.dart';
 import 'package:lpls/domain/entiy/manager_deps.dart';
 import 'package:lpls/domain/entiy/mode.dart';
-import 'package:lpls/domain/entiy/velocity.dart';
 import 'package:lpls/feature/MIDI/midi_holder.dart';
 import 'package:flutter_midi_command/flutter_midi_command.dart';
+import 'package:lpls/utils/ui_utils.dart';
 
-//TODO: режимы на ланчпаде не нужны, только в программе. Воспроизводиться всё будет сразу.
 class MidiManager {
   final MidiHolder holder;
   final ManagerDeps deps;
@@ -15,10 +12,21 @@ class MidiManager {
 
   MidiManager({required this.holder, required this.deps});
 
+  void setLoading(bool isLoading) => holder.setIsLoading(isLoading);
+
   Future<void> getDevices() async {
     await disconnect();
-    final devices = await midi.devices ?? [];
-    holder.setDevices(devices);
+    setLoading(true);
+    try {
+      debug(deps, 'Try to get MIDI devices list');
+      final devices = await midi.devices ?? [];
+      holder.setDevices(devices);
+      success(deps, 'Got ${devices.length} devices');
+    } catch(e, s) {
+      catchException(deps, e, stackTrace: s, description: 'Error while getting MIDI devices list: ');
+    } finally {
+      setLoading(false);
+    }    
   }
 
   Future<void> setDevice(MidiDevice? device) async {
