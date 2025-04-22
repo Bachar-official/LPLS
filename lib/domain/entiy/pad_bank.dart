@@ -6,9 +6,18 @@ class PadBank {
   List<File> midiFiles;
   List<File> audioFiles;
 
-  PadBank({required this.audioFiles, required this.audioIndex, required this.midiFiles, required this.midiIndex});
+  PadBank({
+    required this.audioFiles,
+    required this.audioIndex,
+    required this.midiFiles,
+    required this.midiIndex,
+  });
 
-  PadBank.initial(): audioFiles = [], audioIndex = 0, midiFiles = [], midiIndex = 0;
+  PadBank.initial()
+    : audioFiles = [],
+      audioIndex = 0,
+      midiFiles = [],
+      midiIndex = 0;
 
   void addFile(File file, bool isMidi) {
     if (isMidi) {
@@ -26,6 +35,13 @@ class PadBank {
       } else {
         audioIndex++;
       }
-    } else if (midiFiles.isNotEmpty && midi)
+    } else if (midiFiles.isNotEmpty && midiIndex < midiFiles.length) {
+      print('Playing file #$midiIndex');
+      if (midiIndex == midiFiles.length - 1) {
+        midiIndex = 0;
+      } else {
+        midiIndex++;
+      }
+    }
   }
 }

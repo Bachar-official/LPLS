@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:lpls/domain/entiy/mode.dart';
 import 'package:lpls/domain/entiy/pad_bank.dart';
@@ -5,7 +7,15 @@ import 'package:lpls/domain/entiy/pad_bank.dart';
 class PadButton extends StatelessWidget {
   final PadBank bank;
   final Mode mode;
-  const PadButton({super.key, required this.bank, required this.mode});
+  final VoidCallback onRightClickDown;
+  final VoidCallback onRightClickUp;
+  const PadButton({
+    super.key,
+    required this.bank,
+    required this.mode,
+    required this.onRightClickDown,
+    required this.onRightClickUp,
+  });
 
   Color _getPadColor() {
     if (mode == Mode.audio && bank.audioFiles.isNotEmpty) {
@@ -18,12 +28,19 @@ class PadButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 10,
-      height: 10,
-      decoration: BoxDecoration(
-        color: _getPadColor(),
-        border: Border.all()
+    return Listener(
+      onPointerDown: (event) {
+        if (event.buttons == 2) {
+          onRightClickDown();
+        }
+      },
+      onPointerUp: (event) {
+        onRightClickUp();
+      },
+      child: Container(
+        width: 10,
+        height: 10,
+        decoration: BoxDecoration(color: _getPadColor(), border: Border.all()),
       ),
     );
   }
