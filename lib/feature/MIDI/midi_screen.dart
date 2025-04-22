@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/domain/di.dart';
-import 'package:flutter_application_1/feature/MIDI/midi_holder.dart';
-import 'package:flutter_application_1/feature/MIDI/midi_state.dart';
+import 'package:lpls/domain/di.dart';
+import 'package:lpls/domain/entiy/mode.dart';
+import 'package:lpls/feature/MIDI/midi_holder.dart';
+import 'package:lpls/feature/MIDI/midi_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final provider = StateNotifierProvider<MidiHolder, MidiState>(
@@ -23,15 +24,41 @@ class MidiScreen extends ConsumerWidget {
               ? 'No device'
               : 'Current mode : ${state.mode.name}, current page: ${state.page + 1}',
         ),
+        actions: [
+          DropdownButton(
+            disabledHint: const Text('MIDI Devices not found'),
+            value: state.device,
+            items: state.devices
+                .map((d) => DropdownMenuItem(value: d, child: Text(d.name)))
+                .toList(),
+            onChanged: manager.setDevice,
+          ),
+          SegmentedButton<Mode>(
+            segments: [
+              ButtonSegment(label: const Text('Audio'), value: Mode.audio),
+              ButtonSegment(label: const Text('MIDI'), value: Mode.midi),
+            ],
+            selected: {state.mode},
+            onSelectionChanged: manager.isConnected ? manager.setMode : null,
+          ),
+          IconButton(
+            icon: const Icon(Icons.cloud_off),
+            onPressed: manager.isConnected ? manager.disconnect : null,
+          ),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: manager.getDevices,
+          ),
+        ],
       ),
       body: Column(
         children: [
           DropdownButton(
+            disabledHint: const Text('MIDI Devices not found'),
             value: state.device,
-            items:
-                state.devices
-                    .map((d) => DropdownMenuItem(value: d, child: Text(d.name)))
-                    .toList(),
+            items: state.devices
+                .map((d) => DropdownMenuItem(value: d, child: Text(d.name)))
+                .toList(),
             onChanged: manager.setDevice,
           ),
           ElevatedButton(

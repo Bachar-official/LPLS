@@ -1,4 +1,4 @@
-import 'package:flutter_application_1/domain/entiy/mode.dart';
+import 'package:lpls/domain/entiy/mode.dart';
 import 'package:flutter_midi_command/flutter_midi_command.dart';
 
 class MidiState {
