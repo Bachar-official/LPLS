@@ -17,4 +17,15 @@ class PadBank {
       audioFiles.add(file);
     }
   }
+
+  void trigger() {
+    if (audioFiles.isNotEmpty && audioIndex < audioFiles.length) {
+      print('Playing file #$audioIndex');
+      if (audioIndex == audioFiles.length - 1) {
+        audioIndex = 0;
+      } else {
+        audioIndex++;
+      }
+    } else if (midiFiles.isNotEmpty && midi)
+  }
 }
