@@ -1,4 +1,4 @@
-import 'package:lpls/domain/entiy/mode.dart';
+import 'package:lpls/domain/enum/mode.dart';
 import 'package:lpls/feature/MIDI/midi_state.dart';
 import 'package:flutter_midi_command/flutter_midi_command.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lpls/domain/di.dart';
-import 'package:lpls/domain/entiy/mode.dart';
+import 'package:lpls/domain/enum/mode.dart';
 import 'package:lpls/feature/MIDI/midi_holder.dart';
 import 'package:lpls/feature/MIDI/midi_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

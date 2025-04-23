@@ -1,0 +1,25 @@
+{
+    "bpm": 130,
+    "frames": [
+        {
+            "pads": [
+                {
+                    "pad": 11,
+                    "velocity": 4
+                }
+            ]
+        },
+        {
+            "pads": [
+                {
+                    "pad": 11,
+                    "velocity": 0
+                },
+                {
+                    "pad": 22,
+                    "velocity": 4
+                }
+            ]
+        }
+    ]
+}

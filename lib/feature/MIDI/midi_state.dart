@@ -1,5 +1,5 @@
 import 'package:lpls/constants/pad_structure.dart';
-import 'package:lpls/domain/entiy/mode.dart';
+import 'package:lpls/domain/enum/mode.dart';
 import 'package:flutter_midi_command/flutter_midi_command.dart';
 import 'package:lpls/utils/fill_initial_banks.dart';
 

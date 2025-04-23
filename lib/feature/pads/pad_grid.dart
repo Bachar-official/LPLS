@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lpls/constants/pad_structure.dart';
 import 'package:lpls/domain/di.dart';
-import 'package:lpls/domain/entiy/mode.dart';
+import 'package:lpls/domain/enum/mode.dart';
 import 'package:lpls/domain/entiy/pad_bank.dart';
 import 'package:lpls/feature/pads/pad_button.dart';
 

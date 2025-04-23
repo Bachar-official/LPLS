@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:lpls/domain/entiy/manager_deps.dart';
-import 'package:lpls/domain/entiy/mode.dart';
+import 'package:lpls/domain/enum/mode.dart';
 import 'package:lpls/feature/MIDI/midi_holder.dart';
 import 'package:flutter_midi_command/flutter_midi_command.dart';
 import 'package:lpls/feature/MIDI/midi_state.dart';
