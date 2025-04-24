@@ -54,15 +54,14 @@ class MidiManager {
     debug(deps, 'Device is $lpDevice');
     if (device != null) {
       await midi.connectToDevice(device);
-      // midi.onMidiDataReceived?.listen(_handleMidiMessage);
       lpDevice?.midi.onMidiDataReceived?.listen(_handleMidiMessage);
     }
   }
 
   void _handleMidiMessage(MidiPacket event) {
-    debug(deps, 'event ${event.data}');
+    // debug(deps, 'event ${event.data}');
     var pressedPad = lpDevice?.pressedPad(event.data[1]);
-    debug(deps, '${pressedPad?.name}');
+    debug(deps, 'Pressed pad: ${pressedPad?.name}');
     // Check if change page button pressed
     if (managingPads.contains(pressedPad)) {
       holder.setPage(pressedPad);
