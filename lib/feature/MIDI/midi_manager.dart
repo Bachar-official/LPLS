@@ -51,7 +51,8 @@ class MidiManager {
   Future<void> setDevice(MidiDevice? device) async {
     holder.setDevice(device);
     lpDevice = LaunchpadFactory.create(midi: midi, device: device);
-    if (device != null) {      
+    debug(deps, 'Device is $lpDevice');
+    if (device != null) {
       await midi.connectToDevice(device);
       // midi.onMidiDataReceived?.listen(_handleMidiMessage);
       lpDevice?.midi.onMidiDataReceived?.listen(_handleMidiMessage);
@@ -59,7 +60,7 @@ class MidiManager {
   }
 
   void _handleMidiMessage(MidiPacket event) {
-    // debug(deps, 'event ${event.data}');
+    debug(deps, 'event ${event.data}');
     var pressedPad = lpDevice?.pressedPad(event.data[1]);
     debug(deps, '${pressedPad?.name}');
     // Check if change page button pressed
@@ -97,5 +98,6 @@ class MidiManager {
     }
   }
 
-  void sendCheckSignal(Pad pad, {bool stop = false}) => lpDevice?.sendCheckSignal(pad, stop: stop);
+  void sendCheckSignal(Pad pad, {bool stop = false}) =>
+      lpDevice?.sendCheckSignal(pad, stop: stop);
 }
