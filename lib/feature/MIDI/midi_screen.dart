@@ -26,6 +26,13 @@ class MidiScreen extends ConsumerWidget {
               : 'Current mode : ${state.mode.name}, current page: ${state.page + 1}',
         ),
         actions: [
+          SizedBox(
+            width: 40,
+            height: 40,
+            child: TextField(
+              controller: manager.vText,
+            ),
+          ),
           DropdownButton(
             disabledHint: const Text('MIDI Devices not found'),
             value: state.device,

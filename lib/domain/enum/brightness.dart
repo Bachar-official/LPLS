@@ -1,0 +1,1 @@
+enum Btness { dark, middle, light }
