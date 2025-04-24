@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lpls/constants/paging_pads.dart';
+import 'package:lpls/domain/entiy/launchpad/launchpad_device.dart';
+import 'package:lpls/domain/entiy/launchpad/launchpad_factory.dart';
 import 'package:lpls/domain/entiy/manager_deps.dart';
-import 'package:lpls/domain/enum/lp_color.dart';
 import 'package:lpls/domain/enum/mode.dart';
 import 'package:lpls/domain/enum/color_mk1.dart';
+import 'package:lpls/domain/enum/pad.dart';
 import 'package:lpls/feature/MIDI/midi_holder.dart';
 import 'package:flutter_midi_command/flutter_midi_command.dart';
 import 'package:lpls/feature/MIDI/midi_state.dart';
@@ -14,6 +17,7 @@ class MidiManager {
   final ManagerDeps deps;
   final MidiCommand midi = MidiCommand();
   final TextEditingController vText = TextEditingController();
+  LaunchpadDevice? lpDevice;
   bool get isConnected => holder.rState.device != null;
 
   MidiManager({required this.holder, required this.deps});
@@ -46,20 +50,24 @@ class MidiManager {
 
   Future<void> setDevice(MidiDevice? device) async {
     holder.setDevice(device);
-    if (device != null) {
+    lpDevice = LaunchpadFactory.create(midi: midi, device: device);
+    if (device != null) {      
       await midi.connectToDevice(device);
-      midi.onMidiDataReceived?.listen(_handleMidiMessage);
+      // midi.onMidiDataReceived?.listen(_handleMidiMessage);
+      lpDevice?.midi.onMidiDataReceived?.listen(_handleMidiMessage);
     }
   }
 
   void _handleMidiMessage(MidiPacket event) {
-    debug(deps, 'event ${event.data}');
+    // debug(deps, 'event ${event.data}');
     int coords = event.data[1];
+    var pressedPad = lpDevice?.pressedPad(coords);
+    debug(deps, '${pressedPad?.name}');
     // Check if change page button pressed
-    if (coords % 10 == 9 && coords < 100) {
-      holder.setPage((89 - coords) ~/ 10);
-    } else if (coords < 100) {
-      var bank = state.banks[state.page]?[coords];
+    if (managingPads.contains(pressedPad)) {
+      holder.setPage(pressedPad);
+    } else {
+      var bank = state.banks[state.page]?[pressedPad];
       if (bank != null) {
         bank.trigger();
       }

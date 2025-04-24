@@ -6,7 +6,7 @@ import 'package:lpls/domain/enum/pad.dart';
 
 abstract class LaunchpadDevice<T extends LPColor> {
   final MidiCommand midi;
-  final T palette;
+  final List<T> palette;
   late final String deviceId;
   late final String name;
   Map<Pad, int> get mapping;
@@ -14,6 +14,10 @@ abstract class LaunchpadDevice<T extends LPColor> {
   LaunchpadDevice({required this.midi, required MidiDevice device, required this.palette}) {
     name = device.name;
     deviceId = device.id;
+  }
+
+  Pad pressedPad(int coords) {
+    return mapping.entries.firstWhere((entry) => entry.value == coords).key;
   }
 
   void sendData(Pad pad, T color, {Btness brightness = Btness.light }) {

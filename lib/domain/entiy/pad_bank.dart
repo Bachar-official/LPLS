@@ -28,6 +28,7 @@ class PadBank {
   }
 
   void trigger() {
+    print('TRIGGERED!!!');
     if (audioFiles.isNotEmpty && audioIndex < audioFiles.length) {
       print('Playing file #$audioIndex');
       if (audioIndex == audioFiles.length - 1) {

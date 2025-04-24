@@ -1,4 +1,5 @@
 import 'package:lpls/domain/enum/mode.dart';
+import 'package:lpls/domain/enum/pad.dart';
 import 'package:lpls/feature/MIDI/midi_state.dart';
 import 'package:flutter_midi_command/flutter_midi_command.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,7 +21,18 @@ class MidiHolder extends StateNotifier<MidiState> {
     state = state.copyWith(devices: devices);
   }
 
-  void setPage(int page) {
+  void setPage(Pad? pad) {
+    int page = 0;
+    switch(pad) {
+      case Pad.h: page = 7; break;
+      case Pad.g: page = 6; break;
+      case Pad.f: page = 5; break;
+      case Pad.e: page = 4; break;
+      case Pad.d: page = 3; break;
+      case Pad.c: page = 2; break;
+      case Pad.b: page = 1; break;
+      case Pad.a: default : page = 0; break;
+    }
     state = state.copyWith(page: page);
   }
 
