@@ -70,5 +70,9 @@ enum Pad {
   e,
   f,
   g,
-  h,
+  h;
+
+  const Pad();
+
+  factory Pad.fromString(String val) => Pad.values.firstWhere((pad) => pad.name == val);
 }
