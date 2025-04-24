@@ -28,4 +28,8 @@ abstract class LaunchpadDevice<T extends LPColor> {
     };
     midi.sendData(Uint8List.fromList([144, mapping[pad]!, value]), deviceId: deviceId);
   }
+
+  void sendCheckSignal(Pad pad, {bool stop = false}) {
+    midi.sendData(Uint8List.fromList([144, mapping[pad]!, stop ? 0 : 127]), deviceId: deviceId);
+  }
 }

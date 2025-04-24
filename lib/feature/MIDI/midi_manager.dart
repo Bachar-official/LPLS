@@ -60,8 +60,7 @@ class MidiManager {
 
   void _handleMidiMessage(MidiPacket event) {
     // debug(deps, 'event ${event.data}');
-    int coords = event.data[1];
-    var pressedPad = lpDevice?.pressedPad(coords);
+    var pressedPad = lpDevice?.pressedPad(event.data[1]);
     debug(deps, '${pressedPad?.name}');
     // Check if change page button pressed
     if (managingPads.contains(pressedPad)) {
@@ -97,4 +96,6 @@ class MidiManager {
       // }
     }
   }
+
+  void sendCheckSignal(Pad pad, {bool stop = false}) => lpDevice?.sendCheckSignal(pad, stop: stop);
 }
