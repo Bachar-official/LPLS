@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:lpls/domain/enum/mode.dart';
 import 'package:lpls/domain/entiy/pad_bank.dart';

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lpls/constants/paging_pads.dart';
-import 'package:lpls/domain/entiy/launchpad/launchpad_device.dart';
-import 'package:lpls/domain/entiy/launchpad/launchpad_factory.dart';
 import 'package:lpls/domain/entiy/manager_deps.dart';
 import 'package:lpls/domain/enum/mode.dart';
 import 'package:lpls/domain/enum/color_mk1.dart';
@@ -48,26 +46,30 @@ class MidiManager {
   }
 
   Future<void> setDevice(MidiDevice? device) async {
-    holder.setDevice(device);
-    lpDevice = LaunchpadFactory.create(midi: midi, device: device);
-    debug(deps, 'Device is $lpDevice');
+    holder.setDevice(device, midi);
+    debug(deps, 'Device is ${holder.rState.lpDevice}');
     if (device != null) {
       await midi.connectToDevice(device);
-      lpDevice?.midi.onMidiDataReceived?.listen(_handleMidiMessage);
+      holder.rState.lpDevice?.midi.onMidiDataReceived?.listen(
+        _handleMidiMessage,
+      );
     }
   }
 
   void _handleMidiMessage(MidiPacket event) {
     // debug(deps, 'event ${event.data}');
-    var pressedPad = lpDevice?.pressedPad(event.data[1]);
-    debug(deps, 'Pressed pad: ${pressedPad?.name}');
-    // Check if change page button pressed
-    if (managingPads.contains(pressedPad)) {
-      holder.setPage(pressedPad);
-    } else {
-      var bank = state.banks[state.page]?[pressedPad];
-      if (bank != null) {
-        bank.trigger();
+    // If event in "Note ON"
+    if (event.data[2] == 127) {
+      var pressedPad = holder.rState.lpDevice?.pressedPad(event.data[1]);
+      debug(deps, 'Pressed pad: ${pressedPad?.name}');
+      // Check if change page button pressed
+      if (managingPads.contains(pressedPad)) {
+        holder.setPage(pressedPad);
+      } else {
+        var bank = state.banks[state.page]?[pressedPad];
+        if (bank != null) {
+          bank.trigger();
+        }
       }
     }
   }
@@ -97,5 +99,5 @@ class MidiManager {
   }
 
   void sendCheckSignal(Pad pad, {bool stop = false}) =>
-      lpDevice?.sendCheckSignal(pad, stop: stop);
+      holder.rState.lpDevice?.sendCheckSignal(pad, stop: stop);
 }
