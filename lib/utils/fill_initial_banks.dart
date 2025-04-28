@@ -6,7 +6,7 @@ import 'package:lpls/domain/enum/pad.dart';
 PadStructure fillInitialBanks() {
   final PadStructure result = {};
 
-  for (int page = 0; page < 7; page++) {
+  for (int page = 0; page <= 7; page++) {
     result[page] = {};
 
     for(var pad in Pad.values.toSet().difference(managingPads.toSet())) {

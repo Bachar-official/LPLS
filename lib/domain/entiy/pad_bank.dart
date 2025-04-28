@@ -30,16 +30,16 @@ class PadBank {
     } else {
       audioFiles.add(file);
       final player = AudioPlayer();
-      await player.setSourceAsset('audio/kick.mp3');
+      await player.setSourceDeviceFile(file.path);
       audioPlayers.add(player);
     }
   }
 
   Future<void> trigger() async {
     print('TRIGGERED!!!');
-    AudioPlayer().play(AssetSource('audio/kick.mp3'));
     if (audioFiles.isNotEmpty && audioIndex < audioFiles.length) {
       print('Playing file #$audioIndex');
+      audioPlayers[audioIndex].resume();
       audioIndex = (audioIndex + 1) % audioPlayers.length;
     } else if (midiFiles.isNotEmpty && midiIndex < midiFiles.length) {
       print('Playing file #$midiIndex');if (midiIndex == midiFiles.length - 1) {

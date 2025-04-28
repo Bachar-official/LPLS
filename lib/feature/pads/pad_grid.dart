@@ -20,7 +20,6 @@ class PadGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final manager = di.midiManager;
     return GridView.builder(
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 8,
@@ -29,13 +28,11 @@ class PadGrid extends StatelessWidget {
       itemCount: 64,
       itemBuilder: (context, index) {
         final pad = _buildGridPads()[index];
-        final bank = banks[page]?[pad];
 
         return PadButton(
-          bank: bank ?? PadBank.initial(),
           mode: mode,
-          onRightClickDown: () => manager.sendCheckSignal(pad),
-          onRightClickUp: () => manager.sendCheckSignal(pad, stop: true),
+          pad: pad,
+          page: page,
         );
       },
     );

@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lpls/constants/pad_structure.dart';
 import 'package:lpls/constants/paging_pads.dart';
 import 'package:lpls/domain/entiy/manager_deps.dart';
+import 'package:lpls/domain/entiy/pad_bank.dart';
 import 'package:lpls/domain/enum/mode.dart';
 import 'package:lpls/domain/enum/color_mk1.dart';
 import 'package:lpls/domain/enum/pad.dart';
@@ -100,4 +104,28 @@ class MidiManager {
 
   void sendCheckSignal(Pad pad, {bool stop = false}) =>
       holder.rState.lpDevice?.sendCheckSignal(pad, stop: stop);
+
+  void addFileToPad(int page, Pad pad, File file, {required bool isMidi}) async {
+    setLoading(true);
+    final oldBank = holder.rState.banks[page]?[pad];
+    if (oldBank == null) return;
+
+    final newBank = PadBank(
+      audioFiles: [...oldBank.audioFiles],
+      audioPlayers: [...oldBank.audioPlayers],
+      midiFiles: [...oldBank.midiFiles],
+      audioIndex: oldBank.audioIndex,
+      midiIndex: oldBank.midiIndex,
+    );
+
+    await newBank.addFile(file, isMidi);
+
+    final newBanks = PadStructure.from(holder.rState.banks);
+    final pageBanks = Map<Pad, PadBank>.from(newBanks[page] ?? {});
+    pageBanks[pad] = newBank;
+    newBanks[page] = pageBanks;
+
+    holder.setBanks(newBanks);
+    setLoading(false);
+  }
 }

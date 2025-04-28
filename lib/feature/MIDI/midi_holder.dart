@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:lpls/constants/pad_structure.dart';
 import 'package:lpls/domain/entiy/launchpad/launchpad_device.dart';
 import 'package:lpls/domain/entiy/launchpad/launchpad_factory.dart';
 import 'package:lpls/domain/enum/mode.dart';
@@ -46,7 +49,7 @@ class MidiHolder extends StateNotifier<MidiState> {
     state = state.copyWith(isLoading: isLoading);
   }
 
-  void setLpDevice(LaunchpadDevice? device) {
-
+  void setBanks(PadStructure banks) {
+    state = state.copyWith(banks: banks);
   }
 }

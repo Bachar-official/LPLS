@@ -1,21 +1,33 @@
+import 'dart:io';
+
+import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lpls/domain/di.dart';
 import 'package:lpls/domain/enum/mode.dart';
 import 'package:lpls/domain/entiy/pad_bank.dart';
+import 'package:lpls/domain/enum/pad.dart';
+import 'package:lpls/feature/MIDI/midi_holder.dart';
+import 'package:lpls/feature/MIDI/midi_state.dart';
 
-class PadButton extends StatelessWidget {
-  final PadBank bank;
+final provider = StateNotifierProvider<MidiHolder, MidiState>(
+  (ref) => di.midiHolder,
+);
+
+class PadButton extends ConsumerWidget {
+  final int page;
+  final Pad pad;
   final Mode mode;
-  final VoidCallback onRightClickDown;
-  final VoidCallback onRightClickUp;
+
   const PadButton({
     super.key,
-    required this.bank,
     required this.mode,
-    required this.onRightClickDown,
-    required this.onRightClickUp,
+    required this.pad,
+    required this.page,
   });
 
-  Color _getPadColor() {
+  Color _getPadColor(PadBank? bank) {
+    if (bank == null) return Colors.black;
     if (mode == Mode.audio && bank.audioFiles.isNotEmpty) {
       return Colors.grey;
     } else if (mode == Mode.midi && bank.midiFiles.isNotEmpty) {
@@ -25,20 +37,42 @@ class PadButton extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(provider);
+    final manager = di.midiManager;
+
+    final bank = state.banks[page]?[pad]!;
+
     return Listener(
       onPointerDown: (event) {
         if (event.buttons == 2) {
-          onRightClickDown();
+          manager.sendCheckSignal(pad);
         }
       },
       onPointerUp: (event) {
-        onRightClickUp();
+        manager.sendCheckSignal(pad, stop: true);
       },
       child: Container(
         width: 10,
         height: 10,
-        decoration: BoxDecoration(color: _getPadColor(), border: Border.all()),
+        decoration: BoxDecoration(
+          color: _getPadColor(bank),
+          border: Border.all(),
+        ),
+        child: DropTarget(
+          onDragDone: (details) async {
+            if (bank != null) {
+              if (mode == Mode.audio) {
+                manager.addFileToPad(page, pad, File(details.files.first.path), isMidi: mode == Mode.midi);
+              }
+            }
+          },
+          child: Text(
+            mode == Mode.audio
+                ? (bank?.audioFiles.length ?? 0).toString()
+                : (bank?.midiFiles.length ?? 0).toString(),
+          ),
+        ),
       ),
     );
   }

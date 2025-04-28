@@ -9,6 +9,7 @@ environment:
 dependencies:
   audio_in_app: ^2.1.1
   audioplayers: ^5.2.1
+  desktop_drop: ^0.6.0
   flutter:
     sdk: flutter
   flutter_midi_command: ^0.5.3

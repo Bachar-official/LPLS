@@ -29,9 +29,7 @@ class MidiScreen extends ConsumerWidget {
           SizedBox(
             width: 40,
             height: 40,
-            child: TextField(
-              controller: manager.vText,
-            ),
+            child: TextField(controller: manager.vText),
           ),
           DropdownButton(
             disabledHint: const Text('MIDI Devices not found'),
@@ -60,25 +58,28 @@ class MidiScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final size = constraints.maxHeight - 16;
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Center(
-              child: SizedBox(
-                width: size,
-                height: size,
-                child: PadGrid(
-                  page: state.page,
-                  mode: state.mode,
-                  banks: state.banks,
-                ),
+      body:
+          state.isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : LayoutBuilder(
+                builder: (context, constraints) {
+                  final size = constraints.maxHeight - 16;
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Center(
+                      child: SizedBox(
+                        width: size,
+                        height: size,
+                        child: PadGrid(
+                          page: state.page,
+                          mode: state.mode,
+                          banks: state.banks,
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
-            ),
-          );
-        },
-      ),
     );
   }
 }
