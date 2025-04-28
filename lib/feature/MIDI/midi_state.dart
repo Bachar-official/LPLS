@@ -1,10 +1,12 @@
 import 'package:lpls/constants/pad_structure.dart';
+import 'package:lpls/domain/entiy/launchpad/launchpad_device.dart';
 import 'package:lpls/domain/enum/mode.dart';
 import 'package:flutter_midi_command/flutter_midi_command.dart';
 import 'package:lpls/utils/fill_initial_banks.dart';
 
 class MidiState {
   final MidiDevice? device;
+  final LaunchpadDevice? lpDevice;
   final List<MidiDevice> devices;
   final int page;
   final Mode mode;
@@ -18,10 +20,12 @@ class MidiState {
     required this.mode,
     required this.isLoading,
     required this.banks,
+    required this.lpDevice,
   });
 
   MidiState.initial()
     : device = null,
+    lpDevice = null,
       devices = [],
       page = 0,
       mode = Mode.midi,
@@ -36,6 +40,8 @@ class MidiState {
     Mode? mode,
     bool? isLoading,
     PadStructure? banks,
+    LaunchpadDevice? lpDevice,
+    bool nullableLpDevice = false,
   }) {
     return MidiState(
       device: nullableDevice ? null : device ?? this.device,
@@ -44,6 +50,7 @@ class MidiState {
       mode: mode ?? this.mode,
       isLoading: isLoading ?? this.isLoading,
       banks: banks ?? this.banks,
+      lpDevice: nullableLpDevice ? null : lpDevice ?? this.lpDevice,
     );
   }
 }

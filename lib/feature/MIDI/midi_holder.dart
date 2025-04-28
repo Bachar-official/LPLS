@@ -1,3 +1,5 @@
+import 'package:lpls/domain/entiy/launchpad/launchpad_device.dart';
+import 'package:lpls/domain/entiy/launchpad/launchpad_factory.dart';
 import 'package:lpls/domain/enum/mode.dart';
 import 'package:lpls/domain/enum/pad.dart';
 import 'package:lpls/feature/MIDI/midi_state.dart';
@@ -9,11 +11,11 @@ class MidiHolder extends StateNotifier<MidiState> {
 
   MidiState get rState => super.state;
 
-  void setDevice(MidiDevice? device) {
+  void setDevice(MidiDevice? device, MidiCommand midi) {
     if (device == null) {
-      state = state.copyWith(device: null, nullableDevice: true);
+      state = state.copyWith(device: null, nullableDevice: true, lpDevice: null, nullableLpDevice: true);
     } else {
-      state = state.copyWith(device: device);
+      state = state.copyWith(device: device, lpDevice: LaunchpadFactory.create(midi: midi, device: device));
     }
   }
 
@@ -42,5 +44,9 @@ class MidiHolder extends StateNotifier<MidiState> {
 
   void setIsLoading(bool isLoading) {
     state = state.copyWith(isLoading: isLoading);
+  }
+
+  void setLpDevice(LaunchpadDevice? device) {
+
   }
 }

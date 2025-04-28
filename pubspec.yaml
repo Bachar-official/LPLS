@@ -8,6 +8,7 @@ environment:
 
 dependencies:
   audio_in_app: ^2.1.1
+  audioplayers: ^5.2.1
   flutter:
     sdk: flutter
   flutter_midi_command: ^0.5.3
@@ -21,3 +22,6 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/audio/
+  
