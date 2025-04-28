@@ -48,27 +48,26 @@ class MidiManager {
   }
 
   Future<void> setDevice(MidiDevice? device) async {
-    holder.setDevice(device, midi);
+    holder.setDevice(device);
+    lpDevice = LaunchpadFactory.create(midi: midi, device: device);
+    debug(deps, 'Device is $lpDevice');
     if (device != null) {
       await midi.connectToDevice(device);
-      // midi.onMidiDataReceived?.listen(_handleMidiMessage);
-      holder.rState.lpDevice?.midi.onMidiDataReceived?.listen(
-        _handleMidiMessage,
-      );
+      lpDevice?.midi.onMidiDataReceived?.listen(_handleMidiMessage);
     }
   }
 
   void _handleMidiMessage(MidiPacket event) {
     // debug(deps, 'event ${event.data}');
-    if (event.data[2] == 127) {
-      var pressedPad = holder.rState.lpDevice?.pressedPad(event.data[1]);
-      debug(deps, '${pressedPad?.name}');
-      // Check if change page button pressed
-      if (managingPads.contains(pressedPad)) {
-        holder.setPage(pressedPad);
-      } else {
-        var bank = state.banks[state.page]?[pressedPad];
-        bank?.trigger();
+    var pressedPad = lpDevice?.pressedPad(event.data[1]);
+    debug(deps, 'Pressed pad: ${pressedPad?.name}');
+    // Check if change page button pressed
+    if (managingPads.contains(pressedPad)) {
+      holder.setPage(pressedPad);
+    } else {
+      var bank = state.banks[state.page]?[pressedPad];
+      if (bank != null) {
+        bank.trigger();
       }
     }
   }
@@ -98,5 +97,5 @@ class MidiManager {
   }
 
   void sendCheckSignal(Pad pad, {bool stop = false}) =>
-      holder.rState.lpDevice?.sendCheckSignal(pad, stop: stop);
+      lpDevice?.sendCheckSignal(pad, stop: stop);
 }
