@@ -1,13 +1,13 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:lpls/constants/pad_structure.dart';
 import 'package:lpls/constants/paging_pads.dart';
 import 'package:lpls/domain/entiy/effect/effect.dart';
+import 'package:lpls/domain/entiy/effect/effect_factory.dart';
 import 'package:lpls/domain/entiy/manager_deps.dart';
 import 'package:lpls/domain/entiy/pad_bank.dart';
-import 'package:lpls/domain/enum/lp_color.dart';
+import 'package:lpls/domain/enum/brightness.dart';
 import 'package:lpls/domain/enum/mode.dart';
 import 'package:lpls/domain/enum/color_mk1.dart';
 import 'package:lpls/domain/enum/pad.dart';
@@ -89,21 +89,6 @@ class MidiManager {
     }
   }
 
-  void sendSignal(int coords, {bool stop = false}) async {
-    if (isConnected) {
-      midi.sendData(Uint8List.fromList([144, coords, ColorMk1.green.dark]));
-      // for (int i = 0; i <= 127; i++) {
-      //   debug(deps, 'velocity: $i, $coords');
-      //   await Future.delayed(
-      //     const Duration(seconds: 2),
-      //     () => {
-      //       midi.sendData(Uint8List.fromList([144, coords, i])),
-      //     },
-      //   );
-      // }
-    }
-  }
-
   void sendCheckSignal(Pad pad, {bool stop = false}) =>
       holder.rState.lpDevice?.sendCheckSignal(pad, stop: stop);
 
@@ -132,26 +117,27 @@ class MidiManager {
   }
 
   void foo() async {
-    const effect = Effect<ColorMk1>(frameTime: 500, frames: [
+    const effect = Effect<ColorMk1>(frameTime: 250, beats: 2, frames: [
       {
-        Pad.a1: ColorMk1.red,
+        Pad.a1: (ColorMk1.red, Btness.light),
       },
       {
-        Pad.a8: ColorMk1.red,
-        Pad.a1: ColorMk1.off,
+        Pad.a8: (ColorMk1.red, Btness.light),
+        Pad.a1: (ColorMk1.off, Btness.dark),
       },
       {
-        Pad.h8: ColorMk1.red,
-        Pad.a8: ColorMk1.off,
+        Pad.h8: (ColorMk1.red, Btness.light),
+        Pad.a8: (ColorMk1.off, Btness.dark),
       },
       {
-        Pad.h1: ColorMk1.red,
-        Pad.h8: ColorMk1.off,
+        Pad.h1: (ColorMk1.red, Btness.light),
+        Pad.h8: (ColorMk1.off, Btness.dark),
       },
       {
-        Pad.h1: ColorMk1.off,
+        Pad.h1: (ColorMk1.off, Btness.dark),
       }
     ]);
+    debug(deps, EffectFactory.toJson(effect, palette: 'mk1'));
     if (isConnected) {
       holder.rState.lpDevice?.playEffect(effect);
     }

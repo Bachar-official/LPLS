@@ -1,3 +1,4 @@
+import 'package:lpls/domain/enum/brightness.dart';
 import 'package:lpls/domain/enum/lp_color.dart';
 
 enum ColorMk1 implements LPColor {
@@ -21,4 +22,13 @@ enum ColorMk1 implements LPColor {
   int get dark => value.dark;
 
   const ColorMk1(this.value);
+
+  String serialize(Btness brightness) => '$name.${brightness.name}';
+
+  static (ColorMk1, Btness?) deserialize(String str) {
+    final [colorValue, btnessValue] = str.split('.');
+    final brightness = btnessValue.isNotEmpty ? Btness.values.firstWhere((b) => b.name == btnessValue) : Btness.light;
+    final color = ColorMk1.values.firstWhere((c) => c.name == colorValue);
+    return (color, brightness);
+  }
 }

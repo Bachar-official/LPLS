@@ -1,12 +1,13 @@
 {
     "bpm": 130,
     "palette": "mk1",
+    "beats": 1,
     "frames": [
         {
             "pads": [
                 {
                     "pad": "a1",
-                    "velocity": "red.dark"
+                    "color": "red.dark"
                 }
             ]
         },
@@ -14,11 +15,11 @@
             "pads": [
                 {
                     "pad": "a1",
-                    "velocity": "off"
+                    "color": "off"
                 },
                 {
                     "pad": "a2",
-                    "velocity": "red.middle"
+                    "color": "red.middle"
                 }
             ]
         }

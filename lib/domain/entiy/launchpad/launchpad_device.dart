@@ -49,7 +49,8 @@ abstract class LaunchpadDevice<T extends LPColor> {
   Future<void> playEffect(Effect<T> effect) async {
     if (effect.frames.isNotEmpty) {
       for (var entry in effect.frames.first.entries) {
-        sendData(entry.key, entry.value);
+        var (color, btness) = entry.value;
+        sendData(entry.key, color, brightness: btness ?? Btness.light);
       }
     }
     int index = 1;
@@ -63,7 +64,8 @@ abstract class LaunchpadDevice<T extends LPColor> {
       
       final frame = effect.frames[index];
       for (var entry in frame.entries) {
-        sendData(entry.key, entry.value);
+        var (color, btness) = entry.value;
+        sendData(entry.key, color, brightness: btness ?? Btness.light);
       }
       index++;    
     });
