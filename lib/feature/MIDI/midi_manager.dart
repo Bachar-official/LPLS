@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lpls/constants/pad_structure.dart';
 import 'package:lpls/constants/paging_pads.dart';
+import 'package:lpls/domain/entiy/effect/effect.dart';
 import 'package:lpls/domain/entiy/manager_deps.dart';
 import 'package:lpls/domain/entiy/pad_bank.dart';
+import 'package:lpls/domain/enum/lp_color.dart';
 import 'package:lpls/domain/enum/mode.dart';
 import 'package:lpls/domain/enum/color_mk1.dart';
 import 'package:lpls/domain/enum/pad.dart';
@@ -127,5 +129,31 @@ class MidiManager {
 
     holder.setBanks(newBanks);
     setLoading(false);
+  }
+
+  void foo() async {
+    const effect = Effect<ColorMk1>(frameTime: 500, frames: [
+      {
+        Pad.a1: ColorMk1.red,
+      },
+      {
+        Pad.a8: ColorMk1.red,
+        Pad.a1: ColorMk1.off,
+      },
+      {
+        Pad.h8: ColorMk1.red,
+        Pad.a8: ColorMk1.off,
+      },
+      {
+        Pad.h1: ColorMk1.red,
+        Pad.h8: ColorMk1.off,
+      },
+      {
+        Pad.h1: ColorMk1.off,
+      }
+    ]);
+    if (isConnected) {
+      holder.rState.lpDevice?.playEffect(effect);
+    }
   }
 }

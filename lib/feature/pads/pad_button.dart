@@ -48,6 +48,9 @@ class PadButton extends ConsumerWidget {
         if (event.buttons == 2) {
           manager.sendCheckSignal(pad);
         }
+        if (event.buttons == 1) {
+          manager.foo();
+        }
       },
       onPointerUp: (event) {
         manager.sendCheckSignal(pad, stop: true);
