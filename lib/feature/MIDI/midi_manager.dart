@@ -5,6 +5,7 @@ import 'package:lpls/constants/pad_structure.dart';
 import 'package:lpls/constants/paging_pads.dart';
 import 'package:lpls/domain/entiy/effect/effect.dart';
 import 'package:lpls/domain/entiy/effect/effect_factory.dart';
+import 'package:lpls/domain/entiy/effect/generated/line_effect.dart';
 import 'package:lpls/domain/entiy/manager_deps.dart';
 import 'package:lpls/domain/entiy/pad_bank.dart';
 import 'package:lpls/domain/enum/brightness.dart';
@@ -117,26 +118,27 @@ class MidiManager {
   }
 
   void foo() async {
-    const effect = Effect<ColorMk1>(frameTime: 250, beats: 2, frames: [
-      {
-        Pad.a1: (ColorMk1.red, Btness.light),
-      },
-      {
-        Pad.a8: (ColorMk1.red, Btness.light),
-        Pad.a1: (ColorMk1.off, Btness.dark),
-      },
-      {
-        Pad.h8: (ColorMk1.red, Btness.light),
-        Pad.a8: (ColorMk1.off, Btness.dark),
-      },
-      {
-        Pad.h1: (ColorMk1.red, Btness.light),
-        Pad.h8: (ColorMk1.off, Btness.dark),
-      },
-      {
-        Pad.h1: (ColorMk1.off, Btness.dark),
-      }
-    ]);
+    // const effect = Effect<ColorMk1>(frameTime: 250, beats: 2, frames: [
+    //   {
+    //     Pad.a1: (ColorMk1.red, Btness.light),
+    //   },
+    //   {
+    //     Pad.a8: (ColorMk1.red, Btness.light),
+    //     Pad.a1: (ColorMk1.off, Btness.dark),
+    //   },
+    //   {
+    //     Pad.h8: (ColorMk1.red, Btness.light),
+    //     Pad.a8: (ColorMk1.off, Btness.dark),
+    //   },
+    //   {
+    //     Pad.h1: (ColorMk1.red, Btness.light),
+    //     Pad.h8: (ColorMk1.off, Btness.dark),
+    //   },
+    //   {
+    //     Pad.h1: (ColorMk1.off, Btness.dark),
+    //   }
+    // ]);
+    final effect = LineEffect<ColorMk1>(from: Pad.a1, to: Pad.f4).getEffect(ColorMk1.green);
     debug(deps, EffectFactory.toJson(effect, palette: 'mk1'));
     if (isConnected) {
       holder.rState.lpDevice?.playEffect(effect);

@@ -75,4 +75,24 @@ enum Pad {
   const Pad();
 
   factory Pad.fromString(String val) => Pad.values.firstWhere((pad) => pad.name == val);
+
+  (int x, int y)? get coordinates {
+    final name = this.name;
+    if (name.length != 2) return null;
+    final rowChar = name[0];
+    final colChar = name[1];
+    final x = int.tryParse(colChar);
+    final y = 'abcdefgh'.indexOf(rowChar);
+    if (x == null || y == -1) return null;
+    return (x - 1, y); // x от 0 до 7, y от 0 до 7
+  }
+
+  static Pad? fromCoordinates({required int x, required int y}) {
+    if (x < 0 || x > 7 || y < 0 || y > 7) return null;
+    final rowChar = 'abcdefgh'[y];
+    final col = x + 1;
+    return Pad.values.firstWhere(
+      (p) => p.name == '$rowChar$col',
+    );
+  }
 }
