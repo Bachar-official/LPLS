@@ -14,12 +14,40 @@ class LineEffect<T extends LPColor> implements GeneratedEffect<T> {
   @override
   Effect<T> getEffect(T color) {
     final frames = <Frame<T>>[];
-    for(int i = 1; i <= 8; i++) {
-      final pad = Pad.values.firstWhere((p) => p.name == 'a$i');
-      frames.add({
-        pad: (color, Btness.light),
-      });
+    final fromCoords = from.coordinates;
+    final toCoords = to.coordinates;
+    if (toCoords == null || fromCoords == null) {
+      return Effect<T>(frameTime: 1, frames: frames, beats: 1);
     }
+
+    int x0 = fromCoords.x;
+    int y0 = fromCoords.y;
+    int x1 = toCoords.x;
+    int y1 = toCoords.y;
+
+    final dx = (x1 - x0).abs();
+    final dy = (y1 - y0).abs();
+    final sx = x0 < x1 ? 1 : -1;
+    final sy = y0 < y1 ? 1 : -1;
+
+    int err = dx - dy;
+
+    while (true) {
+      final pad = Pad.fromCoordinates(x: x0, y: y0);
+      if (pad != null) frames.add({pad: (color, Btness.light)});
+      if (x0 == x1 && y0 == y1) break;
+
+      final e2 = 2 * err;
+      if (e2 > -dy) {
+        err -= dy;
+        x0 += sx;
+      }
+      if (e2 < dx) {
+        err += dx;
+        y0 += sy;
+      }
+    }
+
     return Effect<T>(beats: 1, frameTime: 200, frames: frames);
   }
 }

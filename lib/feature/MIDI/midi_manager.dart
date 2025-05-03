@@ -9,6 +9,7 @@ import 'package:lpls/domain/entiy/effect/generated/line_effect.dart';
 import 'package:lpls/domain/entiy/manager_deps.dart';
 import 'package:lpls/domain/entiy/pad_bank.dart';
 import 'package:lpls/domain/enum/brightness.dart';
+import 'package:lpls/domain/enum/color_mk2.dart';
 import 'package:lpls/domain/enum/mode.dart';
 import 'package:lpls/domain/enum/color_mk1.dart';
 import 'package:lpls/domain/enum/pad.dart';
@@ -138,8 +139,8 @@ class MidiManager {
     //     Pad.h1: (ColorMk1.off, Btness.dark),
     //   }
     // ]);
-    final effect = LineEffect<ColorMk1>(from: Pad.a1, to: Pad.f4).getEffect(ColorMk1.green);
-    debug(deps, EffectFactory.toJson(effect, palette: 'mk1'));
+    final effect = LineEffect<ColorMk2>(from: Pad.a1, to: Pad.d8).getEffect(ColorMk2.green);
+    // debug(deps, EffectFactory.toJson(effect, palette: 'mk2'));
     if (isConnected) {
       holder.rState.lpDevice?.playEffect(effect);
     }
