@@ -13,22 +13,22 @@ import 'package:lpls/domain/enum/color_mk2.dart';
 import 'package:lpls/domain/enum/mode.dart';
 import 'package:lpls/domain/enum/color_mk1.dart';
 import 'package:lpls/domain/enum/pad.dart';
-import 'package:lpls/feature/MIDI/midi_holder.dart';
+import 'package:lpls/feature/project/project_holder.dart';
 import 'package:flutter_midi_command/flutter_midi_command.dart';
-import 'package:lpls/feature/MIDI/midi_state.dart';
+import 'package:lpls/feature/project/project_state.dart';
 import 'package:lpls/utils/ui_utils.dart';
 
-class MidiManager {
-  final MidiHolder holder;
+class ProjectManager {
+  final ProjectHolder holder;
   final ManagerDeps deps;
   final MidiCommand midi = MidiCommand();
   final TextEditingController vText = TextEditingController();
   bool get isConnected => holder.rState.device != null;
 
-  MidiManager({required this.holder, required this.deps});
+  ProjectManager({required this.holder, required this.deps});
 
   void setLoading(bool isLoading) => holder.setIsLoading(isLoading);
-  MidiState get state => holder.rState;
+  ProjectState get state => holder.rState;
 
   Future<void> getDevices() async {
     await disconnect();

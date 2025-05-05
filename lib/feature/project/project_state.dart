@@ -4,7 +4,7 @@ import 'package:lpls/domain/enum/mode.dart';
 import 'package:flutter_midi_command/flutter_midi_command.dart';
 import 'package:lpls/utils/fill_initial_banks.dart';
 
-class MidiState {
+class ProjectState {
   final MidiDevice? device;
   final LaunchpadDevice? lpDevice;
   final List<MidiDevice> devices;
@@ -13,7 +13,7 @@ class MidiState {
   final bool isLoading;
   final PadStructure banks;
 
-  MidiState({
+  ProjectState({
     required this.device,
     required this.devices,
     required this.page,
@@ -23,7 +23,7 @@ class MidiState {
     required this.lpDevice,
   });
 
-  MidiState.initial()
+  ProjectState.initial()
     : device = null,
     lpDevice = null,
       devices = [],
@@ -32,7 +32,7 @@ class MidiState {
       isLoading = false,
       banks = fillInitialBanks();
 
-  MidiState copyWith({
+  ProjectState copyWith({
     MidiDevice? device,
     bool nullableDevice = false,
     List<MidiDevice>? devices,
@@ -43,7 +43,7 @@ class MidiState {
     LaunchpadDevice? lpDevice,
     bool nullableLpDevice = false,
   }) {
-    return MidiState(
+    return ProjectState(
       device: nullableDevice ? null : device ?? this.device,
       devices: devices ?? this.devices,
       page: page ?? this.page,

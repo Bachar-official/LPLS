@@ -7,11 +7,11 @@ import 'package:lpls/domain/di.dart';
 import 'package:lpls/domain/enum/mode.dart';
 import 'package:lpls/domain/entiy/pad_bank.dart';
 import 'package:lpls/domain/enum/pad.dart';
-import 'package:lpls/feature/MIDI/midi_holder.dart';
-import 'package:lpls/feature/MIDI/midi_state.dart';
+import 'package:lpls/feature/project/project_holder.dart';
+import 'package:lpls/feature/project/project_state.dart';
 
-final provider = StateNotifierProvider<MidiHolder, MidiState>(
-  (ref) => di.midiHolder,
+final provider = StateNotifierProvider<ProjectHolder, ProjectState>(
+  (ref) => di.projectHolder,
 );
 
 class PadButton extends ConsumerWidget {
@@ -39,7 +39,7 @@ class PadButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(provider);
-    final manager = di.midiManager;
+    final manager = di.projectManager;
 
     final bank = state.banks[page]?[pad]!;
 

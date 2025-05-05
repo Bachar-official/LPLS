@@ -2,14 +2,14 @@ import 'package:lpls/constants/pad_structure.dart';
 import 'package:lpls/domain/entiy/launchpad/launchpad_factory.dart';
 import 'package:lpls/domain/enum/mode.dart';
 import 'package:lpls/domain/enum/pad.dart';
-import 'package:lpls/feature/MIDI/midi_state.dart';
+import 'package:lpls/feature/project/project_state.dart';
 import 'package:flutter_midi_command/flutter_midi_command.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class MidiHolder extends StateNotifier<MidiState> {
-  MidiHolder() : super(MidiState.initial());
+class ProjectHolder extends StateNotifier<ProjectState> {
+  ProjectHolder() : super(ProjectState.initial());
 
-  MidiState get rState => super.state;
+  ProjectState get rState => super.state;
 
   void setDevice(MidiDevice? device, MidiCommand midi) {
     if (device == null) {

@@ -1,0 +1,11 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lpls/domain/enum/screen.dart';
+import 'package:lpls/feature/home/home_state.dart';
+
+class HomeHolder extends StateNotifier<HomeState> {
+  HomeHolder() : super(HomeState.initial());
+
+  void setScreen(Screen screen) {
+    state = state.copyWith(screen: screen);
+  }
+}
