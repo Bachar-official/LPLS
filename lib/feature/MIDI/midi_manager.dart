@@ -65,7 +65,6 @@ class MidiManager {
   }
 
   void _handleMidiMessage(MidiPacket event) {
-    // debug(deps, 'event ${event.data}');
     // If event in "Note ON"
     if (event.data[2] == 127) {
       var pressedPad = holder.rState.lpDevice?.pressedPad(event.data[1]);

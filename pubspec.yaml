@@ -10,10 +10,12 @@ dependencies:
   audio_in_app: ^2.1.1
   audioplayers: ^5.2.1
   desktop_drop: ^0.6.0
+  fluent_ui: ^4.11.3
   flutter:
     sdk: flutter
   flutter_midi_command: ^0.5.3
   flutter_riverpod: ^2.6.1
+  window_manager: ^0.4.3
 
 dev_dependencies:
   flutter_test:
