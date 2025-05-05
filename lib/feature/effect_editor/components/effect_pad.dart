@@ -1,4 +1,5 @@
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:fluent_ui/fluent_ui.dart' hide Colors;
+import 'package:flutter/material.dart' show Theme, Colors;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lpls/domain/di.dart';
 import 'package:lpls/domain/enum/pad.dart';
@@ -14,14 +15,16 @@ class EffectPad extends ConsumerWidget {
 
   @override
   Widget build(context, ref) {
+    final brightness = Theme.of(context).brightness;
+
     return Padding(
       padding: const EdgeInsets.all(2.0),
       child: Container(
         width: 10,
         height: 10,
         decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(),
+          color: Colors.grey.shade400,
+          border: Border.all(color: brightness == Brightness.dark ? Colors.white : Colors.black),
         ),
       ),
     );
