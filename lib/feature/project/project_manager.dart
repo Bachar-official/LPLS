@@ -84,6 +84,7 @@ class ProjectManager {
   void setMode(Set<Mode> modes) => holder.setMode(modes.first);
 
   Future<void> disconnect() async {
+    debug(deps, 'Disconnecting from device ${holder.rState.device}');
     if (holder.rState.device != null) {
       midi.disconnectDevice(holder.rState.device!);
       holder.setDevice(null, midi);

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:lpls/constants/pad_structure.dart';
 import 'package:lpls/domain/enum/mode.dart';
 import 'package:lpls/domain/enum/pad.dart';
-import 'package:lpls/feature/pads/pad_button.dart';
+import 'package:lpls/feature/project/components/pads/pad_button.dart';
+import 'package:lpls/utils/build_grid_pads.dart';
 
 class PadGrid extends StatelessWidget {
   final PadStructure banks;
@@ -25,7 +26,7 @@ class PadGrid extends StatelessWidget {
       ),
       itemCount: 64,
       itemBuilder: (context, index) {
-        final pad = _buildGridPads()[index];
+        final pad = buildGridPads()[index];
 
         return PadButton(
           mode: mode,
@@ -34,16 +35,5 @@ class PadGrid extends StatelessWidget {
         );
       },
     );
-  }
-
-  List<Pad> _buildGridPads() {
-    const rows = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
-    const cols = ['1', '2', '3', '4', '5', '6', '7', '8'];
-
-    return [
-      for (final row in rows)
-        for (final col in cols)
-          Pad.values.firstWhere((p) => p.name == '$row$col')
-    ];
   }
 }

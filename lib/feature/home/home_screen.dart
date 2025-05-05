@@ -2,7 +2,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lpls/domain/di.dart';
 import 'package:lpls/domain/enum/screen.dart';
-import 'package:lpls/feature/effect_editor/effect_editor_screen.dart';
+import 'package:lpls/feature/effect_editor/effect_screen.dart';
 import 'package:lpls/feature/home/home_holder.dart';
 import 'package:lpls/feature/home/home_state.dart';
 import 'package:lpls/feature/project/project_screen.dart';
@@ -24,7 +24,7 @@ class HomeScreen extends ConsumerWidget {
     Widget _getCurrentScreen() {
       switch (state.screen) {
         case Screen.project: return const ProjectScreen();
-        case Screen.effectEditor: return const EffectEditorScreen();
+        case Screen.effectEditor: return const EffectScreen();
         case Screen.trackEditor: return const TrackEditorScreen();
       }
     }

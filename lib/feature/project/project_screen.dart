@@ -6,7 +6,7 @@ import 'package:lpls/domain/enum/mode.dart';
 import 'package:lpls/feature/project/project_holder.dart';
 import 'package:lpls/feature/project/project_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lpls/feature/pads/pad_grid.dart';
+import 'package:lpls/feature/project/components/pads/pad_grid.dart';
 
 final provider = StateNotifierProvider<ProjectHolder, ProjectState>(
   (ref) => di.projectHolder,

@@ -55,25 +55,28 @@ class PadButton extends ConsumerWidget {
       onPointerUp: (event) {
         manager.sendCheckSignal(pad, stop: true);
       },
-      child: Container(
-        width: 10,
-        height: 10,
-        decoration: BoxDecoration(
-          color: _getPadColor(bank),
-          border: Border.all(),
-        ),
-        child: DropTarget(
-          onDragDone: (details) async {
-            if (bank != null) {
-              if (mode == Mode.audio) {
-                manager.addFileToPad(page, pad, File(details.files.first.path), isMidi: mode == Mode.midi);
+      child: Padding(
+        padding: const EdgeInsets.all(2.0),
+        child: Container(
+          width: 10,
+          height: 10,
+          decoration: BoxDecoration(
+            color: _getPadColor(bank),
+            border: Border.all(),
+          ),
+          child: DropTarget(
+            onDragDone: (details) async {
+              if (bank != null) {
+                if (mode == Mode.audio) {
+                  manager.addFileToPad(page, pad, File(details.files.first.path), isMidi: mode == Mode.midi);
+                }
               }
-            }
-          },
-          child: Text(
-            mode == Mode.audio
-                ? (bank?.audioFiles.length ?? 0).toString()
-                : (bank?.midiFiles.length ?? 0).toString(),
+            },
+            child: Text(
+              mode == Mode.audio
+                  ? (bank?.audioFiles.length ?? 0).toString()
+                  : (bank?.midiFiles.length ?? 0).toString(),
+            ),
           ),
         ),
       ),

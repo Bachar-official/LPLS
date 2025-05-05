@@ -1,0 +1,17 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lpls/domain/entiy/effect/effect.dart';
+import 'package:lpls/feature/effect_editor/effect_state.dart';
+
+class EffectHolder extends StateNotifier<EffectState> {
+  EffectHolder(): super(EffectState.initial());
+
+  EffectState get rState => state;
+
+  void setEffect(Effect? effect) {
+    state = state.copyWith(effect: effect);
+  }
+
+  void setFrameNumber(int frameNumber) {
+    state = state.copyWith(frameNumber: frameNumber);
+  }
+}
