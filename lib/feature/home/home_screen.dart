@@ -48,6 +48,14 @@ class HomeScreen extends ConsumerWidget {
                 RadioMenuFlyoutItem<Screen>(text: const Text('Effect editor'), value: Screen.effectEditor, groupValue: state.screen, onChanged: manager.setScreen),
               ],
             ),
+            MenuBarItem(
+              title: 'Theme',
+              items: [
+                RadioMenuFlyoutItem<ThemeMode>(text: const Text('Light'), value: ThemeMode.light, groupValue: state.theme, onChanged: manager.setTheme),
+                RadioMenuFlyoutItem<ThemeMode>(text: const Text('Dark'), value: ThemeMode.dark, groupValue: state.theme, onChanged: manager.setTheme),
+                RadioMenuFlyoutItem<ThemeMode>(text: const Text('System'), value: ThemeMode.system, groupValue: state.theme, onChanged: manager.setTheme),
+              ],
+            ),
           ],
         ),
         title: DragToMoveArea(

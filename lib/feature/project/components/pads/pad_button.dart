@@ -29,11 +29,11 @@ class PadButton extends ConsumerWidget {
   Color _getPadColor(PadBank? bank) {
     if (bank == null) return Colors.black;
     if (mode == Mode.audio && bank.audioFiles.isNotEmpty) {
-      return Colors.grey;
+      return Colors.black12;
     } else if (mode == Mode.midi && bank.midiFiles.isNotEmpty) {
-      return Colors.grey;
+      return Colors.black12;
     }
-    return Colors.white;
+    return Colors.grey.shade400;
   }
 
   @override
@@ -42,6 +42,7 @@ class PadButton extends ConsumerWidget {
     final manager = di.projectManager;
 
     final bank = state.banks[page]?[pad]!;
+    final brightness = Theme.of(context).brightness;
 
     return Listener(
       onPointerDown: (event) {
@@ -62,7 +63,7 @@ class PadButton extends ConsumerWidget {
           height: 10,
           decoration: BoxDecoration(
             color: _getPadColor(bank),
-            border: Border.all(),
+            border: Border.all(color: brightness == Brightness.dark ? Colors.white : Colors.black),
           ),
           child: DropTarget(
             onDragDone: (details) async {
