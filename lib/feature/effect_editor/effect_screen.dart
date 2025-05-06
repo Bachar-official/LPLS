@@ -96,32 +96,54 @@ class EffectScreen extends ConsumerWidget {
       ),
       content: LayoutBuilder(
         builder: (context, constraints) {
-          final size = constraints.maxHeight - 16;
+          final size = constraints.maxHeight - 50;
 
           return Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            child: Column(
               children: [
-                PaletteWidget(),
-                SizedBox(
-                  width: size,
-                  height: size,
-                  child:
-                      state.effect == null
-                          ? const Center(
-                            child: Text(
-                              'There is no effect yet.\nPlease edit effect from Project screen, or create one by clicking on the "+" icon.',
-                              textAlign: TextAlign.center,
-                            ),
-                          )
-                          : EffectGrid(),
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (state.effect != null) 
+                      const PaletteWidget(),
+                      SizedBox(
+                        width: size,
+                        height: size,
+                        child: state.effect == null
+                            ? const Center(
+                                child: Text(
+                                  'There is no effect yet.\nPlease edit effect from Project screen, or create one by clicking on the "+" icon.',
+                                  textAlign: TextAlign.center,
+                                ),
+                              )
+                            : const EffectGrid(),
+                      ),
+                    ],
+                  ),
                 ),
+                if (state.effect != null)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 4),
+                    child: Slider(
+                      min: 0,
+                      max: (state.effect!.frames.length - 1).toDouble(),
+                      value: state.frameNumber.toDouble().clamp(
+                            0,
+                            (state.effect!.frames.length - 1).toDouble(),
+                          ),
+                      onChanged: (value) {
+                        manager.goToFrame(value.round());
+                      },
+                    ),
+                  ),
               ],
             ),
           );
         },
       ),
+
     );
   }
 }

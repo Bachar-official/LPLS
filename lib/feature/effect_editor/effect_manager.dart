@@ -71,4 +71,8 @@ class EffectManager {
   void selectColor(FullColor? color) {
     holder.setSelectedColor(color);
   }
+
+  void goToFrame(int frame) {
+    holder.setFrameNumber(frame.clamp(0, state.effect!.frames.length - 1));
+  }
 }
