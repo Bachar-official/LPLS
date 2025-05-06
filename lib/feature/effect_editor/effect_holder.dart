@@ -8,7 +8,7 @@ class EffectHolder extends StateNotifier<EffectState> {
   EffectState get rState => state;
 
   void setEffect(Effect? effect) {
-    state = state.copyWith(effect: effect);
+    state = state.copyWith(effect: effect, nullableEffect: effect == null);
   }
 
   void setFrameNumber(int frameNumber) {

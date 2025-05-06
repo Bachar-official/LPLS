@@ -1,26 +1,74 @@
-import 'package:flutter/material.dart';
+import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/material.dart' hide IconButton;
 import 'package:lpls/domain/entiy/manager_deps.dart';
 
 void debug(ManagerDeps deps, String message) => deps.logger.d(message);
-void warning(ManagerDeps deps, String message, {bool showScaffold = false, String scaffoldMessage = ''}) {
+void warning(
+  ManagerDeps deps,
+  String message, {
+  bool showScaffold = false,
+  String scaffoldMessage = '',
+}) async {
   deps.logger.w(message);
   if (showScaffold) {
-    deps.scaffoldKey.currentState?.showSnackBar(
-      SnackBar(content: Text(scaffoldMessage), backgroundColor: Colors.yellow),
+    // deps.scaffoldKey.currentState?.showSnackBar(
+    //   SnackBar(content: Text(scaffoldMessage), backgroundColor: Colors.yellow),
+    // );
+    await displayInfoBar(
+      deps.navigatorKey.currentContext!,
+      builder:
+          (context, close) => InfoBar(
+            title: Text(scaffoldMessage),
+            action: IconButton(
+              icon: const Icon(FluentIcons.clear),
+              onPressed: close,
+            ),
+            severity: InfoBarSeverity.warning,
+          ),
     );
   }
 }
-void success(ManagerDeps deps, String message, {bool showScaffold = false, String scaffoldMessage = ''}) {
+
+void success(
+  ManagerDeps deps,
+  String message, {
+  bool showScaffold = false,
+  String scaffoldMessage = '',
+}) async {
   deps.logger.i(message);
   if (showScaffold) {
-    deps.scaffoldKey.currentState?.showSnackBar(
-      SnackBar(content: Text(scaffoldMessage), backgroundColor: Colors.green),
+    await displayInfoBar(
+      deps.navigatorKey.currentContext!,
+      builder:
+          (context, close) => InfoBar(
+            title: Text(scaffoldMessage),
+            action: IconButton(
+              icon: const Icon(FluentIcons.clear),
+              onPressed: close,
+            ),
+            severity: InfoBarSeverity.success,
+          ),
     );
   }
 }
-void catchException(ManagerDeps deps, Object e, {String? description, StackTrace? stackTrace}) {
+
+void catchException(
+  ManagerDeps deps,
+  Object e, {
+  String? description,
+  StackTrace? stackTrace,
+}) async {
   deps.logger.e(e, stackTrace: stackTrace);
-  deps.scaffoldKey.currentState!.showSnackBar(
-    SnackBar(content: Text('${description ?? ''}$e'), backgroundColor: Colors.red),
+  await displayInfoBar(
+    deps.navigatorKey.currentContext!,
+    builder:
+        (context, close) => InfoBar(
+          title: Text(e.toString()),
+          action: IconButton(
+            icon: const Icon(FluentIcons.clear),
+            onPressed: close,
+          ),
+          severity: InfoBarSeverity.error,
+        ),
   );
 }

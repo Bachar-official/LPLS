@@ -16,6 +16,7 @@ import 'package:lpls/domain/enum/pad.dart';
 import 'package:lpls/feature/project/project_holder.dart';
 import 'package:flutter_midi_command/flutter_midi_command.dart';
 import 'package:lpls/feature/project/project_state.dart';
+import 'package:lpls/feature/project/utils/check_file_extension.dart';
 import 'package:lpls/utils/ui_utils.dart';
 
 class ProjectManager {
@@ -55,10 +56,10 @@ class ProjectManager {
 
   Future<void> setDevice(MidiDevice? device) async {
     holder.setDevice(device, midi);
-    debug(deps, 'Device is ${holder.rState.lpDevice}');
+    debug(deps, 'Device is ${state.lpDevice}');
     if (device != null) {
       await midi.connectToDevice(device);
-      holder.rState.lpDevice?.midi.onMidiDataReceived?.listen(
+      state.lpDevice?.midi.onMidiDataReceived?.listen(
         _handleMidiMessage,
       );
     }
@@ -67,7 +68,7 @@ class ProjectManager {
   void _handleMidiMessage(MidiPacket event) {
     // If event in "Note ON"
     if (event.data[2] == 127) {
-      var pressedPad = holder.rState.lpDevice?.pressedPad(event.data[1]);
+      var pressedPad = state.lpDevice?.pressedPad(event.data[1]);
       debug(deps, 'Pressed pad: ${pressedPad?.name}');
       // Check if change page button pressed
       if (managingPads.contains(pressedPad)) {
@@ -84,38 +85,52 @@ class ProjectManager {
   void setMode(Set<Mode> modes) => holder.setMode(modes.first);
 
   Future<void> disconnect() async {
-    debug(deps, 'Disconnecting from device ${holder.rState.device}');
-    if (holder.rState.device != null) {
-      midi.disconnectDevice(holder.rState.device!);
+    debug(deps, 'Disconnecting from device ${state.device}');
+    if (state.device != null) {
+      midi.disconnectDevice(state.device!);
       holder.setDevice(null, midi);
     }
   }
 
   void sendCheckSignal(Pad pad, {bool stop = false}) =>
-      holder.rState.lpDevice?.sendCheckSignal(pad, stop: stop);
+      state.lpDevice?.sendCheckSignal(pad, stop: stop);
 
-  void addFileToPad(int page, Pad pad, File file, {required bool isMidi}) async {
+  void addFileToPad(
+    int page,
+    Pad pad,
+    File file, {
+    required bool isMidi,
+  }) async {
     setLoading(true);
-    final oldBank = holder.rState.banks[page]?[pad];
-    if (oldBank == null) return;
+    try {
+      if (state.mode == Mode.audio) {
+        checkFileExtension(file);
+      }
 
-    final newBank = PadBank(
-      audioFiles: [...oldBank.audioFiles],
-      audioPlayers: [...oldBank.audioPlayers],
-      midiFiles: [...oldBank.midiFiles],
-      audioIndex: oldBank.audioIndex,
-      midiIndex: oldBank.midiIndex,
-    );
+      final oldBank = state.banks[page]?[pad];
+      if (oldBank == null) return;
 
-    await newBank.addFile(file, isMidi);
+      final newBank = PadBank(
+        audioFiles: [...oldBank.audioFiles],
+        audioPlayers: [...oldBank.audioPlayers],
+        midiFiles: [...oldBank.midiFiles],
+        audioIndex: oldBank.audioIndex,
+        midiIndex: oldBank.midiIndex,
+      );
 
-    final newBanks = PadStructure.from(holder.rState.banks);
-    final pageBanks = Map<Pad, PadBank>.from(newBanks[page] ?? {});
-    pageBanks[pad] = newBank;
-    newBanks[page] = pageBanks;
+      await newBank.addFile(file, isMidi);
 
-    holder.setBanks(newBanks);
-    setLoading(false);
+      final newBanks = PadStructure.from(state.banks);
+      final pageBanks = Map<Pad, PadBank>.from(newBanks[page] ?? {});
+      pageBanks[pad] = newBank;
+      newBanks[page] = pageBanks;
+
+      holder.setBanks(newBanks);
+    } catch (e, s) {
+      catchException(deps, e, stackTrace: s);
+    } finally {
+      setLoading(false);
+    }
   }
 
   void foo() async {
@@ -139,10 +154,13 @@ class ProjectManager {
     //     Pad.h1: (ColorMk1.off, Btness.dark),
     //   }
     // ]);
-    final effect = LineEffect<ColorMk2>(from: Pad.a1, to: Pad.d8).getEffect(ColorMk2.green);
+    final effect = LineEffect<ColorMk2>(
+      from: Pad.a1,
+      to: Pad.d8,
+    ).getEffect(ColorMk2.green);
     // debug(deps, EffectFactory.toJson(effect, palette: 'mk2'));
     if (isConnected) {
-      holder.rState.lpDevice?.playEffect(effect);
+      state.lpDevice?.playEffect(effect);
     }
   }
 }

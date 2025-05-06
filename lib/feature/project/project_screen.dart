@@ -79,7 +79,9 @@ class ProjectScreen extends ConsumerWidget {
                   child: SizedBox(
                     width: size,
                     height: size,
-                    child: PadGrid(
+                    child: state.device == null ? const Center(
+                      child: Text('No devices connected or incompatible device connected')
+                    ) : PadGrid(
                       page: state.page,
                       mode: state.mode,
                       banks: state.banks,

@@ -14,6 +14,16 @@ class App extends ConsumerWidget {
   @override
   Widget build(context, ref) {
     final state = ref.watch(provider);
-    return FluentApp(home: HomeScreen(), themeMode: state.theme, darkTheme: FluentThemeData.dark(),);
+    return FluentApp(
+      home: HomeScreen(),
+      themeMode: state.theme,
+      darkTheme: FluentThemeData.dark(),
+      navigatorKey: di.navigatorKey,
+      builder: (context, child) => Overlay(
+        initialEntries: [
+          OverlayEntry(builder: (ctx) => child!),
+        ],
+      ),
+    );
   }
 }

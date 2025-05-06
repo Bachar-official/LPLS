@@ -18,13 +18,17 @@ class EffectManager {
   }
 
   void addFrame() {
-    holder.setEffect(state.effect.withNewFrame());
-    holder.setFrameNumber(state.frameNumber + 1);
+    if (state.effect == null) {
+      holder.setEffect(Effect.initial());
+      holder.setFrameNumber(0);
+    } else {
+      holder.setEffect(state.effect?.withNewFrame());
+      holder.setFrameNumber(state.frameNumber + 1);
+    }
   }
 
   void removeFrame() {
-    holder.setEffect(state.effect.withoutFrame(state.frameNumber));
-
+    holder.setEffect(state.effect?.withoutFrame(state.frameNumber));
   }
 
   void goToPrevFrame() {
@@ -36,7 +40,7 @@ class EffectManager {
 
   void goToNextFrame() {
     final frame = state.frameNumber;
-    if (frame < state.effect.frames.length) {
+    if (state.effect != null && frame < state.effect!.frames.length) {
       holder.setFrameNumber(frame + 1);
     }
   }
@@ -46,13 +50,15 @@ class EffectManager {
   }
 
   void goToLastFrame() {
-    holder.setFrameNumber(state.effect.frames.length - 1);
+    if (state.effect != null) {
+      holder.setFrameNumber(state.effect!.frames.length - 1);
+    }
   }
 
   void draw(Pad pad, int frame, FullColor color) {
-    if (state.effect.frames.length >= frame - 1) {
+    if (state.effect != null && state.effect!.frames.length >= frame - 1) {
       final effect = state.effect;
-      holder.setEffect(effect.withPadColored(frame, pad, color));  
-    }    
+      holder.setEffect(effect?.withPadColored(frame, pad, color));
+    }
   }
 }

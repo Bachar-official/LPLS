@@ -15,6 +15,7 @@ class EffectPad extends ConsumerWidget {
 
   @override
   Widget build(context, ref) {
+    final state = ref.watch(provider);
     final brightness = Theme.of(context).brightness;
 
     return Padding(

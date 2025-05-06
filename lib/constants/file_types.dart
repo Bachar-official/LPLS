@@ -1,0 +1,1 @@
+const audioFileTypes = ['mp3', 'wav', 'ogg'];

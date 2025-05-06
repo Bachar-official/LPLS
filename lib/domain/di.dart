@@ -20,19 +20,20 @@ class DI {
   late final EffectManager effectManager;
 
   final Logger logger = Logger();
-  final GlobalKey<ScaffoldMessengerState> scaffoldKey = GlobalKey<ScaffoldMessengerState>();
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   late final ManagerDeps deps;
 
   DI() {
-    deps = (logger: logger, scaffoldKey: scaffoldKey);
-    projectHolder = ProjectHolder();
-    projectManager = ProjectManager(holder: projectHolder, deps: deps);
+    deps = (logger: logger, navigatorKey: navigatorKey);
 
     homeHolder = HomeHolder();
     homeManager = HomeManager(deps: deps, holder: homeHolder);
 
     effectHolder = EffectHolder();
     effectManager = EffectManager(deps: deps, holder: effectHolder);
+
+    projectHolder = ProjectHolder();
+    projectManager = ProjectManager(holder: projectHolder, deps: deps);
   }
 
   Future<void> init() async {
