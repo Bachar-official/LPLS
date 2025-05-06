@@ -15,7 +15,11 @@ List<FullColor<T>> generatePalette<T extends LPColor>(List<T> values) {
   return result;
 }
 
-Color resolveColor<T extends LPColor>(FullColor<T> color) {
+Color resolveColor<T extends LPColor>(FullColor<T>? color) {
+  if (color == null) {
+    return Colors.grey.shade400;
+  }
+
   const baseColors = {
     ColorMk1.off: Colors.black,
     ColorMk2.off: Colors.black,
@@ -38,11 +42,22 @@ Color resolveColor<T extends LPColor>(FullColor<T> color) {
 
   final base = baseColors[color.$1]!;
 
+  double factor;
   switch (color.$2) {
-    case Btness.dark: return base.withValues(alpha: 0.5);
-    case Btness.middle: return base.withValues(alpha: 0.75);
-    case Btness.light: case null: return base;
+    case Btness.dark:
+      factor = 0.5;
+      break;
+    case Btness.middle:
+      factor = 0.75;
+      break;
+    case Btness.light:
+    case null:
+      return base;
   }
+
+  final hsl = HSLColor.fromColor(base);
+  final darkened = hsl.withLightness((hsl.lightness * factor).clamp(0.0, 1.0));
+  return darkened.toColor();
 }
 
 Map<FullColor<T>, Color> buildColorMap<T extends LPColor>(List<T> values) {

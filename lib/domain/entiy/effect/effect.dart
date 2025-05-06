@@ -1,4 +1,7 @@
+import 'package:lpls/domain/entiy/effect/utils/generate_empty_frame.dart';
 import 'package:lpls/domain/enum/brightness.dart';
+import 'package:lpls/domain/enum/color_mk1.dart';
+import 'package:lpls/domain/enum/color_mk2.dart';
 import 'package:lpls/domain/enum/lp_color.dart';
 import 'package:lpls/domain/enum/pad.dart';
 import 'package:lpls/domain/type/frame.dart';
@@ -24,14 +27,14 @@ class Effect<T extends LPColor> {
         beats: beats ?? this.beats,
       );
 
-  Effect withPadColored(int frameIndex, Pad pad, FullColor<T> color) {
+  Effect withPadColored(int frameIndex, Pad pad, FullColor<T>? color, FullColor<T> offColor) {
     if (frameIndex >= frames.length) {
       throw RangeError('Frame $frameIndex does not exist.');
     }
 
     final newFrames = List<Frame<T>>.from(frames);
     final newFrame = Map<Pad, FullColor<T>>.from(newFrames[frameIndex]);
-    newFrame[pad] = color;
+    newFrame[pad] = color ?? offColor;
     newFrames[frameIndex] = newFrame;
 
     return copyWith(frames: newFrames);

@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lpls/domain/entiy/effect/effect.dart';
+import 'package:lpls/domain/type/full_color.dart';
 import 'package:lpls/feature/effect_editor/effect_state.dart';
 
 class EffectHolder extends StateNotifier<EffectState> {
@@ -13,5 +14,9 @@ class EffectHolder extends StateNotifier<EffectState> {
 
   void setFrameNumber(int frameNumber) {
     state = state.copyWith(frameNumber: frameNumber);
+  }
+
+  void setSelectedColor(FullColor? selectedColor) {
+    state = state.copyWith(selectedColor: selectedColor, nullableColor: selectedColor == null);
   }
 }

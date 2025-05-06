@@ -1,9 +1,12 @@
 import 'package:lpls/domain/entiy/effect/effect.dart';
 import 'package:lpls/domain/entiy/manager_deps.dart';
+import 'package:lpls/domain/enum/color_mk1.dart';
 import 'package:lpls/domain/enum/pad.dart';
 import 'package:lpls/domain/type/full_color.dart';
 import 'package:lpls/feature/effect_editor/effect_holder.dart';
 import 'package:lpls/feature/effect_editor/effect_state.dart';
+import 'package:lpls/feature/effect_editor/utils/palettes.dart';
+import 'package:lpls/utils/ui_utils.dart';
 
 class EffectManager {
   final EffectHolder holder;
@@ -13,13 +16,16 @@ class EffectManager {
 
   EffectState get state => holder.rState;
 
+  List<FullColor> get generatedPalette => generatePalette(ColorMk1.values);
+
   void setEffect(Effect effect) {
     holder.setEffect(effect);
   }
 
   void addFrame() {
+    debug(deps, generatedPalette.length.toString());
     if (state.effect == null) {
-      holder.setEffect(Effect.initial());
+      holder.setEffect(Effect.initial().withNewFrame());
       holder.setFrameNumber(0);
     } else {
       holder.setEffect(state.effect?.withNewFrame());
@@ -55,10 +61,14 @@ class EffectManager {
     }
   }
 
-  void draw(Pad pad, int frame, FullColor color) {
+  void draw(Pad pad, int frame, FullColor? color) {
     if (state.effect != null && state.effect!.frames.length >= frame - 1) {
       final effect = state.effect;
-      holder.setEffect(effect?.withPadColored(frame, pad, color));
+      holder.setEffect(effect?.withPadColored(frame, pad, color, (ColorMk1.off, null)));
     }
+  }
+
+  void selectColor(FullColor? color) {
+    holder.setSelectedColor(color);
   }
 }

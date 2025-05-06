@@ -3,6 +3,7 @@ import 'package:flutter/material.dart' show Icons;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lpls/domain/di.dart';
 import 'package:lpls/feature/effect_editor/components/effect_grid.dart';
+import 'package:lpls/feature/effect_editor/components/palette_widget.dart';
 import 'package:lpls/feature/effect_editor/effect_holder.dart';
 import 'package:lpls/feature/effect_editor/effect_state.dart';
 
@@ -102,7 +103,7 @@ class EffectScreen extends ConsumerWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text('Palette'),
+                PaletteWidget(),
                 SizedBox(
                   width: size,
                   height: size,

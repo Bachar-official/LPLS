@@ -16,9 +16,8 @@ class EffectGrid extends StatelessWidget {
       itemBuilder: (ctx, index) {
         final pad = buildGridPads()[index];
 
-        return EffectPad(
-          pad: pad,
-        );
-      },);
+        return EffectPad(pad: pad);
+      },
+    );
   }
 }
