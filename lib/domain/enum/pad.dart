@@ -74,6 +74,8 @@ enum Pad {
 
   const Pad();
 
+  static List<Pad> get regularPads => Pad.values.where((p) => p.name.length == 2).toList();
+
   factory Pad.fromString(String val) => Pad.values.firstWhere((pad) => pad.name == val);
 
   ({int x, int y})? get coordinates {

@@ -59,9 +59,7 @@ class ProjectManager {
     debug(deps, 'Device is ${state.lpDevice}');
     if (device != null) {
       await midi.connectToDevice(device);
-      state.lpDevice?.midi.onMidiDataReceived?.listen(
-        _handleMidiMessage,
-      );
+      state.lpDevice?.midi.onMidiDataReceived?.listen(_handleMidiMessage);
     }
   }
 
@@ -103,9 +101,7 @@ class ProjectManager {
   }) async {
     setLoading(true);
     try {
-      if (state.mode == Mode.audio) {
-        checkFileExtension(file);
-      }
+      checkFileExtension(state.mode, file);
 
       final oldBank = state.banks[page]?[pad];
       if (oldBank == null) return;
