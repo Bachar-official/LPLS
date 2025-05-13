@@ -5,6 +5,9 @@ import 'package:lpls/domain/entiy/launchpad/launchpad_mk2.dart';
 import 'package:lpls/domain/enum/color_mk1.dart';
 import 'package:lpls/domain/enum/color_mk2.dart';
 
+const mk1Devices = [' s', 'mini'];
+const mk2Devices = ['mk2', 'pro', 'mk3'];
+
 class LaunchpadFactory {
   static LaunchpadDevice? create({
     required MidiCommand midi,

@@ -1,6 +1,7 @@
 import 'package:lpls/domain/entiy/effect/effect.dart';
 import 'package:lpls/domain/entiy/manager_deps.dart';
 import 'package:lpls/domain/enum/color_mk1.dart';
+import 'package:lpls/domain/enum/color_mk2.dart';
 import 'package:lpls/domain/enum/pad.dart';
 import 'package:lpls/domain/type/full_color.dart';
 import 'package:lpls/feature/effect_editor/effect_holder.dart';
@@ -17,7 +18,7 @@ class EffectManager {
 
   EffectState get state => holder.rState;
 
-  List<FullColor> get generatedPalette => generatePalette(ColorMk1.values);
+  List<FullColor> get generatedPalette => state.effect == null ? [] : generatePalette(state.effect.runtimeType == ColorMk1 ? ColorMk1.values : ColorMk2.values);
 
   num? getBPMValue() {
     if (state.effect == null) {
