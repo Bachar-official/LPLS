@@ -1,17 +1,26 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/material.dart' show Icons;
+import 'package:flutter/material.dart' show Icons, InputDecoration;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lpls/domain/di.dart';
 import 'package:lpls/feature/effect_editor/components/effect_grid.dart';
 import 'package:lpls/feature/effect_editor/components/palette_widget.dart';
 import 'package:lpls/feature/effect_editor/effect_holder.dart';
 import 'package:lpls/feature/effect_editor/effect_state.dart';
+import 'package:lpls/utils/bpm_utils.dart';
 
 final provider = StateNotifierProvider<EffectHolder, EffectState>(
   (ref) => di.effectHolder,
 );
 
 const iconSize = 25.0;
+const divider = Divider(
+  size: iconSize,
+  direction: Axis.vertical,
+  style: DividerThemeData(
+    thickness: 2.0,
+    decoration: BoxDecoration(color: Colors.grey),
+  ),
+);
 
 class EffectScreen extends ConsumerWidget {
   const EffectScreen({super.key});
@@ -23,73 +32,76 @@ class EffectScreen extends ConsumerWidget {
 
     return ScaffoldPage(
       header: PageHeader(
-        title: Text(state.effect == null ? 'No effect' : 'Effect editor - frame #${state.frameNumber + 1}'),
-        commandBar: CommandBar(
-          primaryItems: [
-            CommandBarButton(
-              tooltip: 'First frame',
+        title: Text(
+          state.effect == null
+              ? 'No effect'
+              : 'Effect editor - frame #${state.frameNumber + 1}',
+        ),
+        commandBar: Wrap(
+          children: [
+            SizedBox(
+              width: 100,
+              child: NumberBox(
+                clearButton: false,
+                min: 0,
+                value: manager.getBPMValue(),
+                onChanged: manager.setBPM,
+                format: manager.formatBPM,
+                mode: SpinButtonPlacementMode.none,
+              ),
+            ),
+            IconButton(
               icon: const Icon(FluentIcons.previous, size: iconSize),
               onPressed: manager.goToFirstFrame,
             ),
-            CommandBarButton(
-              tooltip: 'Stop',
+            IconButton(
               icon: const Icon(FluentIcons.stop, size: iconSize),
               onPressed: () {},
             ),
-            CommandBarButton(
-              tooltip: 'Previous frame',
+            IconButton(
               icon: const Icon(FluentIcons.play_reverse_resume, size: iconSize),
               onPressed: state.isFirstFrame ? null : manager.goToPrevFrame,
             ),
-            CommandBarButton(
-              tooltip: 'Play',
+            IconButton(
               icon: const Icon(FluentIcons.play, size: iconSize),
               onPressed: () {},
             ),
-            CommandBarButton(
-              tooltip: 'Pause',
+            IconButton(
               icon: const Icon(FluentIcons.pause, size: iconSize),
               onPressed: () {},
             ),
-            CommandBarButton(
-              tooltip: 'Next frame',
+            IconButton(
               icon: const Icon(FluentIcons.play_resume, size: iconSize),
               onPressed: state.isLastFrame ? null : manager.goToNextFrame,
             ),
-            CommandBarButton(
-              tooltip: 'Last frame',
+            IconButton(
               icon: const Icon(FluentIcons.next, size: iconSize),
               onPressed: manager.goToLastFrame,
             ),
-            const CommandBarSeparator(),
-            CommandBarButton(
-              tooltip: 'Add frame',
+            divider,
+            IconButton(
               icon: const Icon(FluentIcons.add, size: iconSize),
               onPressed: manager.addFrame,
             ),
-            CommandBarButton(
-              tooltip: 'Remove frame',
+            IconButton(
               icon: const Icon(FluentIcons.remove, size: iconSize),
               onPressed: state.isRemoveAvailable ? manager.removeFrame : null,
             ),
-            const CommandBarSeparator(),
-            CommandBarButton(
-              icon: SplitButton(
-                flyout: MenuFlyout(
-                  items: [
-                    MenuFlyoutItem(
-                      text: const Text('MK1 Palette'),
-                      onPressed: () {},
-                    ),
-                    MenuFlyoutItem(
-                      text: const Text('MK2 Palette'),
-                      onPressed: () {},
-                    ),
-                  ],
-                ),
-                child: Text('Palette'),
+            divider,
+            SplitButton(
+              flyout: MenuFlyout(
+                items: [
+                  MenuFlyoutItem(
+                    text: const Text('MK1 Palette'),
+                    onPressed: () {},
+                  ),
+                  MenuFlyoutItem(
+                    text: const Text('MK2 Palette'),
+                    onPressed: () {},
+                  ),
+                ],
               ),
-              onPressed: null,
+              child: Text('Palette'),
             ),
           ],
         ),
@@ -106,33 +118,36 @@ class EffectScreen extends ConsumerWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      if (state.effect != null) 
-                      const PaletteWidget(),
+                      if (state.effect != null) const PaletteWidget(),
                       SizedBox(
                         width: size,
                         height: size,
-                        child: state.effect == null
-                            ? const Center(
-                                child: Text(
-                                  'There is no effect yet.\nPlease edit effect from Project screen, or create one by clicking on the "+" icon.',
-                                  textAlign: TextAlign.center,
-                                ),
-                              )
-                            : const EffectGrid(),
+                        child:
+                            state.effect == null
+                                ? const Center(
+                                  child: Text(
+                                    'There is no effect yet.\nPlease edit effect from Project screen, or create one by clicking on the "+" icon.',
+                                    textAlign: TextAlign.center,
+                                  ),
+                                )
+                                : const EffectGrid(),
                       ),
                     ],
                   ),
                 ),
                 if (state.effect != null)
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 5,
+                      vertical: 4,
+                    ),
                     child: Slider(
                       min: 0,
                       max: (state.effect!.frames.length - 1).toDouble(),
                       value: state.frameNumber.toDouble().clamp(
-                            0,
-                            (state.effect!.frames.length - 1).toDouble(),
-                          ),
+                        0,
+                        (state.effect!.frames.length - 1).toDouble(),
+                      ),
                       onChanged: (value) {
                         manager.goToFrame(value.round());
                       },
@@ -143,7 +158,6 @@ class EffectScreen extends ConsumerWidget {
           );
         },
       ),
-
     );
   }
 }

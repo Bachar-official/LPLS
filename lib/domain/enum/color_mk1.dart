@@ -20,6 +20,8 @@ enum ColorMk1 implements LPColor {
   int get middle => value.middle;
   @override
   int get dark => value.dark;
+  @override
+  String get colorName => name;
 
   const ColorMk1(this.value);
 

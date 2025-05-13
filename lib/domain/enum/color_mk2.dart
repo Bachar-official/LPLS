@@ -28,13 +28,13 @@ enum ColorMk2 implements LPColor {
   const ColorMk2(this.value);
   
   @override
-  int get dark => value.dark;
-  
+  int get dark => value.dark;  
   @override
-  int get light => value.light;
-  
+  int get light => value.light;  
   @override
   int get middle => value.middle;
+  @override
+  String get colorName => name;
 
   String serialize(Btness brightness) => '$name.${brightness.name}';
 

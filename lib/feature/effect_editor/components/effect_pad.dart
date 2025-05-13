@@ -25,8 +25,14 @@ class EffectPad extends ConsumerWidget {
 
     return Padding(
       padding: const EdgeInsets.all(2.0),
-      child: GestureDetector(
-        onTap: () => manager.draw(pad, state.frameNumber, state.selectedColor),
+      child: Listener(
+        onPointerDown: (event) {
+          if (event.buttons == 1) {
+            manager.draw(pad, state.frameNumber, state.selectedColor);
+          } else if (event.buttons == 2) {
+            manager.draw(pad, state.frameNumber, null);
+          }          
+        },
         child: Container(
           width: 10,
           height: 10,

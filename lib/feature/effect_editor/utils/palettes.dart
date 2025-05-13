@@ -7,7 +7,7 @@ import 'package:lpls/domain/type/full_color.dart';
 
 List<FullColor<T>> generatePalette<T extends LPColor>(List<T> values) {
   final result = <FullColor<T>>[];
-  for (final color in values) {
+  for (final color in values.where((val) => val.colorName != 'off').toList()) {
     for (final btness in Btness.values) {
       result.add((color, btness));
     }
@@ -16,14 +16,11 @@ List<FullColor<T>> generatePalette<T extends LPColor>(List<T> values) {
 }
 
 Color resolveColor<T extends LPColor>(FullColor<T>? color) {
-  if (color == null) {
+  if (color == null || color.$1.colorName == 'off') {
     return Colors.grey.shade400;
   }
 
   const baseColors = {
-    ColorMk1.off: Colors.black,
-    ColorMk2.off: Colors.black,
-
     ColorMk1.green: Colors.green,
     ColorMk1.orange: Colors.orange,
     ColorMk1.yellow: Colors.yellow,

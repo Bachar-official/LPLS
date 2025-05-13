@@ -6,6 +6,7 @@ import 'package:lpls/domain/type/full_color.dart';
 import 'package:lpls/feature/effect_editor/effect_holder.dart';
 import 'package:lpls/feature/effect_editor/effect_state.dart';
 import 'package:lpls/feature/effect_editor/utils/palettes.dart';
+import 'package:lpls/utils/bpm_utils.dart';
 import 'package:lpls/utils/ui_utils.dart';
 
 class EffectManager {
@@ -17,6 +18,26 @@ class EffectManager {
   EffectState get state => holder.rState;
 
   List<FullColor> get generatedPalette => generatePalette(ColorMk1.values);
+
+  num? getBPMValue() {
+    if (state.effect == null) {
+      return null;
+    }
+    return BpmUtils.millisToBpm(state.effect!.frameTime, state.effect!.beats);
+  }
+
+  String formatBPM(num? value) {
+    if (value == null) {
+      return 'No effect';
+    }
+    return '$value BPM';
+  }
+
+  void setBPM(num? value) {
+    if (value != null && state.effect == null) {
+      holder.setEffect(state.effect?.withBPM(value.toInt()));
+    }
+  }
 
   void setEffect(Effect effect) {
     holder.setEffect(effect);
@@ -64,7 +85,9 @@ class EffectManager {
   void draw(Pad pad, int frame, FullColor? color) {
     if (state.effect != null && state.effect!.frames.length >= frame - 1) {
       final effect = state.effect;
-      holder.setEffect(effect?.withPadColored(frame, pad, color, (ColorMk1.off, null)));
+      holder.setEffect(
+        effect?.withPadColored(frame, pad, color, (ColorMk1.off, null)),
+      );
     }
   }
 

@@ -6,6 +6,7 @@ import 'package:lpls/domain/enum/lp_color.dart';
 import 'package:lpls/domain/enum/pad.dart';
 import 'package:lpls/domain/type/frame.dart';
 import 'package:lpls/domain/type/full_color.dart';
+import 'package:lpls/utils/bpm_utils.dart';
 
 class Effect<T extends LPColor> {
   final int frameTime;
@@ -52,5 +53,9 @@ class Effect<T extends LPColor> {
       return copyWith(frames: frames);
     }
     return this;
+  }
+
+  Effect withBPM(int bpm) {
+    return copyWith(frameTime: BpmUtils.bpmToMillis(bpm, beats));
   }
 }
