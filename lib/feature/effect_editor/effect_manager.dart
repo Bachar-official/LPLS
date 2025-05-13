@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:lpls/domain/entiy/effect/effect.dart';
 import 'package:lpls/domain/entiy/manager_deps.dart';
 import 'package:lpls/domain/enum/color_mk1.dart';
@@ -13,6 +15,11 @@ import 'package:lpls/utils/ui_utils.dart';
 class EffectManager {
   final EffectHolder holder;
   final ManagerDeps deps;
+  Timer? _playbackTimer;
+  int _currentFrameIndex = 0;
+  bool _isPlaying = false;
+  Stopwatch? _stopwatch;
+  Duration _remainingTime = Duration.zero;
 
   EffectManager({required this.deps, required this.holder});
 
@@ -98,5 +105,71 @@ class EffectManager {
 
   void goToFrame(int frame) {
     holder.setFrameNumber(frame.clamp(0, state.effect!.frames.length - 1));
+  }
+
+  /// Запускает воспроизведение эффекта.
+  void play() {
+    if (state.effect == null || _isPlaying) return;
+
+    _isPlaying = true;
+    _currentFrameIndex = state.frameNumber;
+    _startPlaybackTimer();
+  }
+
+  /// Ставит воспроизведение на паузу.
+  void pause() {
+    if (!_isPlaying || _playbackTimer == null) return;
+
+    _playbackTimer?.cancel();
+    _remainingTime = Duration(milliseconds: state.effect!.frameTime) - _stopwatch!.elapsed;
+    _stopwatch?.stop();
+    _isPlaying = false;
+  }
+
+  /// Возобновляет воспроизведение с места паузы.
+  void resume() {
+    if (_isPlaying || state.effect == null) return;
+
+    _isPlaying = true;
+    _startPlaybackTimer(initialDelay: _remainingTime);
+  }
+
+  /// Останавливает воспроизведение и сбрасывает позицию.
+  void stop() {
+    _playbackTimer?.cancel();
+    _stopwatch?.stop();
+    _isPlaying = false;
+    _remainingTime = Duration.zero;
+    _currentFrameIndex = 0;
+    holder.setFrameNumber(0);
+  }
+
+  /// Запускает таймер для переключения кадров.
+  void _startPlaybackTimer({Duration? initialDelay}) {
+    if (state.effect == null) return;
+
+    final frameTime = state.effect!.frameTime;
+    _stopwatch = Stopwatch()..start();
+
+    _playbackTimer = Timer.periodic(
+      Duration(milliseconds: frameTime),
+      (timer) {
+        if (_currentFrameIndex >= state.effect!.frames.length - 1) {
+          _currentFrameIndex = 0; // Зацикливаем
+        } else {
+          _currentFrameIndex++;
+        }
+        holder.setFrameNumber(_currentFrameIndex);
+        _stopwatch?.reset();
+      },
+    );
+
+    // Если было восстановление с паузы, устанавливаем задержку
+    if (initialDelay != null) {
+      _playbackTimer = Timer(initialDelay, () {
+        _playbackTimer?.cancel();
+        _startPlaybackTimer();
+      });
+    }
   }
 }

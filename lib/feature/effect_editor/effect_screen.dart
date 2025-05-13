@@ -56,7 +56,7 @@ class EffectScreen extends ConsumerWidget {
             ),
             IconButton(
               icon: const Icon(FluentIcons.stop, size: iconSize),
-              onPressed: () {},
+              onPressed: manager.stop,
             ),
             IconButton(
               icon: const Icon(FluentIcons.play_reverse_resume, size: iconSize),
@@ -64,11 +64,11 @@ class EffectScreen extends ConsumerWidget {
             ),
             IconButton(
               icon: const Icon(FluentIcons.play, size: iconSize),
-              onPressed: () {},
+              onPressed: manager.play,
             ),
             IconButton(
               icon: const Icon(FluentIcons.pause, size: iconSize),
-              onPressed: () {},
+              onPressed: manager.pause,
             ),
             IconButton(
               icon: const Icon(FluentIcons.play_resume, size: iconSize),
