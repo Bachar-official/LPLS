@@ -23,6 +23,8 @@ abstract class LaunchpadDevice<T extends LPColor> {
     deviceId = device.id;
   }
 
+  Effect<T> createEffect() => Effect<T>.initial();
+
   Pad pressedPad(int coords) {
     return mapping.entries.firstWhere((entry) => entry.value == coords).key;
   }

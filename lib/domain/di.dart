@@ -33,7 +33,7 @@ class DI {
     effectManager = EffectManager(deps: deps, holder: effectHolder);
 
     projectHolder = ProjectHolder();
-    projectManager = ProjectManager(holder: projectHolder, deps: deps);
+    projectManager = ProjectManager(holder: projectHolder, deps: deps, effectManager: effectManager);
   }
 
   Future<void> init() async {

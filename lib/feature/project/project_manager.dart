@@ -13,6 +13,7 @@ import 'package:lpls/domain/enum/color_mk2.dart';
 import 'package:lpls/domain/enum/mode.dart';
 import 'package:lpls/domain/enum/color_mk1.dart';
 import 'package:lpls/domain/enum/pad.dart';
+import 'package:lpls/feature/effect_editor/effect_manager.dart';
 import 'package:lpls/feature/project/project_holder.dart';
 import 'package:flutter_midi_command/flutter_midi_command.dart';
 import 'package:lpls/feature/project/project_state.dart';
@@ -22,11 +23,12 @@ import 'package:lpls/utils/ui_utils.dart';
 class ProjectManager {
   final ProjectHolder holder;
   final ManagerDeps deps;
+  final EffectManager effectManager;
   final MidiCommand midi = MidiCommand();
   final TextEditingController vText = TextEditingController();
   bool get isConnected => holder.rState.device != null;
 
-  ProjectManager({required this.holder, required this.deps});
+  ProjectManager({required this.holder, required this.deps, required this.effectManager});
 
   void setLoading(bool isLoading) => holder.setIsLoading(isLoading);
   ProjectState get state => holder.rState;
@@ -60,6 +62,7 @@ class ProjectManager {
     if (device != null) {
       await midi.connectToDevice(device);
       state.lpDevice?.midi.onMidiDataReceived?.listen(_handleMidiMessage);
+      effectManager.setEffect(state.lpDevice!.createEffect());
     }
   }
 

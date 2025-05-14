@@ -6,6 +6,9 @@ class LPMk1 extends LaunchpadDevice<ColorMk1> {
   LPMk1({required super.midi, required super.device, required super.palette});
 
   @override
+  String toString() => 'Launchpad with mk1 palette';
+
+  @override
   Map<Pad, int> mapping = {
     Pad.a1: 0,
     Pad.a2: 1,

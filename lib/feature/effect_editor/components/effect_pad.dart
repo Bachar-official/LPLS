@@ -21,7 +21,7 @@ class EffectPad extends ConsumerWidget {
     final state = ref.watch(provider);
     final manager = di.effectManager;
     final brightness = Theme.of(context).brightness;
-    final padColor = resolveColor(state.effect?.frames[state.frameNumber][pad]);
+    final padColor = manager.isFramesEmpty ? Colors.grey.shade400 : resolveColor(state.effect?.frames[state.frameNumber][pad]);
 
     return Padding(
       padding: const EdgeInsets.all(2.0),

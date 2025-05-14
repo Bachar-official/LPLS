@@ -141,7 +141,7 @@ class EffectScreen extends ConsumerWidget {
                       horizontal: 5,
                       vertical: 4,
                     ),
-                    child: Slider(
+                    child: manager.isFramesEmpty ? const Text('No frames for this effect') : Slider(
                       min: 0,
                       max: (state.effect!.frames.length - 1).toDouble(),
                       value: state.frameNumber.toDouble().clamp(

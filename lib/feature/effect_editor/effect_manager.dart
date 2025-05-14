@@ -22,10 +22,20 @@ class EffectManager {
   Duration _remainingTime = Duration.zero;
 
   EffectManager({required this.deps, required this.holder});
+  
 
   EffectState get state => holder.rState;
+  bool get isFramesEmpty => state.effect?.frames.isEmpty ?? false;
 
-  List<FullColor> get generatedPalette => state.effect == null ? [] : generatePalette(state.effect.runtimeType == ColorMk1 ? ColorMk1.values : ColorMk2.values);
+  List<FullColor> get generatedPalette {
+    if (state.effect is Effect<ColorMk1>) {
+      return generatePalette(ColorMk1.values);
+    } else if (state.effect is Effect<ColorMk2>) {
+      return generatePalette(ColorMk2.values);
+    } else {
+      return [];
+    }
+  }
 
   num? getBPMValue() {
     if (state.effect == null) {
@@ -42,13 +52,14 @@ class EffectManager {
   }
 
   void setBPM(num? value) {
-    if (value != null && state.effect == null) {
+    if (value != null && state.effect != null) {
       holder.setEffect(state.effect?.withBPM(value.toInt()));
     }
   }
 
   void setEffect(Effect effect) {
     holder.setEffect(effect);
+    debug(deps, 'Set effect to ${state.effect.runtimeType}');
   }
 
   void addFrame() {
@@ -58,7 +69,7 @@ class EffectManager {
       holder.setFrameNumber(0);
     } else {
       holder.setEffect(state.effect?.withNewFrame());
-      holder.setFrameNumber(state.frameNumber + 1);
+        holder.setFrameNumber(state.effect!.frames.length - 1);
     }
   }
 

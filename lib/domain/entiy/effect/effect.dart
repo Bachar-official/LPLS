@@ -19,16 +19,21 @@ class Effect<T extends LPColor> {
     required this.beats,
   });
 
-  Effect.initial(): frameTime = 500, beats = 1, frames = [];
+  factory Effect.initial() => Effect<T>(frameTime: 500, frames: [], beats: 1);
 
-  Effect copyWith({int? frameTime, List<Frame<T>>? frames, int? beats}) =>
+  Effect<T> copyWith({int? frameTime, List<Frame<T>>? frames, int? beats}) =>
       Effect(
         frameTime: frameTime ?? this.frameTime,
         frames: frames ?? this.frames,
         beats: beats ?? this.beats,
       );
 
-  Effect withPadColored(int frameIndex, Pad pad, FullColor<T>? color, FullColor<T> offColor) {
+  Effect withPadColored(
+    int frameIndex,
+    Pad pad,
+    FullColor<T>? color,
+    FullColor<T> offColor,
+  ) {
     if (frameIndex >= frames.length) {
       throw RangeError('Frame $frameIndex does not exist.');
     }
@@ -41,16 +46,16 @@ class Effect<T extends LPColor> {
     return copyWith(frames: newFrames);
   }
 
-  Effect withNewFrame() {
-    final Map<Pad, (T, Btness?)> newFrame = {};
-    frames.add(newFrame);
-    return copyWith(frames: frames);
+  Effect<T> withNewFrame() {
+    final newFrames = List<Frame<T>>.from(frames); // копируем старые фреймы
+    newFrames.add({}); // добавляем новый пустой кадр
+    return copyWith(frames: newFrames); // возвращаем новый эффект с тем же T
   }
 
-  Effect withoutFrame(int frameIndex) {
+  Effect<T> withoutFrame(int frameIndex) {
     if (frameIndex < frames.length) {
-      frames.removeAt(frameIndex);
-      return copyWith(frames: frames);
+      final newFrames = List<Frame<T>>.from(frames)..removeAt(frameIndex);
+      return copyWith(frames: newFrames);
     }
     return this;
   }
