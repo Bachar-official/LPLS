@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/material.dart' hide Colors;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lpls/domain/di.dart';
 import 'package:lpls/domain/enum/mode.dart';
@@ -25,35 +26,43 @@ class TrackEditorScreen extends ConsumerWidget {
 
     return state.bank == null
         ? const Center(child: Text('No filed attached yet'))
-        : Container(
-          padding: const EdgeInsets.all(8.0),
-          decoration: BoxDecoration(
-            color: Colors.grey[900],
-            borderRadius: BorderRadius.circular(12),
+        : ScaffoldPage(
+          header: PageHeader(
+            title: Text('Track editor (${mode.name})'),
           ),
-          child: Row(
-            children:
-                mode == Mode.audio
-                    ? state.bank!.audioFiles
-                        .map(
-                          (file) => Expanded(
-                            child: Container(
-                              color: Colors.red,
-                              child: Text(file.path),
-                            ),
-                          ),
-                        )
-                        .toList()
-                    : state.bank!.midiFiles
-                        .map(
-                          (file) => Expanded(
-                            child: Container(
-                              color: Colors.green,
-                              child: Text(file.path),
-                            ),
-                          ),
-                        )
-                        .toList(),
+          content: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ReorderableListView(
+                scrollDirection: Axis.horizontal,
+                onReorder: (oldIndex, newIndex) {
+                  // TODO: move this method to manager
+                  state.bank?.reorderFiles(oldIndex, newIndex, isMidi: mode == Mode.midi);
+                },
+                children:
+                    mode == Mode.audio
+                        ? state.bank!.audioFiles
+                            .map(
+                              (file) => Expanded(
+                                child: Container(
+                                  color: Colors.red,
+                                  child: Text(file.path),
+                                ),
+                              ),
+                            )
+                            .toList()
+                        : state.bank!.midiFiles
+                            .map(
+                              (file) => Expanded(
+                                child: Container(
+                                  color: Colors.green,
+                                  child: Text(file.path),
+                                ),
+                              ),
+                            )
+                            .toList(),
+              ),
+            ),
           ),
         );
   }

@@ -35,6 +35,20 @@ class PadBank {
     }
   }
 
+  void reorderFiles(int oldIndex, int newIndex, {required bool isMidi}) {
+  if (isMidi) {
+    if (oldIndex < 0 || oldIndex >= midiFiles.length || newIndex < 0 || newIndex > midiFiles.length) return;
+    final file = midiFiles.removeAt(oldIndex);
+    midiFiles.insert(newIndex, file);
+  } else {
+    if (oldIndex < 0 || oldIndex >= audioFiles.length || newIndex < 0 || newIndex > audioFiles.length) return;
+    final file = audioFiles.removeAt(oldIndex);
+    final player = audioPlayers.removeAt(oldIndex);
+    audioFiles.insert(newIndex, file);
+    audioPlayers.insert(newIndex, player);
+  }
+}
+
   Future<void> trigger() async {
     print('TRIGGERED!!!');
     if (audioFiles.isNotEmpty && audioIndex < audioFiles.length) {
