@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lpls/constants/pad_structure.dart';
 import 'package:lpls/domain/enum/mode.dart';
-import 'package:lpls/domain/enum/pad.dart';
 import 'package:lpls/feature/project/components/pads/pad_button.dart';
 import 'package:lpls/utils/build_grid_pads.dart';
 

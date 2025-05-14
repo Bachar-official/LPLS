@@ -6,7 +6,6 @@ import 'package:lpls/feature/effect_editor/components/effect_grid.dart';
 import 'package:lpls/feature/effect_editor/components/palette_widget.dart';
 import 'package:lpls/feature/effect_editor/effect_holder.dart';
 import 'package:lpls/feature/effect_editor/effect_state.dart';
-import 'package:lpls/utils/bpm_utils.dart';
 
 final provider = StateNotifierProvider<EffectHolder, EffectState>(
   (ref) => di.effectHolder,
