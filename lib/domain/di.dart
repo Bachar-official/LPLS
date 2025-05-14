@@ -8,6 +8,8 @@ import 'package:lpls/feature/project/project_holder.dart';
 import 'package:lpls/feature/project/project_manager.dart';
 // ignore: depend_on_referenced_packages
 import 'package:logger/logger.dart';
+import 'package:lpls/feature/track_editor/track_holder.dart';
+import 'package:lpls/feature/track_editor/track_manager.dart';
 
 class DI {
   late final ProjectHolder projectHolder;
@@ -18,6 +20,9 @@ class DI {
 
   late final EffectHolder effectHolder;
   late final EffectManager effectManager;
+
+  late final TrackHolder trackHolder;
+  late final TrackManager trackManager;
 
   final Logger logger = Logger();
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -32,8 +37,11 @@ class DI {
     effectHolder = EffectHolder();
     effectManager = EffectManager(deps: deps, holder: effectHolder);
 
+    trackHolder = TrackHolder();
+    trackManager = TrackManager(deps: deps, holder: trackHolder);
+
     projectHolder = ProjectHolder();
-    projectManager = ProjectManager(holder: projectHolder, deps: deps, effectManager: effectManager);
+    projectManager = ProjectManager(holder: projectHolder, deps: deps, effectManager: effectManager, trackManager: trackManager);
   }
 
   Future<void> init() async {

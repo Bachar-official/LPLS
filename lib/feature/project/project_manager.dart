@@ -14,17 +14,19 @@ import 'package:lpls/feature/project/project_holder.dart';
 import 'package:flutter_midi_command/flutter_midi_command.dart';
 import 'package:lpls/feature/project/project_state.dart';
 import 'package:lpls/feature/project/utils/check_file_extension.dart';
+import 'package:lpls/feature/track_editor/track_manager.dart';
 import 'package:lpls/utils/ui_utils.dart';
 
 class ProjectManager {
   final ProjectHolder holder;
   final ManagerDeps deps;
   final EffectManager effectManager;
+  final TrackManager trackManager;
   final MidiCommand midi = MidiCommand();
   final TextEditingController vText = TextEditingController();
   bool get isConnected => holder.rState.device != null;
 
-  ProjectManager({required this.holder, required this.deps, required this.effectManager});
+  ProjectManager({required this.holder, required this.deps, required this.effectManager, required this.trackManager});
 
   void setLoading(bool isLoading) => holder.setIsLoading(isLoading);
   ProjectState get state => holder.rState;
@@ -128,34 +130,7 @@ class ProjectManager {
     }
   }
 
-  void foo() async {
-    // const effect = Effect<ColorMk1>(frameTime: 250, beats: 2, frames: [
-    //   {
-    //     Pad.a1: (ColorMk1.red, Btness.light),
-    //   },
-    //   {
-    //     Pad.a8: (ColorMk1.red, Btness.light),
-    //     Pad.a1: (ColorMk1.off, Btness.dark),
-    //   },
-    //   {
-    //     Pad.h8: (ColorMk1.red, Btness.light),
-    //     Pad.a8: (ColorMk1.off, Btness.dark),
-    //   },
-    //   {
-    //     Pad.h1: (ColorMk1.red, Btness.light),
-    //     Pad.h8: (ColorMk1.off, Btness.dark),
-    //   },
-    //   {
-    //     Pad.h1: (ColorMk1.off, Btness.dark),
-    //   }
-    // ]);
-    final effect = LineEffect<ColorMk2>(
-      from: Pad.a1,
-      to: Pad.d8,
-    ).getEffect(ColorMk2.green);
-    // debug(deps, EffectFactory.toJson(effect, palette: 'mk2'));
-    if (isConnected) {
-      state.lpDevice?.playEffect(effect);
-    }
+  void selectPad(Pad pad) {
+    trackManager.setBank(state.banks[state.page]?[pad]);
   }
 }

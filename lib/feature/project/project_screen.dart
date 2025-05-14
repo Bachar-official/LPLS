@@ -21,7 +21,7 @@ class ProjectScreen extends ConsumerWidget {
     final manager = di.projectManager;
 
     return state.isLoading
-        ? const ProgressRing()
+        ? Center(child: const ProgressRing())
         : ScaffoldPage(
           header: PageHeader(
             title: Text(
@@ -79,13 +79,18 @@ class ProjectScreen extends ConsumerWidget {
                   child: SizedBox(
                     width: size,
                     height: size,
-                    child: state.device == null ? const Center(
-                      child: Text('No devices connected or incompatible device connected')
-                    ) : PadGrid(
-                      page: state.page,
-                      mode: state.mode,
-                      banks: state.banks,
-                    ),
+                    child:
+                        state.device == null
+                            ? const Center(
+                              child: Text(
+                                'No devices connected or incompatible device connected',
+                              ),
+                            )
+                            : PadGrid(
+                              page: state.page,
+                              mode: state.mode,
+                              banks: state.banks,
+                            ),
                   ),
                 ),
               );
