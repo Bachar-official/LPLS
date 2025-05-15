@@ -106,11 +106,36 @@ class PadBank {
     int? midiIndex,
     List<File>? midiFiles,
     List<File>? audioFiles,
-  }) async => PadBank(
-    audioIndex: audioIndex ?? this.audioIndex,
-    midiIndex: midiIndex ?? this.midiIndex,
-    midiFiles: midiFiles ?? this.midiFiles,
-    audioFiles: audioFiles ?? this.audioFiles,
-    audioPlayers: await _cachePlayers(),
-  );
+  }) async {
+    final updatedAudioFiles = audioFiles ?? this.audioFiles;
+    final updatedMidiFiles = midiFiles ?? this.midiFiles;
+
+    // Если аудиофайлы изменились — пересоздаём плееры и очищаем старые
+    List<AudioPlayer> newAudioPlayers;
+    if (!identical(updatedAudioFiles, this.audioFiles)) {
+      // Освобождаем текущие плееры
+      for (var player in audioPlayers) {
+        await player.dispose();
+      }
+      // Кэшируем новые плееры
+      newAudioPlayers = await Future.wait(
+        updatedAudioFiles.map((file) async {
+          final player = AudioPlayer();
+          await player.setSourceDeviceFile(file.path);
+          return player;
+        }),
+      );
+    } else {
+      // Не изменялись — используем старые плееры
+      newAudioPlayers = audioPlayers;
+    }
+
+    return PadBank(
+      audioIndex: audioIndex ?? this.audioIndex,
+      midiIndex: midiIndex ?? this.midiIndex,
+      midiFiles: updatedMidiFiles,
+      audioFiles: updatedAudioFiles,
+      audioPlayers: newAudioPlayers,
+    );
+  }
 }
