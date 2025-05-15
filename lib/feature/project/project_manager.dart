@@ -26,7 +26,12 @@ class ProjectManager {
   final TextEditingController vText = TextEditingController();
   bool get isConnected => holder.rState.device != null;
 
-  ProjectManager({required this.holder, required this.deps, required this.effectManager, required this.trackManager});
+  ProjectManager({
+    required this.holder,
+    required this.deps,
+    required this.effectManager,
+    required this.trackManager,
+  });
 
   void setLoading(bool isLoading) => holder.setIsLoading(isLoading);
   ProjectState get state => holder.rState;
@@ -64,7 +69,7 @@ class ProjectManager {
     }
   }
 
-  void _handleMidiMessage(MidiPacket event) {
+  void _handleMidiMessage(MidiPacket event) async {
     // If event in "Note ON"
     if (event.data[2] == 127) {
       var pressedPad = state.lpDevice?.pressedPad(event.data[1]);
@@ -75,7 +80,11 @@ class ProjectManager {
       } else {
         var bank = state.banks[state.page]?[pressedPad];
         if (bank != null) {
-          bank.trigger();
+          Pad pad = pressedPad!;
+          var newBank = await bank.trigger();
+          final updatedPageBanks = {...state.banks[state.page]!, pad: newBank};
+          final updatedBanks = {...state.banks, state.page: updatedPageBanks};
+          holder.setBanks(updatedBanks);
         }
       }
     }

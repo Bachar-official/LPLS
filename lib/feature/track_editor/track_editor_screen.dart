@@ -44,6 +44,7 @@ class TrackEditorScreen extends ConsumerWidget {
                         ? state.bank!.audioFiles
                             .map(
                               (file) => Expanded(
+                                key: ValueKey(file.path),
                                 child: Container(
                                   color: Colors.red,
                                   child: Text(file.path),
@@ -54,6 +55,7 @@ class TrackEditorScreen extends ConsumerWidget {
                         : state.bank!.midiFiles
                             .map(
                               (file) => Expanded(
+                                key: ValueKey(file.path),
                                 child: Container(
                                   color: Colors.green,
                                   child: Text(file.path),

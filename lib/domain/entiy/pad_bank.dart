@@ -19,7 +19,7 @@ class PadBank {
 
   PadBank.initial()
     : audioFiles = [],
-    audioPlayers = [],
+      audioPlayers = [],
       audioIndex = 0,
       midiFiles = [],
       midiIndex = 0;
@@ -35,34 +35,64 @@ class PadBank {
     }
   }
 
-  void reorderFiles(int oldIndex, int newIndex, {required bool isMidi}) {
-  if (isMidi) {
-    if (oldIndex < 0 || oldIndex >= midiFiles.length || newIndex < 0 || newIndex > midiFiles.length) return;
-    final file = midiFiles.removeAt(oldIndex);
-    midiFiles.insert(newIndex, file);
-  } else {
-    if (oldIndex < 0 || oldIndex >= audioFiles.length || newIndex < 0 || newIndex > audioFiles.length) return;
-    final file = audioFiles.removeAt(oldIndex);
-    final player = audioPlayers.removeAt(oldIndex);
-    audioFiles.insert(newIndex, file);
-    audioPlayers.insert(newIndex, player);
+  Future<List<AudioPlayer>> _cachePlayers() async {
+    return audioFiles.map((file) {
+      final player = AudioPlayer();
+      player.setSourceDeviceFile(file.path);
+      return player;
+    }).toList();
   }
-}
 
-  Future<void> trigger() async {
+  Future<PadBank> reorderFiles(
+    int oldIndex,
+    int newIndex, {
+    required bool isMidi,
+  }) async {
+    if (isMidi) {
+      if (oldIndex < 0 ||
+          oldIndex >= midiFiles.length ||
+          newIndex < 0 ||
+          newIndex > midiFiles.length) {
+        return this;
+      }
+
+      final newMidiFiles = List<File>.from(midiFiles);
+      final file = newMidiFiles.removeAt(oldIndex);
+      newMidiFiles.insert(newIndex, file);
+
+      return await copyWith(midiFiles: newMidiFiles);
+    } else {
+      if (oldIndex < 0 ||
+          oldIndex >= audioFiles.length ||
+          newIndex < 0 ||
+          newIndex > audioFiles.length) {
+        return this;
+      }
+
+      final newAudioFiles = List<File>.from(audioFiles);
+      final file = newAudioFiles.removeAt(oldIndex);
+      newAudioFiles.insert(newIndex, file);
+
+      return await copyWith(audioFiles: newAudioFiles);
+    }
+  }
+
+  Future<PadBank> trigger() async {
+    // TODO: re-update cache?
     print('TRIGGERED!!!');
+
     if (audioFiles.isNotEmpty && audioIndex < audioFiles.length) {
       print('Playing file #$audioIndex');
-      audioPlayers[audioIndex].resume();
-      audioIndex = (audioIndex + 1) % audioPlayers.length;
+      await audioPlayers[audioIndex].resume();
+      final newIndex = (audioIndex + 1) % audioPlayers.length;
+      return await copyWith(audioIndex: newIndex);
     } else if (midiFiles.isNotEmpty && midiIndex < midiFiles.length) {
-      print('Playing file #$midiIndex');if (midiIndex == midiFiles.length - 1) {
-        midiIndex = 0;
-      } else {
-        midiIndex++;
-      }
-      midiIndex = (midiIndex + 1) % midiFiles.length;
+      print('Playing file #$midiIndex');
+      final newIndex = (midiIndex + 1) % midiFiles.length;
+      return await copyWith(midiIndex: newIndex);
     }
+
+    return this;
   }
 
   void dispose() {
@@ -70,4 +100,17 @@ class PadBank {
       player.dispose();
     }
   }
+
+  Future<PadBank> copyWith({
+    int? audioIndex,
+    int? midiIndex,
+    List<File>? midiFiles,
+    List<File>? audioFiles,
+  }) async => PadBank(
+    audioIndex: audioIndex ?? this.audioIndex,
+    midiIndex: midiIndex ?? this.midiIndex,
+    midiFiles: midiFiles ?? this.midiFiles,
+    audioFiles: audioFiles ?? this.audioFiles,
+    audioPlayers: await _cachePlayers(),
+  );
 }

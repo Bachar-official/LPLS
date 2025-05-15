@@ -5,6 +5,8 @@ import 'package:lpls/feature/track_editor/track_state.dart';
 class TrackHolder extends StateNotifier<TrackState> {
   TrackHolder(): super(TrackState.initial());
 
+  TrackState get rState => state;
+
   void setBank(PadBank? bank) {
     state = state.copyWith(bank: bank, nullableBank: bank == null);
   }
