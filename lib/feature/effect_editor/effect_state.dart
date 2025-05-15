@@ -9,7 +9,7 @@ class EffectState {
   bool get isFirstFrame => frameNumber == 0;
   bool get isLastFrame =>
       effect != null && frameNumber == effect!.frames.length - 1;
-  bool get isSingleFrame => effect != null && effect!.frames.length == 1;
+  bool get isSingleFrame => effect != null && effect!.frames.length > 1;
 
   bool get isRemoveAvailable => effect != null && !isSingleFrame;
   bool get isControlAvailable => effect != null;

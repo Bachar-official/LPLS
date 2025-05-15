@@ -122,7 +122,7 @@ class EffectScreen extends ConsumerWidget {
                         width: size,
                         height: size,
                         child:
-                            state.effect == null
+                            state.effect == null || state.effect!.frames.isEmpty
                                 ? const Center(
                                   child: Text(
                                     'There is no effect yet.\nPlease edit effect from Project screen, or create one by clicking on the "+" icon.',

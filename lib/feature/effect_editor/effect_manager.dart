@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:lpls/domain/entiy/effect/effect.dart';
 import 'package:lpls/domain/entiy/manager_deps.dart';
+import 'package:lpls/domain/enum/brightness.dart';
 import 'package:lpls/domain/enum/color_mk1.dart';
 import 'package:lpls/domain/enum/color_mk2.dart';
 import 'package:lpls/domain/enum/pad.dart';
@@ -105,7 +106,7 @@ class EffectManager {
     if (state.effect != null && state.effect!.frames.length >= frame - 1) {
       final effect = state.effect;
       holder.setEffect(
-        effect?.withPadColored(frame, pad, color, (ColorMk1.off, null)),
+        effect?.withPadColored(frame, pad, color, (state.effect is Effect<ColorMk1> ? ColorMk1.off : ColorMk2.off, null)),
       );
     }
   }
