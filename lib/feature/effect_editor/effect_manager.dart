@@ -76,6 +76,7 @@ class EffectManager {
 
   void removeFrame() {
     holder.setEffect(state.effect?.withoutFrame(state.frameNumber));
+    holder.setFrameNumber(state.effect!.frames.length - 1);
   }
 
   void goToPrevFrame() {
