@@ -1,5 +1,8 @@
-import 'package:lpls/domain/entiy/effect/utils/generate_empty_frame.dart';
-import 'package:lpls/domain/enum/brightness.dart';
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:lpls/domain/entiy/effect/mk1_effect_serializer.dart';
+import 'package:lpls/domain/entiy/effect/mk2_effect_serializer.dart';
 import 'package:lpls/domain/enum/color_mk1.dart';
 import 'package:lpls/domain/enum/color_mk2.dart';
 import 'package:lpls/domain/enum/lp_color.dart';
@@ -58,6 +61,45 @@ class Effect<T extends LPColor> {
       return copyWith(frames: newFrames);
     }
     return this;
+  }
+
+  void toFile(String path) async {
+    var content = '';
+    if (T is ColorMk1) {
+      content = jsonEncode(
+        Mk1EffectSerializer().toMap(
+          this as Effect<ColorMk1>,
+          bpm: BpmUtils.millisToBpm(frameTime, beats),
+          palette: 'mk1',
+        ),
+      );
+    } else if (T is ColorMk2) {
+      content = jsonEncode(
+        Mk2EffectSerializer().toMap(
+          this as Effect<ColorMk2>,
+          bpm: BpmUtils.millisToBpm(frameTime, beats),
+          palette: 'mk2',
+        ),
+      );
+    } else {
+      throw Exception('Unsupported palette');
+    }
+    await File(path).writeAsString(content);
+  }
+
+  factory Effect.fromFile(File file) {
+    final map = jsonDecode(file.readAsStringSync());
+    var palette = map['palette'];
+    if (palette == null) {
+      throw Exception('Unsupported effect file');
+    }
+    if (palette == 'mk1') {
+      return Mk1EffectSerializer().fromMap(map) as Effect<T>;
+    } else if (palette == 'mk2') {
+      return Mk2EffectSerializer().fromMap(map) as Effect<T>;
+    } else {
+      throw Exception('Unsupported palette');
+    }
   }
 
   Effect withBPM(int bpm) {
