@@ -187,4 +187,6 @@ class EffectManager {
       });
     }
   }
+
+  void goBack() => homeManager.toTrackScreen();
 }

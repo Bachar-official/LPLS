@@ -1,5 +1,5 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/material.dart' show Icons, InputDecoration;
+import 'package:flutter/material.dart' show Icons, InputDecoration hide IconButton;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lpls/domain/di.dart';
 import 'package:lpls/feature/effect_editor/components/effect_grid.dart';
@@ -31,6 +31,7 @@ class EffectScreen extends ConsumerWidget {
 
     return ScaffoldPage(
       header: PageHeader(
+        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: manager.goBack),
         title: Text(
           state.effect == null
               ? 'No effect'
