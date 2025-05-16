@@ -12,4 +12,8 @@ class HomeManager {
   void setScreen(Screen screen) => holder.setScreen(screen);
 
   void setTheme(ThemeMode theme) => holder.setTheme(theme);
+
+  void toProjectScreen() => setScreen(Screen.project);
+  void toTrackScreen() => setScreen(Screen.trackEditor);
+  void toEffectScreen() => setScreen(Screen.effectEditor);
 }

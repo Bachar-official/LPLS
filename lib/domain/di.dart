@@ -35,13 +35,27 @@ class DI {
     homeManager = HomeManager(deps: deps, holder: homeHolder);
 
     effectHolder = EffectHolder();
-    effectManager = EffectManager(deps: deps, holder: effectHolder);
+    effectManager = EffectManager(
+      deps: deps,
+      holder: effectHolder,
+      homeManager: homeManager,
+    );
 
     trackHolder = TrackHolder();
-    trackManager = TrackManager(deps: deps, holder: trackHolder);
+    trackManager = TrackManager(
+      deps: deps,
+      holder: trackHolder,
+      homeManager: homeManager,
+    );
 
     projectHolder = ProjectHolder();
-    projectManager = ProjectManager(holder: projectHolder, deps: deps, effectManager: effectManager, trackManager: trackManager);
+    projectManager = ProjectManager(
+      holder: projectHolder,
+      deps: deps,
+      effectManager: effectManager,
+      trackManager: trackManager,
+      homeManager: homeManager,
+    );
   }
 
   Future<void> init() async {

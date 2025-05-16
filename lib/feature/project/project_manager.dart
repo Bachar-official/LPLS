@@ -3,13 +3,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:lpls/constants/pad_structure.dart';
 import 'package:lpls/constants/paging_pads.dart';
-import 'package:lpls/domain/entiy/effect/generated/line_effect.dart';
 import 'package:lpls/domain/entiy/manager_deps.dart';
 import 'package:lpls/domain/entiy/pad_bank.dart';
-import 'package:lpls/domain/enum/color_mk2.dart';
 import 'package:lpls/domain/enum/mode.dart';
 import 'package:lpls/domain/enum/pad.dart';
 import 'package:lpls/feature/effect_editor/effect_manager.dart';
+import 'package:lpls/feature/home/home_manager.dart';
 import 'package:lpls/feature/project/project_holder.dart';
 import 'package:flutter_midi_command/flutter_midi_command.dart';
 import 'package:lpls/feature/project/project_state.dart';
@@ -22,6 +21,7 @@ class ProjectManager {
   final ManagerDeps deps;
   final EffectManager effectManager;
   final TrackManager trackManager;
+  final HomeManager homeManager;
   final MidiCommand midi = MidiCommand();
   final TextEditingController vText = TextEditingController();
   bool get isConnected => holder.rState.device != null;
@@ -31,6 +31,7 @@ class ProjectManager {
     required this.deps,
     required this.effectManager,
     required this.trackManager,
+    required this.homeManager,
   });
 
   void setLoading(bool isLoading) => holder.setIsLoading(isLoading);
@@ -141,5 +142,6 @@ class ProjectManager {
 
   void selectPad(Pad pad) {
     trackManager.setBank(state.banks[state.page]?[pad]);
+    homeManager.toTrackScreen();
   }
 }

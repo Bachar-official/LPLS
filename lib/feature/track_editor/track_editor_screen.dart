@@ -1,5 +1,5 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/material.dart' hide Colors;
+import 'package:flutter/material.dart' hide Colors, IconButton;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lpls/domain/di.dart';
 import 'package:lpls/domain/enum/mode.dart';
@@ -28,6 +28,10 @@ class TrackEditorScreen extends ConsumerWidget {
         ? const Center(child: Text('No filed attached yet'))
         : ScaffoldPage(
           header: PageHeader(
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: manager.goBack,
+            ),
             title: Text('Track editor (${mode.name})'),
           ),
           content: Center(

@@ -10,19 +10,21 @@ import 'package:lpls/domain/type/full_color.dart';
 import 'package:lpls/feature/effect_editor/effect_holder.dart';
 import 'package:lpls/feature/effect_editor/effect_state.dart';
 import 'package:lpls/feature/effect_editor/utils/palettes.dart';
+import 'package:lpls/feature/home/home_manager.dart';
 import 'package:lpls/utils/bpm_utils.dart';
 import 'package:lpls/utils/ui_utils.dart';
 
 class EffectManager {
   final EffectHolder holder;
   final ManagerDeps deps;
+  final HomeManager homeManager;
   Timer? _playbackTimer;
   int _currentFrameIndex = 0;
   bool _isPlaying = false;
   Stopwatch? _stopwatch;
   Duration _remainingTime = Duration.zero;
 
-  EffectManager({required this.deps, required this.holder});
+  EffectManager({required this.deps, required this.holder, required this.homeManager});
   
 
   EffectState get state => holder.rState;
