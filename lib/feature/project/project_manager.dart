@@ -82,6 +82,7 @@ class ProjectManager {
         var bank = state.banks[state.page]?[pressedPad];
         if (bank != null) {
           Pad pad = pressedPad!;
+          state.lpDevice?.playEffect(bank.currentEffect);
           var newBank = await bank.trigger();
           final updatedPageBanks = {...state.banks[state.page]!, pad: newBank};
           final updatedBanks = {...state.banks, state.page: updatedPageBanks};
@@ -121,6 +122,7 @@ class ProjectManager {
         audioFiles: [...oldBank.audioFiles],
         audioPlayers: [...oldBank.audioPlayers],
         midiFiles: [...oldBank.midiFiles],
+        effects: [...oldBank.effects],
         audioIndex: oldBank.audioIndex,
         midiIndex: oldBank.midiIndex,
       );

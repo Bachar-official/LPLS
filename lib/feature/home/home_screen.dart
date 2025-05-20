@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lpls/domain/di.dart';
@@ -37,7 +39,9 @@ class HomeScreen extends ConsumerWidget {
             MenuBarItem(
               title: 'File',
               items: [
-                MenuFlyoutItem(text: const Text('Exit'), onPressed: () => {}),
+                MenuFlyoutItem(text: const Text('Open...'), onPressed: manager.onOpen),
+                MenuFlyoutItem(text: const Text('Save'), onPressed: manager.onSave),
+                MenuFlyoutItem(text: const Text('Exit'), onPressed: () => exit(0)),
               ],
             ),
             MenuBarItem(

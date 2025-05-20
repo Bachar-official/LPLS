@@ -6,6 +6,8 @@ import 'package:lpls/feature/home/home_state.dart';
 class HomeHolder extends StateNotifier<HomeState> {
   HomeHolder() : super(HomeState.initial());
 
+  HomeState get rState => state;
+
   void setScreen(Screen screen) {
     state = state.copyWith(screen: screen);
   }

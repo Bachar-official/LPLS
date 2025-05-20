@@ -28,9 +28,20 @@ enum ColorMk1 implements LPColor {
   String serialize(Btness brightness) => '$name.${brightness.name}';
 
   static (ColorMk1, Btness?) deserialize(String str) {
-    final [colorValue, btnessValue] = str.split('.');
-    final brightness = btnessValue.isNotEmpty ? Btness.values.firstWhere((b) => b.name == btnessValue) : Btness.light;
-    final color = ColorMk1.values.firstWhere((c) => c.name == colorValue);
-    return (color, brightness);
-  }
+  final parts = str.split('.');
+  final colorValue = parts[0];
+  final btnessValue = parts.length > 1 ? parts[1] : null;
+
+  final brightness = btnessValue != null
+      ? Btness.values.firstWhere((b) => b.name == btnessValue, orElse: () => Btness.light)
+      : Btness.light;
+
+  final color = ColorMk1.values.firstWhere(
+    (c) => c.name == colorValue,
+    orElse: () => throw ArgumentError('Unknown color: $colorValue'),
+  );
+
+  return (color, brightness);
+}
+
 }

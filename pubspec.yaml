@@ -10,6 +10,7 @@ dependencies:
   audio_in_app: ^2.1.1
   audioplayers: ^5.2.1
   desktop_drop: ^0.6.0
+  file_picker: ^10.1.9
   fluent_ui: ^4.11.3
   flutter:
     sdk: flutter

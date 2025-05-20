@@ -68,9 +68,7 @@ class PadButton extends ConsumerWidget {
           child: DropTarget(
             onDragDone: (details) async {
               if (bank != null) {
-                if (mode == Mode.audio) {
                   manager.addFileToPad(page, pad, File(details.files.first.path), isMidi: mode == Mode.midi);
-                }
               }
             },
             child: Text(

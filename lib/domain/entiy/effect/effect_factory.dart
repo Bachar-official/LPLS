@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:lpls/domain/entiy/effect/effect.dart';
 import 'package:lpls/domain/entiy/effect/effect_serializer.dart';
@@ -10,6 +11,11 @@ import 'package:lpls/domain/enum/lp_color.dart';
 import 'package:lpls/utils/bpm_utils.dart';
 
 class EffectFactory {
+  static Future<Effect> readFile(File file) async {
+  final content = await file.readAsString();
+  return EffectFactory.fromJson(content);
+}
+
   static Effect fromJson(String json) {
     final map = jsonDecode(json);
     final palette = map[EffectSerializer.palette];
@@ -33,3 +39,5 @@ class EffectFactory {
     }
   }
 }
+
+

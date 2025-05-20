@@ -25,7 +25,7 @@ class TrackEditorScreen extends ConsumerWidget {
     final manager = di.trackManager;
 
     return state.bank == null
-        ? const Center(child: Text('No filed attached yet'))
+        ? const Center(child: Text('No files attached yet'))
         : ScaffoldPage(
           header: PageHeader(
             leading: IconButton(

@@ -1,6 +1,9 @@
 import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:lpls/domain/entiy/effect/effect.dart';
+import 'package:lpls/domain/entiy/effect/effect_factory.dart';
+import 'package:lpls/domain/entiy/effect/effect_serializer.dart';
 
 class PadBank {
   int audioIndex;
@@ -8,6 +11,7 @@ class PadBank {
   List<File> midiFiles;
   List<File> audioFiles;
   late List<AudioPlayer> audioPlayers;
+  late List<Effect> effects;
 
   PadBank({
     required this.audioFiles,
@@ -15,6 +19,7 @@ class PadBank {
     required this.midiFiles,
     required this.midiIndex,
     required this.audioPlayers,
+    required this.effects,
   });
 
   PadBank.initial()
@@ -22,11 +27,15 @@ class PadBank {
       audioPlayers = [],
       audioIndex = 0,
       midiFiles = [],
+      effects = [],
       midiIndex = 0;
+
+      Effect get currentEffect => effects[midiIndex];
 
   Future<void> addFile(File file, bool isMidi) async {
     if (isMidi) {
       midiFiles.add(file);
+      effects.add(await EffectFactory.readFile(file));
     } else {
       audioFiles.add(file);
       final player = AudioPlayer();
@@ -111,7 +120,8 @@ class PadBank {
     final updatedMidiFiles = midiFiles ?? this.midiFiles;
 
     // Если аудиофайлы изменились — пересоздаём плееры и очищаем старые
-    List<AudioPlayer> newAudioPlayers;
+    List<AudioPlayer> newAudioPlayers = [];
+    List<Effect> newEffects = [];
     if (!identical(updatedAudioFiles, this.audioFiles)) {
       // Освобождаем текущие плееры
       for (var player in audioPlayers) {
@@ -125,9 +135,16 @@ class PadBank {
           return player;
         }),
       );
+    } else if (!identical(updatedMidiFiles, this.midiFiles)) {
+      newEffects = await Future.wait(
+        updatedMidiFiles.map((file) async {
+          return await EffectFactory.readFile(file);
+        }
+      ));
     } else {
       // Не изменялись — используем старые плееры
       newAudioPlayers = audioPlayers;
+      newEffects = effects;
     }
 
     return PadBank(
@@ -136,6 +153,7 @@ class PadBank {
       midiFiles: updatedMidiFiles,
       audioFiles: updatedAudioFiles,
       audioPlayers: newAudioPlayers,
+      effects: newEffects,
     );
   }
 }

@@ -1,6 +1,13 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:lpls/domain/entiy/effect/effect.dart';
+import 'package:lpls/domain/entiy/effect/effect_factory.dart';
+import 'package:lpls/domain/entiy/effect/effect_serializer.dart';
+import 'package:lpls/domain/entiy/effect/mk1_effect_serializer.dart';
+import 'package:lpls/domain/entiy/effect/mk2_effect_serializer.dart';
 import 'package:lpls/domain/entiy/manager_deps.dart';
 import 'package:lpls/domain/enum/brightness.dart';
 import 'package:lpls/domain/enum/color_mk1.dart';
@@ -24,8 +31,11 @@ class EffectManager {
   Stopwatch? _stopwatch;
   Duration _remainingTime = Duration.zero;
 
-  EffectManager({required this.deps, required this.holder, required this.homeManager});
-  
+  EffectManager({
+    required this.deps,
+    required this.holder,
+    required this.homeManager,
+  });
 
   EffectState get state => holder.rState;
   bool get isFramesEmpty => state.effect?.frames.isEmpty ?? false;
@@ -72,7 +82,7 @@ class EffectManager {
       holder.setFrameNumber(0);
     } else {
       holder.setEffect(state.effect?.withNewFrame());
-        holder.setFrameNumber(state.effect!.frames.length - 1);
+      holder.setFrameNumber(state.effect!.frames.length - 1);
     }
   }
 
@@ -109,7 +119,10 @@ class EffectManager {
     if (state.effect != null && state.effect!.frames.length >= frame - 1) {
       final effect = state.effect;
       holder.setEffect(
-        effect?.withPadColored(frame, pad, color, (state.effect is Effect<ColorMk1> ? ColorMk1.off : ColorMk2.off, null)),
+        effect?.withPadColored(frame, pad, color, (
+          state.effect is Effect<ColorMk1> ? ColorMk1.off : ColorMk2.off,
+          null,
+        )),
       );
     }
   }
@@ -136,7 +149,8 @@ class EffectManager {
     if (!_isPlaying || _playbackTimer == null) return;
 
     _playbackTimer?.cancel();
-    _remainingTime = Duration(milliseconds: state.effect!.frameTime) - _stopwatch!.elapsed;
+    _remainingTime =
+        Duration(milliseconds: state.effect!.frameTime) - _stopwatch!.elapsed;
     _stopwatch?.stop();
     _isPlaying = false;
   }
@@ -166,18 +180,15 @@ class EffectManager {
     final frameTime = state.effect!.frameTime;
     _stopwatch = Stopwatch()..start();
 
-    _playbackTimer = Timer.periodic(
-      Duration(milliseconds: frameTime),
-      (timer) {
-        if (_currentFrameIndex >= state.effect!.frames.length - 1) {
-          _currentFrameIndex = 0; // Зацикливаем
-        } else {
-          _currentFrameIndex++;
-        }
-        holder.setFrameNumber(_currentFrameIndex);
-        _stopwatch?.reset();
-      },
-    );
+    _playbackTimer = Timer.periodic(Duration(milliseconds: frameTime), (timer) {
+      if (_currentFrameIndex >= state.effect!.frames.length - 1) {
+        _currentFrameIndex = 0; // Зацикливаем
+      } else {
+        _currentFrameIndex++;
+      }
+      holder.setFrameNumber(_currentFrameIndex);
+      _stopwatch?.reset();
+    });
 
     // Если было восстановление с паузы, устанавливаем задержку
     if (initialDelay != null) {
@@ -185,6 +196,79 @@ class EffectManager {
         _playbackTimer?.cancel();
         _startPlaybackTimer();
       });
+    }
+  }
+
+  Future<void> saveEffect() async {
+    debug(deps, 'Try to save effect at file');
+    try {
+      if (state.effect == null) {
+        warning(
+          deps,
+          'Effect is null',
+          showScaffold: true,
+          scaffoldMessage: 'There is no effect to save',
+        );
+      } else {
+        var path = await FilePicker.platform.saveFile(
+          dialogTitle: 'Select output file',
+          fileName: 'effect.lpe',
+        );
+        if (path == null) {
+          warning(
+            deps,
+            'Cancelled file saving',
+            showScaffold: true,
+            scaffoldMessage: 'File saving cancelled',
+          );
+        } else {
+          if (state.effect is Effect<ColorMk1>) {
+            final map = Mk1EffectSerializer().toMap(
+              state.effect as Effect<ColorMk1>,
+              bpm: BpmUtils.millisToBpm(
+                state.effect?.frameTime ?? 0,
+                state.effect?.beats ?? 1,
+              ),
+              palette: 'mk1',
+            );
+            await File(path).writeAsString(jsonEncode(map));
+          } else {
+            final map = Mk2EffectSerializer().toMap(
+              state.effect as Effect<ColorMk2>,
+              bpm: BpmUtils.millisToBpm(
+                state.effect?.frameTime ?? 0,
+                state.effect?.beats ?? 1,
+              ),
+              palette: 'mk2',
+            );
+            await File(path).writeAsString(jsonEncode(map));
+          }
+          success(deps, 'File saved at $path');
+        }
+      }
+    } catch (e, s) {
+      catchException(deps, e, stackTrace: s);
+    }
+  }
+
+  Future<void> openEffect() async {
+    debug(deps, 'Try to open effect from file');
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        allowMultiple: false,
+        type: FileType.custom,
+        allowedExtensions: ['lpe'],
+      );
+      if (result == null) { 
+        warning(deps, 'file pick result is null', showScaffold: true, scaffoldMessage: 'There is no file to open');
+      } else {
+        final file = File(result.files.first.path!);
+        final effect = await EffectFactory.readFile(file);
+        holder.setEffect(effect);
+        success(deps, 'Effect loaded from file');
+      }
+    } catch (e, s) {
+      catchException(deps, e, stackTrace: s);
     }
   }
 

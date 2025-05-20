@@ -8,4 +8,7 @@ void checkFileExtension(Mode mode, File file) {
   if (mode == Mode.audio && !audioFileTypes.contains(extension)) {
     throw Exception('Invalid file type. Only audio files are supported.');
   }
+  if (mode == Mode.midi && extension != midiFileType) {
+    throw Exception('Invalid file type. In MIDI mode only LPE files supported.');
+  }
 }
