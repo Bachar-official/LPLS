@@ -30,7 +30,7 @@ class PadBank {
       effects = [],
       midiIndex = 0;
 
-      Effect get currentEffect => effects[midiIndex];
+  Effect? get currentEffect => effects.isEmpty ? null : effects[midiIndex];
 
   Future<void> addFile(File file, bool isMidi) async {
     if (isMidi) {
@@ -87,9 +87,6 @@ class PadBank {
   }
 
   Future<PadBank> trigger() async {
-    // TODO: re-update cache?
-    print('TRIGGERED!!!');
-
     if (audioFiles.isNotEmpty && audioIndex < audioFiles.length) {
       print('Playing file #$audioIndex');
       await audioPlayers[audioIndex].resume();
@@ -139,8 +136,8 @@ class PadBank {
       newEffects = await Future.wait(
         updatedMidiFiles.map((file) async {
           return await EffectFactory.readFile(file);
-        }
-      ));
+        }),
+      );
     } else {
       // Не изменялись — используем старые плееры
       newAudioPlayers = audioPlayers;

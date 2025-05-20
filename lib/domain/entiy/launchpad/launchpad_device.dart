@@ -48,8 +48,8 @@ abstract class LaunchpadDevice<T extends LPColor> {
     );
   }
 
-  Future<void> playEffect(Effect<T> effect) async {
-  if (effect.frames.isEmpty) return;
+  Future<void> playEffect(Effect<T>? effect) async {
+  if (effect == null || effect.frames.isEmpty) return;
 
   Map<Pad, (T, Btness?)> previousFrame = {};
 
