@@ -3,12 +3,13 @@ import 'package:lpls/domain/entiy/effect/effect_serializer.dart';
 import 'package:lpls/domain/enum/color_mk1.dart';
 import 'package:lpls/domain/enum/pad.dart';
 import 'package:lpls/domain/type/frame.dart';
+import 'package:lpls/utils/bpm_utils.dart';
 
 class Mk1EffectSerializer implements EffectSerializer<ColorMk1> {
   @override
   Effect<ColorMk1> fromMap(Map<String, dynamic> map) {
     final bpm = map[EffectSerializer.bpm] as int;
-    final frameTime = ((EffectSerializer.minuteMillis / bpm) *  EffectSerializer.quarter).round();
+    final frameTime = BpmUtils.bpmToMillis(bpm, map[EffectSerializer.beats]);
     final List<Frame<ColorMk1>> frames = [];
 
     for (final frame in map[EffectSerializer.frames]) {
