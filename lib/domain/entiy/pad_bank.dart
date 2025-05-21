@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:lpls/domain/entiy/effect/effect.dart';
 import 'package:lpls/domain/entiy/effect/effect_factory.dart';
-import 'package:lpls/domain/entiy/effect/effect_serializer.dart';
 
 class PadBank {
   int audioIndex;
@@ -44,14 +43,6 @@ class PadBank {
     }
   }
 
-  Future<List<AudioPlayer>> _cachePlayers() async {
-    return audioFiles.map((file) {
-      final player = AudioPlayer();
-      player.setSourceDeviceFile(file.path);
-      return player;
-    }).toList();
-  }
-
   Future<PadBank> reorderFiles(
     int oldIndex,
     int newIndex, {
@@ -67,6 +58,7 @@ class PadBank {
 
       final newMidiFiles = List<File>.from(midiFiles);
       final file = newMidiFiles.removeAt(oldIndex);
+      if (newIndex > oldIndex) newIndex--;
       newMidiFiles.insert(newIndex, file);
 
       return await copyWith(midiFiles: newMidiFiles);
@@ -80,6 +72,7 @@ class PadBank {
 
       final newAudioFiles = List<File>.from(audioFiles);
       final file = newAudioFiles.removeAt(oldIndex);
+      if (newIndex > oldIndex) newIndex--;
       newAudioFiles.insert(newIndex, file);
 
       return await copyWith(audioFiles: newAudioFiles);
@@ -88,12 +81,10 @@ class PadBank {
 
   Future<PadBank> trigger() async {
     if (audioFiles.isNotEmpty && audioIndex < audioFiles.length) {
-      print('Playing file #$audioIndex');
       await audioPlayers[audioIndex].resume();
       final newIndex = (audioIndex + 1) % audioPlayers.length;
       return await copyWith(audioIndex: newIndex);
     } else if (midiFiles.isNotEmpty && midiIndex < midiFiles.length) {
-      print('Playing file #$midiIndex');
       final newIndex = (midiIndex + 1) % midiFiles.length;
       return await copyWith(midiIndex: newIndex);
     }
@@ -116,32 +107,47 @@ class PadBank {
     final updatedAudioFiles = audioFiles ?? this.audioFiles;
     final updatedMidiFiles = midiFiles ?? this.midiFiles;
 
-    // Если аудиофайлы изменились — пересоздаём плееры и очищаем старые
-    List<AudioPlayer> newAudioPlayers = [];
-    List<Effect> newEffects = [];
-    if (!identical(updatedAudioFiles, this.audioFiles)) {
-      // Освобождаем текущие плееры
-      for (var player in audioPlayers) {
-        await player.dispose();
-      }
-      // Кэшируем новые плееры
-      newAudioPlayers = await Future.wait(
-        updatedAudioFiles.map((file) async {
+    bool audioChanged = !identical(updatedAudioFiles, this.audioFiles);
+    bool midiChanged = !identical(updatedMidiFiles, this.midiFiles);
+
+    List<AudioPlayer> newAudioPlayers = audioPlayers;
+    List<Effect> newEffects = effects;
+
+    if (audioChanged) {
+      // Пытаемся сопоставить старые плееры по пути
+      newAudioPlayers = [];
+
+      for (var file in updatedAudioFiles) {
+        // Ищем существующий плеер для этого файла
+        final existingIndex = this.audioFiles.indexWhere(
+          (oldFile) => oldFile.path == file.path,
+        );
+
+        if (existingIndex != -1) {
+          // Переиспользуем существующий
+          newAudioPlayers.add(audioPlayers[existingIndex]);
+        } else {
+          // Новый файл — создаём новый плеер
           final player = AudioPlayer();
           await player.setSourceDeviceFile(file.path);
-          return player;
-        }),
-      );
-    } else if (!identical(updatedMidiFiles, this.midiFiles)) {
+          newAudioPlayers.add(player);
+        }
+      }
+
+      // Освобождаем неиспользуемые плееры
+      for (int i = 0; i < this.audioFiles.length; i++) {
+        final oldPath = this.audioFiles[i].path;
+        final isUsed = updatedAudioFiles.any((f) => f.path == oldPath);
+        if (!isUsed) {
+          await audioPlayers[i].dispose();
+        }
+      }
+    }
+
+    if (midiChanged) {
       newEffects = await Future.wait(
-        updatedMidiFiles.map((file) async {
-          return await EffectFactory.readFile(file);
-        }),
+        updatedMidiFiles.map((file) => EffectFactory.readFile(file)),
       );
-    } else {
-      // Не изменялись — используем старые плееры
-      newAudioPlayers = audioPlayers;
-      newEffects = effects;
     }
 
     return PadBank(

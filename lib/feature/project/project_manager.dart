@@ -61,12 +61,13 @@ class ProjectManager {
   }
 
   Future<void> setDevice(MidiDevice? device) async {
-    holder.setDevice(device, midi);
-    debug(deps, 'Device is ${state.lpDevice}');
+    debug(deps, 'Trying to set device to ${device?.name ?? 'Unnamed device'}');
+    holder.setDevice(device, midi);    
     if (device != null) {
       await midi.connectToDevice(device);
       state.lpDevice?.midi.onMidiDataReceived?.listen(_handleMidiMessage);
       effectManager.setEffect(state.lpDevice!.createEffect());
+      success(deps, 'Device set to ${state.lpDevice}');
     }
   }
 
@@ -142,8 +143,17 @@ class ProjectManager {
     }
   }
 
+  void setBank(PadBank bank, Pad pad) {
+    final newBanks = PadStructure.from(state.banks);
+    final pageBanks = Map<Pad, PadBank>.from(newBanks[state.page] ?? {});
+    pageBanks[pad] = bank;
+    newBanks[state.page] = pageBanks;
+    holder.setBanks(newBanks);
+  }
+
   void selectPad(Pad pad) {
     trackManager.setBank(state.banks[state.page]?[pad]);
+    trackManager.setPad(pad);
     homeManager.toTrackScreen();
   }
 }

@@ -40,8 +40,7 @@ class TrackEditorScreen extends ConsumerWidget {
               child: ReorderableListView(
                 scrollDirection: Axis.horizontal,
                 onReorder: (oldIndex, newIndex) {
-                  // TODO: move this method to manager
-                  state.bank?.reorderFiles(oldIndex, newIndex, isMidi: mode == Mode.midi);
+                  manager.reorderTracks(oldIndex, newIndex);
                 },
                 children:
                     mode == Mode.audio
