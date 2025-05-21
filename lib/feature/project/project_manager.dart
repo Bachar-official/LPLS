@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:lpls/constants/pad_structure.dart';
 import 'package:lpls/constants/paging_pads.dart';
@@ -62,7 +64,7 @@ class ProjectManager {
 
   Future<void> setDevice(MidiDevice? device) async {
     debug(deps, 'Trying to set device to ${device?.name ?? 'Unnamed device'}');
-    holder.setDevice(device, midi);    
+    holder.setDevice(device, midi);
     if (device != null) {
       await midi.connectToDevice(device);
       state.lpDevice?.midi.onMidiDataReceived?.listen(_handleMidiMessage);
@@ -143,6 +145,8 @@ class ProjectManager {
     }
   }
 
+  // TODO: make "Collect All and Save" function
+
   void setBank(PadBank bank, Pad pad) {
     final newBanks = PadStructure.from(state.banks);
     final pageBanks = Map<Pad, PadBank>.from(newBanks[state.page] ?? {});
@@ -155,5 +159,63 @@ class ProjectManager {
     trackManager.setBank(state.banks[state.page]?[pad]);
     trackManager.setPad(pad);
     homeManager.toTrackScreen();
+  }
+
+  Future<void> saveProject() async {
+    debug(deps, 'Trying to save project');
+    setLoading(true);
+    try {
+      var path = await FilePicker.platform.saveFile(
+        dialogTitle: 'Save project',
+        fileName: 'project.lpls',
+      );
+      if (path == null) {
+        warning(
+          deps,
+          'Cancelled file saving',
+          showScaffold: true,
+          scaffoldMessage: 'File saving cancelled',
+        );
+        setLoading(false);
+        return;
+      }
+      debug(deps, PadStructureSerializer.serialize(state.banks).toString());
+      final content = jsonEncode(PadStructureSerializer.serialize(state.banks));
+      await File(path).writeAsString(content);
+      success(
+        deps,
+        'Project saved as $path',
+        showScaffold: true,
+        scaffoldMessage: 'Sucessfully saved as $path',
+      );
+    } catch (e, s) {
+      catchException(deps, e, stackTrace: s);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  Future<void> openProject() async {
+    debug(deps, 'Trying to open project from file');
+    setLoading(true);
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        allowMultiple: false,
+        type: FileType.custom,
+        allowedExtensions: ['lpls'],
+      );
+      if (result == null) {
+        warning(deps, 'file pick result is null', showScaffold: true, scaffoldMessage: 'There is no file to open');
+        return;
+      }
+      final content = await File(result.files.first.path!).readAsString();
+      final banks = await PadStructureSerializer.deserialize(jsonDecode(content));
+      holder.setBanks(banks);
+      success(deps, 'Project opened', showScaffold: true, scaffoldMessage: 'Sucessfully opened');
+    } catch(e, s) {
+      catchException(deps, e, stackTrace: s);
+    } finally {
+      setLoading(false);
+    }
   }
 }

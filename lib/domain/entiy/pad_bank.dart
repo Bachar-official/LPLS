@@ -98,6 +98,32 @@ class PadBank {
     }
   }
 
+  Map<String, dynamic> serialize() => {
+      'midiFiles': midiFiles.map((file) => file.path).toList(),
+      'audioFiles': audioFiles.map((file) => file.path).toList(),
+    };
+
+  static Future<PadBank> deserialize(Map<String, dynamic> map) async {
+    final midiField = 'midiFiles', audioField = 'audioFiles';
+    if (map[midiField] == null) {
+      throw Exception('Midi files is missing');
+    } else if (map[audioField] == null) {
+      throw Exception('Audio files is missing');
+    } else {
+      final midiFiles = (map[midiField] as List<dynamic>).map((file) => File(file)).toList();
+      final audioFiles = (map[audioField] as List<dynamic>).map((file) => File(file)).toList();
+      for (final file in [...midiFiles, ...audioFiles]) {
+        if (!file.existsSync()) {
+          throw Exception('${file.path} not exists');
+        }
+      }
+      return await PadBank.initial().copyWith(
+        midiFiles: midiFiles,
+        audioFiles: audioFiles,
+      );
+    }
+  }
+
   Future<PadBank> copyWith({
     int? audioIndex,
     int? midiIndex,

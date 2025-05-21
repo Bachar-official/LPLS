@@ -23,12 +23,16 @@ class HomeManager {
   Future<void> onOpen() async {
     if (state.screen == Screen.effectEditor) {
       await di.effectManager.openEffect();
-    }    
+    } else if (state.screen == Screen.project) {
+      await di.projectManager.openProject();
+    }
   }
 
   Future<void> onSave() async {
     if (state.screen == Screen.effectEditor) {
       await di.effectManager.saveEffect();
+    } else if (state.screen == Screen.project) {
+      await di.projectManager.saveProject();
     }
   }
 }

@@ -28,7 +28,7 @@ class ProjectState {
     lpDevice = null,
       devices = [],
       page = 0,
-      mode = Mode.midi,
+      mode = Mode.audio,
       isLoading = false,
       banks = fillInitialBanks();
 
