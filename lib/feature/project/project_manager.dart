@@ -145,8 +145,6 @@ class ProjectManager {
     }
   }
 
-  // TODO: make "Collect All and Save" function
-
   void setBank(PadBank bank, Pad pad) {
     final newBanks = PadStructure.from(state.banks);
     final pageBanks = Map<Pad, PadBank>.from(newBanks[state.page] ?? {});
@@ -159,6 +157,31 @@ class ProjectManager {
     trackManager.setBank(state.banks[state.page]?[pad]);
     trackManager.setPad(pad);
     homeManager.toTrackScreen();
+  }
+
+  Future<void> exportProject() async {
+    setLoading(true);
+    try {
+      final path = await FilePicker.platform.saveFile(
+        dialogTitle: 'Export project to...',
+        fileName: FileExtensions.projectFileName,
+      );
+      if (path == null) {
+        warning(deps, 'File saving cancelled', showScaffold: true, scaffoldMessage: 'Cancelled saving file');
+        return;
+      }
+      final tempDir = await Directory.systemTemp.createTemp('lpls_temp_');
+      final effectsDir = Directory('${tempDir.path}/effects');
+      final audioDir = Directory('${tempDir.path}/audio');
+      await effectsDir.create(recursive: true);
+      await audioDir.create(recursive: true);
+
+      // TODO: Serialize files with relative paths
+    } catch(e, s) {
+      catchException(deps, e, stackTrace: s);
+    } finally {
+      setLoading(false);
+    }
   }
 
   Future<void> saveProject() async {
