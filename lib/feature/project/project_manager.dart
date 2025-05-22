@@ -167,7 +167,7 @@ class ProjectManager {
     try {
       var path = await FilePicker.platform.saveFile(
         dialogTitle: 'Save project',
-        fileName: 'project.lpls',
+        fileName: FileExtensions.tempProjectFileName,
       );
       if (path == null) {
         warning(
@@ -202,7 +202,7 @@ class ProjectManager {
       final result = await FilePicker.platform.pickFiles(
         allowMultiple: false,
         type: FileType.custom,
-        allowedExtensions: ['lpls'],
+        allowedExtensions: [FileExtensions.tempProject],
       );
       if (result == null) {
         warning(deps, 'file pick result is null', showScaffold: true, scaffoldMessage: 'There is no file to open');

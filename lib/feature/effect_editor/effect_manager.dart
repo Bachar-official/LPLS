@@ -18,6 +18,7 @@ import 'package:lpls/feature/effect_editor/effect_holder.dart';
 import 'package:lpls/feature/effect_editor/effect_state.dart';
 import 'package:lpls/feature/effect_editor/utils/palettes.dart';
 import 'package:lpls/feature/home/home_manager.dart';
+import 'package:lpls/feature/project/utils/check_file_extension.dart';
 import 'package:lpls/utils/bpm_utils.dart';
 import 'package:lpls/utils/ui_utils.dart';
 
@@ -212,7 +213,7 @@ class EffectManager {
       } else {
         var path = await FilePicker.platform.saveFile(
           dialogTitle: 'Select output file',
-          fileName: 'effect.lpe',
+          fileName: FileExtensions.effectFileName,
         );
         if (path == null) {
           warning(
@@ -257,7 +258,7 @@ class EffectManager {
       final result = await FilePicker.platform.pickFiles(
         allowMultiple: false,
         type: FileType.custom,
-        allowedExtensions: ['lpe'],
+        allowedExtensions: [FileExtensions.effect],
       );
       if (result == null) { 
         warning(deps, 'file pick result is null', showScaffold: true, scaffoldMessage: 'There is no file to open');
