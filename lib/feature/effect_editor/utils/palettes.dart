@@ -27,14 +27,21 @@ Color resolveColor<T extends LPColor>(FullColor<T>? color) {
     ColorMk1.red: Colors.red,
 
     ColorMk2.white: Colors.white,
-    ColorMk2.blue: Colors.blue,
-    ColorMk2.green: Colors.green,
     ColorMk2.red: Colors.red,
-    ColorMk2.yellow: Colors.yellow,
-    ColorMk2.cyan: Colors.cyan,
-    ColorMk2.greenWarm: Color.fromARGB(255, 166, 255, 0),
-    ColorMk2.magenta: Colors.purple,
     ColorMk2.orange: Colors.orange,
+    ColorMk2.yellow: Colors.yellow,
+    ColorMk2.greenWarm: Color.fromARGB(255, 166, 255, 0),
+    ColorMk2.green: Colors.green,
+    ColorMk2.aqua: Color.fromARGB(255, 0, 255, 166),
+    ColorMk2.cyan: Colors.cyan,
+    ColorMk2.sky: Color.fromARGB(255, 0, 200, 255),
+    ColorMk2.blue: Colors.blue,
+    ColorMk2.indigo: Color.fromARGB(255, 75, 0, 255),
+    ColorMk2.purple: Colors.purple,
+    ColorMk2.violet: Color.fromARGB(255, 180, 0, 255),
+    ColorMk2.magenta: Color.fromARGB(255, 255, 0, 180),
+    ColorMk2.fuchsia: Color.fromARGB(255, 255, 0, 120),
+    ColorMk2.amber: Colors.amber,
   };
 
   final base = baseColors[color.$1]!;

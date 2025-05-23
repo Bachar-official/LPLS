@@ -9,7 +9,6 @@ import 'package:lpls/feature/home/home_holder.dart';
 import 'package:lpls/feature/home/home_state.dart';
 import 'package:lpls/feature/project/project_screen.dart';
 import 'package:lpls/feature/track_editor/track_editor_screen.dart';
-import 'package:window_manager/window_manager.dart';
 
 final provider = StateNotifierProvider<HomeHolder, HomeState>(
   (ref) => di.homeHolder,
@@ -62,41 +61,8 @@ class HomeScreen extends ConsumerWidget {
             ),
           ],
         ),
-        title: DragToMoveArea(
-          child: SizedBox(
-            height: double.infinity,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  'LPLS',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-          ),
-        ),
-        actions: WindowButtons(),
       ),
       content: _getCurrentScreen(),
-    );
-  }
-}
-
-class WindowButtons extends StatelessWidget {
-  const WindowButtons({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final FluentThemeData theme = FluentTheme.of(context);
-
-    return SizedBox(
-      width: 138,
-      height: 50,
-      child: WindowCaption(
-        brightness: theme.brightness,
-        backgroundColor: Colors.transparent,
-      ),
     );
   }
 }
