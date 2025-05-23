@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:lpls/constants/pad_structure.dart';
 import 'package:lpls/constants/paging_pads.dart';
+import 'package:lpls/domain/entiy/launchpad/launchpad_mini_mk3.dart';
 import 'package:lpls/domain/entiy/manager_deps.dart';
 import 'package:lpls/domain/entiy/pad_bank.dart';
 import 'package:lpls/domain/enum/mode.dart';
@@ -69,7 +71,7 @@ class ProjectManager {
       await midi.connectToDevice(device);
       state.lpDevice?.midi.onMidiDataReceived?.listen(_handleMidiMessage);
       effectManager.setEffect(state.lpDevice!.createEffect());
-      success(deps, 'Device set to ${state.lpDevice}');
+      success(deps, 'Device set to ${state.lpDevice}');      
     }
   }
 
@@ -92,6 +94,7 @@ class ProjectManager {
           holder.setBanks(updatedBanks);
         }
       }
+      debug(deps, 'Event in ${event.data}');
     }
   }
 
