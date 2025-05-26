@@ -164,13 +164,17 @@ class ProjectManager {
   }
 
   Future<void> exportProject() async {
-    // TODO: name lpp file same as project
     setLoading(true);
     try {
+      // Asking for save location
       final path = await FilePicker.platform.saveFile(
         dialogTitle: 'Export project to...',
         fileName: FileExtensions.projectFileName,
       );
+      final baseName = path != null
+    ? path.split(Platform.pathSeparator).last.split('.').first
+    : 'project';
+    // If no path is selected
       if (path == null) {
         warning(
           deps,
@@ -180,12 +184,14 @@ class ProjectManager {
         );
         return;
       }
+      // Creating temp directories
       final tempDir = await Directory.systemTemp.createTemp('lpls_temp_');
       final effectsDir = Directory('${tempDir.path}/effects');
       final audioDir = Directory('${tempDir.path}/audio');
       await effectsDir.create(recursive: true);
       await audioDir.create(recursive: true);
 
+      // Serializing project and copying files
       final serializedBanks =
           <String, Map<String, Map<String, List<String>>>>{};
 
@@ -220,14 +226,15 @@ class ProjectManager {
         serializedBanks[bankIndex.toString()] = serializedPadMap;
       }
 
+      // Writing lpp file and archiving at ZIP
       final projectJson = jsonEncode(serializedBanks);
       final lppFile = File(
-        '${tempDir.path}/${FileExtensions.tempProjectFileName}',
+        '${tempDir.path}/$baseName.lpp',
       );
       await lppFile.writeAsString(projectJson);
 
       final encoder = ZipEncoder();
-      final archive = Archive();
+      final archive = Archive();      
 
       for (final entity in tempDir.listSync(recursive: true)) {
         if (entity is File) {
@@ -240,6 +247,13 @@ class ProjectManager {
       final zipData = encoder.encode(archive);
       final outFile = File(path);
       await outFile.writeAsBytes(zipData);
+
+      // Deleting temp dir and writing success message
+      if (tempDir.existsSync()) {
+        await tempDir.delete(recursive: true);
+      }
+
+      success(deps, 'Project file exported', showScaffold: true, scaffoldMessage: 'Successfully saved as $baseName.lpls');
     } catch (e, s) {
       catchException(deps, e, stackTrace: s);
     } finally {
