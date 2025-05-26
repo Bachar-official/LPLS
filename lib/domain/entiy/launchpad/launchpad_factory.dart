@@ -18,7 +18,7 @@ class LaunchpadFactory {
       return null;
     }
     final name = device.name.toLowerCase();
-    if (name.contains('lpminimk3')) {
+    if (name.contains('lpminimk3') || name.contains('mini mk3')) {
       return LPMiniMk3(midi: midi, device: device, palette: ColorMk2.values);
     }
     if (name.contains('mk2') || name.contains('pro')) {
