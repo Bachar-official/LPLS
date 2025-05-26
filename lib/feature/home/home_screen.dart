@@ -37,11 +37,7 @@ class HomeScreen extends ConsumerWidget {
           items: [
             MenuBarItem(
               title: 'File',
-              items: [
-                MenuFlyoutItem(text: const Text('Open...'), onPressed: manager.onOpen),
-                MenuFlyoutItem(text: const Text('Save'), onPressed: manager.onSave),
-                MenuFlyoutItem(text: const Text('Exit'), onPressed: () => exit(0)),
-              ],
+              items: manager.fileMenuItems,
             ),
             MenuBarItem(
               title: 'Screen',

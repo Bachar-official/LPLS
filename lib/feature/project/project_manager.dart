@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:archive/archive.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:lpls/constants/pad_structure.dart';
@@ -71,7 +72,7 @@ class ProjectManager {
       await midi.connectToDevice(device);
       state.lpDevice?.midi.onMidiDataReceived?.listen(_handleMidiMessage);
       effectManager.setEffect(state.lpDevice!.createEffect());
-      success(deps, 'Device set to ${state.lpDevice}');      
+      success(deps, 'Device set to ${state.lpDevice}');
     }
   }
 
@@ -163,6 +164,7 @@ class ProjectManager {
   }
 
   Future<void> exportProject() async {
+    // TODO: name lpp file same as project
     setLoading(true);
     try {
       final path = await FilePicker.platform.saveFile(
@@ -170,7 +172,12 @@ class ProjectManager {
         fileName: FileExtensions.projectFileName,
       );
       if (path == null) {
-        warning(deps, 'File saving cancelled', showScaffold: true, scaffoldMessage: 'Cancelled saving file');
+        warning(
+          deps,
+          'File saving cancelled',
+          showScaffold: true,
+          scaffoldMessage: 'Cancelled saving file',
+        );
         return;
       }
       final tempDir = await Directory.systemTemp.createTemp('lpls_temp_');
@@ -179,8 +186,61 @@ class ProjectManager {
       await effectsDir.create(recursive: true);
       await audioDir.create(recursive: true);
 
-      // TODO: Serialize files with relative paths
-    } catch(e, s) {
+      final serializedBanks =
+          <String, Map<String, Map<String, List<String>>>>{};
+
+      for (final bankEntry in state.banks.entries) {
+        final bankIndex = bankEntry.key;
+        final serializedPadMap = <String, Map<String, List<String>>>{};
+
+        for (final padEntry in bankEntry.value.entries) {
+          final pad = padEntry.key;
+          final bank = padEntry.value;
+
+          final updatedMidiPaths = <String>[];
+          for (final file in bank.midiFiles) {
+            final newPath = '${effectsDir.path}/${file.uri.pathSegments.last}';
+            await file.copy(newPath);
+            updatedMidiPaths.add('effects/${file.uri.pathSegments.last}');
+          }
+
+          final updatedAudioPaths = <String>[];
+          for (final file in bank.audioFiles) {
+            final newPath = '${audioDir.path}/${file.uri.pathSegments.last}';
+            await file.copy(newPath);
+            updatedAudioPaths.add('audio/${file.uri.pathSegments.last}');
+          }
+
+          serializedPadMap[pad.name] = {
+            'midiFiles': updatedMidiPaths,
+            'audioFiles': updatedAudioPaths,
+          };
+        }
+
+        serializedBanks[bankIndex.toString()] = serializedPadMap;
+      }
+
+      final projectJson = jsonEncode(serializedBanks);
+      final lppFile = File(
+        '${tempDir.path}/${FileExtensions.tempProjectFileName}',
+      );
+      await lppFile.writeAsString(projectJson);
+
+      final encoder = ZipEncoder();
+      final archive = Archive();
+
+      for (final entity in tempDir.listSync(recursive: true)) {
+        if (entity is File) {
+          final relativePath = entity.path.substring(tempDir.path.length + 1);
+          final data = await entity.readAsBytes();
+          archive.addFile(ArchiveFile(relativePath, data.length, data));
+        }
+      }
+
+      final zipData = encoder.encode(archive);
+      final outFile = File(path);
+      await outFile.writeAsBytes(zipData);
+    } catch (e, s) {
       catchException(deps, e, stackTrace: s);
     } finally {
       setLoading(false);
@@ -231,14 +291,26 @@ class ProjectManager {
         allowedExtensions: [FileExtensions.tempProject],
       );
       if (result == null) {
-        warning(deps, 'file pick result is null', showScaffold: true, scaffoldMessage: 'There is no file to open');
+        warning(
+          deps,
+          'file pick result is null',
+          showScaffold: true,
+          scaffoldMessage: 'There is no file to open',
+        );
         return;
       }
       final content = await File(result.files.first.path!).readAsString();
-      final banks = await PadStructureSerializer.deserialize(jsonDecode(content));
+      final banks = await PadStructureSerializer.deserialize(
+        jsonDecode(content),
+      );
       holder.setBanks(banks);
-      success(deps, 'Project opened', showScaffold: true, scaffoldMessage: 'Sucessfully opened');
-    } catch(e, s) {
+      success(
+        deps,
+        'Project opened',
+        showScaffold: true,
+        scaffoldMessage: 'Sucessfully opened',
+      );
+    } catch (e, s) {
       catchException(deps, e, stackTrace: s);
     } finally {
       setLoading(false);
