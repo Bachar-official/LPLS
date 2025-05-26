@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
+import 'package:archive/archive_io.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:lpls/constants/pad_structure.dart';
@@ -19,6 +20,7 @@ import 'package:flutter_midi_command/flutter_midi_command.dart';
 import 'package:lpls/feature/project/project_state.dart';
 import 'package:lpls/feature/project/utils/check_file_extension.dart';
 import 'package:lpls/feature/track_editor/track_manager.dart';
+import 'package:lpls/utils/file_utils.dart';
 import 'package:lpls/utils/ui_utils.dart';
 
 class ProjectManager {
@@ -164,6 +166,7 @@ class ProjectManager {
   }
 
   Future<void> exportProject() async {
+    debug(deps, 'Try to export project');
     setLoading(true);
     try {
       // Asking for save location
@@ -261,6 +264,40 @@ class ProjectManager {
     }
   }
 
+  Future<void> importProject() async {
+    debug(deps, 'Try to import project');
+    setLoading(true);
+    // Asking for a project file
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        allowMultiple: false,
+        type: FileType.custom,
+        allowedExtensions: [FileExtensions.project],
+      );
+      if (result == null) {
+        warning(
+          deps,
+          'file pick result is null',
+          showScaffold: true,
+          scaffoldMessage: 'There is no file to open',
+        );
+        return;
+      }
+      final baseName = result.paths.last != null
+    ? result.paths.last!.split(Platform.pathSeparator).last.split('.').first
+    : 'project';
+
+      final baseDirectory = FileUtils.getBasePath(result.paths.last!);
+      await FileUtils.extractLpls(result.paths.last!, '$baseDirectory/$baseName');
+      await openProject(path: '$baseDirectory/$baseName/$baseName.lpp');
+
+    } catch(e, s) {
+      catchException(deps, e, stackTrace: s);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   Future<void> saveProject() async {
     debug(deps, 'Trying to save project');
     setLoading(true);
@@ -295,39 +332,58 @@ class ProjectManager {
     }
   }
 
-  Future<void> openProject() async {
-    debug(deps, 'Trying to open project from file');
-    setLoading(true);
-    try {
-      final result = await FilePicker.platform.pickFiles(
-        allowMultiple: false,
-        type: FileType.custom,
-        allowedExtensions: [FileExtensions.tempProject],
-      );
-      if (result == null) {
-        warning(
-          deps,
-          'file pick result is null',
-          showScaffold: true,
-          scaffoldMessage: 'There is no file to open',
+  Future<void> openProject({String? path}) async {
+  debug(deps, 'Trying to open project from file');
+  setLoading(true);
+  try {
+    final result = path == null ? await FilePicker.platform.pickFiles(
+      allowMultiple: false,
+      type: FileType.custom,
+      allowedExtensions: [FileExtensions.tempProject],
+    ) : null;
+
+    final filePath = path ?? result?.files.single.path;
+    if (filePath == null) return;
+
+    final file = File(filePath);
+    final jsonString = await file.readAsString();
+    final Map<String, dynamic> decoded = jsonDecode(jsonString);
+
+    // Получаем директорию, в которой находится .lpp
+    final baseDir = FileUtils.getBasePath(filePath);
+
+    final banks = <int, Map<Pad, PadBank>>{};
+    for (final bankEntry in decoded.entries) {
+      final page = int.parse(bankEntry.key);
+      final padMap = <Pad, PadBank>{};
+
+      for (final padEntry in (bankEntry.value as Map).entries) {
+        final pad = Pad.values.firstWhere((p) => p.name == padEntry.key);
+        final data = padEntry.value as Map;
+
+        final midiPaths = (data['midiFiles'] as List).map((relPath) {
+          return File('$baseDir/$relPath');
+        }).toList();
+
+        final audioPaths = (data['audioFiles'] as List).map((relPath) {
+          return File('$baseDir/$relPath');
+        }).toList();
+
+        padMap[pad] = await PadBank.initial().copyWith(
+          midiFiles: midiPaths,
+          audioFiles: audioPaths,
         );
-        return;
       }
-      final content = await File(result.files.first.path!).readAsString();
-      final banks = await PadStructureSerializer.deserialize(
-        jsonDecode(content),
-      );
-      holder.setBanks(banks);
-      success(
-        deps,
-        'Project opened',
-        showScaffold: true,
-        scaffoldMessage: 'Sucessfully opened',
-      );
-    } catch (e, s) {
-      catchException(deps, e, stackTrace: s);
-    } finally {
-      setLoading(false);
+
+      banks[page] = padMap;
     }
+
+    holder.setBanks(banks);
+    success(deps, 'Project opened');
+  } catch (e, s) {
+    catchException(deps, e, stackTrace: s);
+  } finally {
+    setLoading(false);
   }
+}
 }
