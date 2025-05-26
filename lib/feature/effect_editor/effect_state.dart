@@ -6,13 +6,14 @@ class EffectState {
   final FullColor? selectedColor;
   final int frameNumber;
 
+  bool get hasEffect => effect != null;
   bool get isFirstFrame => frameNumber == 0;
   bool get isLastFrame =>
-      effect != null && frameNumber == effect!.frames.length - 1;
+      hasEffect && frameNumber == effect!.frames.length - 1;
   bool get isSingleFrame => effect!.frames.length < 2;
 
-  bool get isRemoveAvailable => effect != null && !isSingleFrame;
-  bool get isControlAvailable => effect != null;
+  bool get isRemoveAvailable => hasEffect && !isSingleFrame;
+  bool get isControlAvailable => hasEffect;
 
   const EffectState({
     required this.effect,

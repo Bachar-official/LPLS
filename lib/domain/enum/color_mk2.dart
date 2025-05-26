@@ -22,13 +22,12 @@ enum ColorMk2 implements LPColor {
 
   final ({int dark, int middle, int light}) value;
 
-  
   const ColorMk2(this.value);
-  
+
   @override
-  int get dark => value.dark;  
+  int get dark => value.dark;
   @override
-  int get light => value.light;  
+  int get light => value.light;
   @override
   int get middle => value.middle;
   @override
@@ -37,8 +36,18 @@ enum ColorMk2 implements LPColor {
   String serialize(Btness brightness) => '$name.${brightness.name}';
 
   static (ColorMk2, Btness?) deserialize(String str) {
-    final [colorValue, btnessValue] = str.split('.');
-    final brightness = btnessValue.isNotEmpty ? Btness.values.firstWhere((b) => b.name == btnessValue) : Btness.light;
+    final parts = str.split('.');
+    final colorValue = parts[0];
+    final btnessValue = parts.length > 1 ? parts[1] : null;
+
+    final brightness =
+        btnessValue != null
+            ? Btness.values.firstWhere(
+              (b) => b.name == btnessValue,
+              orElse: () => Btness.light,
+            )
+            : Btness.light;
+
     final color = ColorMk2.values.firstWhere((c) => c.name == colorValue);
     return (color, brightness);
   }

@@ -26,7 +26,7 @@ class EffectManager {
   final HomeManager homeManager;
   Timer? _playbackTimer;
   int _currentFrameIndex = 0;
-  bool _isPlaying = false;
+  bool isPlaying = false;
   Stopwatch? _stopwatch;
   Duration _remainingTime = Duration.zero;
 
@@ -64,8 +64,22 @@ class EffectManager {
   }
 
   void setBPM(num? value) {
-    if (value != null && state.effect != null) {
+    if (value != null && state.hasEffect) {
       holder.setEffect(state.effect?.withBPM(value.toInt()));
+    }
+  }
+
+  void setBeats(num? value) {
+    if (value != null && state.hasEffect) {
+      holder.setEffect(
+        state.effect?.withBeats(
+          value.toInt(),
+          bpm: BpmUtils.millisToBpm(
+            state.effect?.frameTime ?? 120,
+            value.toInt(),
+          ),
+        ),
+      );
     }
   }
 
@@ -99,7 +113,7 @@ class EffectManager {
 
   void goToNextFrame() {
     final frame = state.frameNumber;
-    if (state.effect != null && frame < state.effect!.frames.length) {
+    if (state.hasEffect && frame < state.effect!.frames.length) {
       holder.setFrameNumber(frame + 1);
     }
   }
@@ -109,13 +123,13 @@ class EffectManager {
   }
 
   void goToLastFrame() {
-    if (state.effect != null) {
+    if (state.hasEffect) {
       holder.setFrameNumber(state.effect!.frames.length - 1);
     }
   }
 
   void draw(Pad pad, int frame, FullColor? color) {
-    if (state.effect != null && state.effect!.frames.length >= frame - 1) {
+    if (state.hasEffect && state.effect!.frames.length >= frame - 1) {
       final effect = state.effect;
       holder.setEffect(
         effect?.withPadColored(frame, pad, color, (
@@ -134,45 +148,40 @@ class EffectManager {
     holder.setFrameNumber(frame.clamp(0, state.effect!.frames.length - 1));
   }
 
-  /// Запускает воспроизведение эффекта.
   void play() {
-    if (state.effect == null || _isPlaying) return;
+    if (state.effect == null || isPlaying) return;
 
-    _isPlaying = true;
+    isPlaying = true;
     _currentFrameIndex = state.frameNumber;
     _startPlaybackTimer();
   }
 
-  /// Ставит воспроизведение на паузу.
   void pause() {
-    if (!_isPlaying || _playbackTimer == null) return;
+    if (!isPlaying || _playbackTimer == null) return;
 
     _playbackTimer?.cancel();
     _remainingTime =
         Duration(milliseconds: state.effect!.frameTime) - _stopwatch!.elapsed;
     _stopwatch?.stop();
-    _isPlaying = false;
+    isPlaying = false;
   }
 
-  /// Возобновляет воспроизведение с места паузы.
   void resume() {
-    if (_isPlaying || state.effect == null) return;
+    if (isPlaying || state.effect == null) return;
 
-    _isPlaying = true;
+    isPlaying = true;
     _startPlaybackTimer(initialDelay: _remainingTime);
   }
 
-  /// Останавливает воспроизведение и сбрасывает позицию.
   void stop() {
     _playbackTimer?.cancel();
     _stopwatch?.stop();
-    _isPlaying = false;
+    isPlaying = false;
     _remainingTime = Duration.zero;
     _currentFrameIndex = 0;
     holder.setFrameNumber(0);
   }
 
-  /// Запускает таймер для переключения кадров.
   void _startPlaybackTimer({Duration? initialDelay}) {
     if (state.effect == null) return;
 
@@ -181,7 +190,7 @@ class EffectManager {
 
     _playbackTimer = Timer.periodic(Duration(milliseconds: frameTime), (timer) {
       if (_currentFrameIndex >= state.effect!.frames.length - 1) {
-        _currentFrameIndex = 0; // Зацикливаем
+        _currentFrameIndex = 0;
       } else {
         _currentFrameIndex++;
       }
@@ -189,7 +198,6 @@ class EffectManager {
       _stopwatch?.reset();
     });
 
-    // Если было восстановление с паузы, устанавливаем задержку
     if (initialDelay != null) {
       _playbackTimer = Timer(initialDelay, () {
         _playbackTimer?.cancel();
@@ -258,8 +266,13 @@ class EffectManager {
         type: FileType.custom,
         allowedExtensions: [FileExtensions.effect],
       );
-      if (result == null) { 
-        warning(deps, 'file pick result is null', showScaffold: true, scaffoldMessage: 'There is no file to open');
+      if (result == null) {
+        warning(
+          deps,
+          'file pick result is null',
+          showScaffold: true,
+          scaffoldMessage: 'There is no file to open',
+        );
       } else {
         final file = File(result.files.first.path!);
         final effect = await EffectFactory.readFile(file);

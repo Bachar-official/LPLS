@@ -63,12 +63,8 @@ class EffectScreen extends ConsumerWidget {
               onPressed: state.isFirstFrame ? null : manager.goToPrevFrame,
             ),
             IconButton(
-              icon: const Icon(FluentIcons.play, size: iconSize),
-              onPressed: manager.play,
-            ),
-            IconButton(
-              icon: const Icon(FluentIcons.pause, size: iconSize),
-              onPressed: manager.pause,
+              icon: Icon(manager.isPlaying ? FluentIcons.pause : FluentIcons.play, size: iconSize),
+              onPressed: manager.isPlaying ? manager.pause : manager.play,
             ),
             IconButton(
               icon: const Icon(FluentIcons.play_resume, size: iconSize),
@@ -86,22 +82,6 @@ class EffectScreen extends ConsumerWidget {
             IconButton(
               icon: const Icon(FluentIcons.remove, size: iconSize),
               onPressed: state.isRemoveAvailable ? manager.removeFrame : null,
-            ),
-            divider,
-            SplitButton(
-              flyout: MenuFlyout(
-                items: [
-                  MenuFlyoutItem(
-                    text: const Text('MK1 Palette'),
-                    onPressed: () {},
-                  ),
-                  MenuFlyoutItem(
-                    text: const Text('MK2 Palette'),
-                    onPressed: () {},
-                  ),
-                ],
-              ),
-              child: Text('Palette'),
             ),
           ],
         ),

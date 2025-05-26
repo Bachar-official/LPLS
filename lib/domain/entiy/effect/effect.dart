@@ -50,9 +50,13 @@ class Effect<T extends LPColor> {
   }
 
   Effect<T> withNewFrame() {
-    final newFrames = List<Frame<T>>.from(frames); // копируем старые фреймы
-    newFrames.add({}); // добавляем новый пустой кадр
-    return copyWith(frames: newFrames); // возвращаем новый эффект с тем же T
+    final newFrames = List<Frame<T>>.from(frames);
+    if (frames.isEmpty) {
+      newFrames.add({});
+    } else {
+      newFrames.add(frames.last);
+    }    
+    return copyWith(frames: newFrames);
   }
 
   Effect<T> withoutFrame(int frameIndex) {
@@ -105,4 +109,11 @@ class Effect<T extends LPColor> {
   Effect withBPM(int bpm) {
     return copyWith(frameTime: BpmUtils.bpmToMillis(bpm, beats));
   }
+
+  Effect<T> withBeats(int newBeats, {required int bpm}) {
+  return copyWith(
+    beats: newBeats,
+    frameTime: BpmUtils.bpmToMillis(bpm, newBeats),
+  );
+}
 }
