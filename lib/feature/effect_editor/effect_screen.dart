@@ -1,5 +1,5 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/material.dart' show Icons, InputDecoration hide IconButton;
+import 'package:flutter/material.dart' show Icons hide IconButton;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lpls/domain/di.dart';
 import 'package:lpls/feature/effect_editor/components/effect_grid.dart';
