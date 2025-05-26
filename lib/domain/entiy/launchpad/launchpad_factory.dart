@@ -23,7 +23,8 @@ class LaunchpadFactory {
     }
     if (name.contains('mk2') || name.contains('pro')) {
       return LPMk2(midi: midi, device: device, palette: ColorMk2.values);
-    } else if (name.contains(' s') || name.contains('mini')) {
+    }
+    if (name.contains(' s') || name.contains('mini')) {
       return LPMk1(midi: midi, device: device, palette: ColorMk1.values);
     }
     return null;
