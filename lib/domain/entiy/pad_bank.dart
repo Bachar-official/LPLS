@@ -43,6 +43,18 @@ class PadBank {
     }
   }
 
+  Future<PadBank> removeFile(int index, bool isMidi) async {
+    if (isMidi) {
+      if (index < 0 || index >= midiFiles.length) return this;
+      final newMidi = List<File>.from(midiFiles)..removeAt(index);
+      return await copyWith(midiFiles: newMidi, midiIndex: 0);
+    } else {
+      if (index < 0 || index >= audioFiles.length) return this;
+      final newAudio = List<File>.from(audioFiles)..removeAt(index);
+      return await copyWith(audioFiles: newAudio, audioIndex: 0);
+    }
+  }
+
   Future<PadBank> reorderFiles(
     int oldIndex,
     int newIndex, {
@@ -99,9 +111,9 @@ class PadBank {
   }
 
   Map<String, dynamic> serialize() => {
-      'midiFiles': midiFiles.map((file) => file.path).toList(),
-      'audioFiles': audioFiles.map((file) => file.path).toList(),
-    };
+    'midiFiles': midiFiles.map((file) => file.path).toList(),
+    'audioFiles': audioFiles.map((file) => file.path).toList(),
+  };
 
   static Future<PadBank> deserialize(Map<String, dynamic> map) async {
     final midiField = 'midiFiles', audioField = 'audioFiles';
@@ -110,8 +122,10 @@ class PadBank {
     } else if (map[audioField] == null) {
       throw Exception('Audio files is missing');
     } else {
-      final midiFiles = (map[midiField] as List<dynamic>).map((file) => File(file)).toList();
-      final audioFiles = (map[audioField] as List<dynamic>).map((file) => File(file)).toList();
+      final midiFiles =
+          (map[midiField] as List<dynamic>).map((file) => File(file)).toList();
+      final audioFiles =
+          (map[audioField] as List<dynamic>).map((file) => File(file)).toList();
       for (final file in [...midiFiles, ...audioFiles]) {
         if (!file.existsSync()) {
           throw Exception('${file.path} not exists');
@@ -140,27 +154,22 @@ class PadBank {
     List<Effect> newEffects = effects;
 
     if (audioChanged) {
-      // Пытаемся сопоставить старые плееры по пути
       newAudioPlayers = [];
 
       for (var file in updatedAudioFiles) {
-        // Ищем существующий плеер для этого файла
         final existingIndex = this.audioFiles.indexWhere(
           (oldFile) => oldFile.path == file.path,
         );
 
         if (existingIndex != -1) {
-          // Переиспользуем существующий
           newAudioPlayers.add(audioPlayers[existingIndex]);
         } else {
-          // Новый файл — создаём новый плеер
           final player = AudioPlayer();
           await player.setSourceDeviceFile(file.path);
           newAudioPlayers.add(player);
         }
       }
 
-      // Освобождаем неиспользуемые плееры
       for (int i = 0; i < this.audioFiles.length; i++) {
         final oldPath = this.audioFiles[i].path;
         final isUsed = updatedAudioFiles.any((f) => f.path == oldPath);

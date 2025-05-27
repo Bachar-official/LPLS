@@ -24,7 +24,10 @@ class TrackManager {
   void setPad(Pad? pad) => holder.setPad(pad);
 
   void reorderTracks(oldIndex, newIndex) async {
-    debug(deps, 'Try to reorder ${di.projectManager.state.mode} track from $oldIndex to $newIndex');
+    debug(
+      deps,
+      'Try to reorder ${di.projectManager.state.mode} track from $oldIndex to $newIndex',
+    );
     final pad = state.pad;
     final bank = state.bank;
     if (bank != null && pad != null) {
@@ -37,6 +40,18 @@ class TrackManager {
       di.projectManager.setBank(newBank, pad);
       success(deps, 'Reordered successfully');
     }
+  }
+
+  Future<void> removeFile(int index, bool isMidi) async {
+    debug(deps, 'Try to remove track number $index from pad ${state.pad}');
+    holder.setLoading(true);
+    await di.projectManager.removeFileFromBank(
+      pad: state.pad!,
+      bank: state.bank!,
+      index: index,
+      isMidi: isMidi,
+    );
+    holder.setLoading(false);
   }
 
   void goBack() {

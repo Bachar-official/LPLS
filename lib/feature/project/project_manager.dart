@@ -87,12 +87,19 @@ class ProjectManager {
       } else {
         var bank = state.banks[state.page]?[pressedPad];
         if (bank != null) {
-          Pad pad = pressedPad!;
-          state.lpDevice?.playEffect(bank.currentEffect);
-          var newBank = await bank.trigger();
-          final updatedPageBanks = {...state.banks[state.page]!, pad: newBank};
-          final updatedBanks = {...state.banks, state.page: updatedPageBanks};
-          holder.setBanks(updatedBanks);
+          try {
+            Pad pad = pressedPad!;
+            state.lpDevice?.playEffect(bank.currentEffect);
+            var newBank = await bank.trigger();
+            final updatedPageBanks = {
+              ...state.banks[state.page]!,
+              pad: newBank,
+            };
+            final updatedBanks = {...state.banks, state.page: updatedPageBanks};
+            holder.setBanks(updatedBanks);
+          } catch (e, s) {
+            catchException(deps, e, stackTrace: s);
+          }
         }
       }
       debug(deps, 'Event in ${event.data}');
@@ -149,6 +156,17 @@ class ProjectManager {
     }
   }
 
+  Future<void> removeFileFromBank({
+    required Pad pad,
+    required PadBank bank,
+    required int index,
+    required bool isMidi,
+  }) async {
+    final newBank = await bank.removeFile(index, isMidi);
+    setBank(newBank, pad);
+    selectPad(pad);
+  }
+
   void setBank(PadBank bank, Pad pad) {
     final newBanks = PadStructure.from(state.banks);
     final pageBanks = Map<Pad, PadBank>.from(newBanks[state.page] ?? {});
@@ -172,15 +190,16 @@ class ProjectManager {
         dialogTitle: 'Export project to...',
         fileName: FileExtensions.projectFileName,
       );
-      final baseName = path != null
-    ? path.split(Platform.pathSeparator).last.split('.').first
-    : 'project';
-    // If no path is selected
+      final baseName =
+          path != null
+              ? path.split(Platform.pathSeparator).last.split('.').first
+              : 'project';
+      // If no path is selected
       if (path == null) {
         warning(
           deps,
           'File saving cancelled',
-          
+
           scaffoldMessage: 'Cancelled saving file',
         );
         return;
@@ -229,13 +248,11 @@ class ProjectManager {
 
       // Writing lpp file and archiving at ZIP
       final projectJson = jsonEncode(serializedBanks);
-      final lppFile = File(
-        '${tempDir.path}/$baseName.lpp',
-      );
+      final lppFile = File('${tempDir.path}/$baseName.lpp');
       await lppFile.writeAsString(projectJson);
 
       final encoder = ZipEncoder();
-      final archive = Archive();      
+      final archive = Archive();
 
       for (final entity in tempDir.listSync(recursive: true)) {
         if (entity is File) {
@@ -254,7 +271,11 @@ class ProjectManager {
         await tempDir.delete(recursive: true);
       }
 
-      success(deps, 'Project file exported',  scaffoldMessage: 'Successfully saved as $baseName.lpls');
+      success(
+        deps,
+        'Project file exported',
+        scaffoldMessage: 'Successfully saved as $baseName.lpls',
+      );
     } catch (e, s) {
       catchException(deps, e, stackTrace: s);
     } finally {
@@ -276,20 +297,27 @@ class ProjectManager {
         warning(
           deps,
           'file pick result is null',
-          
+
           scaffoldMessage: 'There is no file to open',
         );
         return;
       }
-      final baseName = result.paths.last != null
-    ? result.paths.last!.split(Platform.pathSeparator).last.split('.').first
-    : 'project';
+      final baseName =
+          result.paths.last != null
+              ? result.paths.last!
+                  .split(Platform.pathSeparator)
+                  .last
+                  .split('.')
+                  .first
+              : 'project';
 
       final baseDirectory = FileUtils.getBasePath(result.paths.last!);
-      await FileUtils.extractLpls(result.paths.last!, '$baseDirectory/$baseName');
+      await FileUtils.extractLpls(
+        result.paths.last!,
+        '$baseDirectory/$baseName',
+      );
       await openProject(path: '$baseDirectory/$baseName/$baseName.lpp');
-
-    } catch(e, s) {
+    } catch (e, s) {
       catchException(deps, e, stackTrace: s);
     } finally {
       setLoading(false);
@@ -308,7 +336,7 @@ class ProjectManager {
         warning(
           deps,
           'Cancelled file saving',
-          
+
           scaffoldMessage: 'File saving cancelled',
         );
         setLoading(false);
@@ -320,7 +348,7 @@ class ProjectManager {
       success(
         deps,
         'Project saved as $path',
-        
+
         scaffoldMessage: 'Sucessfully saved as $path',
       );
     } catch (e, s) {
@@ -331,57 +359,62 @@ class ProjectManager {
   }
 
   Future<void> openProject({String? path}) async {
-  debug(deps, 'Trying to open project from file');
-  setLoading(true);
-  try {
-    final result = path == null ? await FilePicker.platform.pickFiles(
-      allowMultiple: false,
-      type: FileType.custom,
-      allowedExtensions: [FileExtensions.tempProject],
-    ) : null;
+    debug(deps, 'Trying to open project from file');
+    setLoading(true);
+    try {
+      final result =
+          path == null
+              ? await FilePicker.platform.pickFiles(
+                allowMultiple: false,
+                type: FileType.custom,
+                allowedExtensions: [FileExtensions.tempProject],
+              )
+              : null;
 
-    final filePath = path ?? result?.files.single.path;
-    if (filePath == null) return;
+      final filePath = path ?? result?.files.single.path;
+      if (filePath == null) return;
 
-    final file = File(filePath);
-    final jsonString = await file.readAsString();
-    final Map<String, dynamic> decoded = jsonDecode(jsonString);
+      final file = File(filePath);
+      final jsonString = await file.readAsString();
+      final Map<String, dynamic> decoded = jsonDecode(jsonString);
 
-    // Получаем директорию, в которой находится .lpp
-    final baseDir = FileUtils.getBasePath(filePath);
+      // Получаем директорию, в которой находится .lpp
+      final baseDir = FileUtils.getBasePath(filePath);
 
-    final banks = <int, Map<Pad, PadBank>>{};
-    for (final bankEntry in decoded.entries) {
-      final page = int.parse(bankEntry.key);
-      final padMap = <Pad, PadBank>{};
+      final banks = <int, Map<Pad, PadBank>>{};
+      for (final bankEntry in decoded.entries) {
+        final page = int.parse(bankEntry.key);
+        final padMap = <Pad, PadBank>{};
 
-      for (final padEntry in (bankEntry.value as Map).entries) {
-        final pad = Pad.values.firstWhere((p) => p.name == padEntry.key);
-        final data = padEntry.value as Map;
+        for (final padEntry in (bankEntry.value as Map).entries) {
+          final pad = Pad.values.firstWhere((p) => p.name == padEntry.key);
+          final data = padEntry.value as Map;
 
-        final midiPaths = (data['midiFiles'] as List).map((relPath) {
-          return File('$baseDir/$relPath');
-        }).toList();
+          final midiPaths =
+              (data['midiFiles'] as List).map((relPath) {
+                return File('$baseDir/$relPath');
+              }).toList();
 
-        final audioPaths = (data['audioFiles'] as List).map((relPath) {
-          return File('$baseDir/$relPath');
-        }).toList();
+          final audioPaths =
+              (data['audioFiles'] as List).map((relPath) {
+                return File('$baseDir/$relPath');
+              }).toList();
 
-        padMap[pad] = await PadBank.initial().copyWith(
-          midiFiles: midiPaths,
-          audioFiles: audioPaths,
-        );
+          padMap[pad] = await PadBank.initial().copyWith(
+            midiFiles: midiPaths,
+            audioFiles: audioPaths,
+          );
+        }
+
+        banks[page] = padMap;
       }
 
-      banks[page] = padMap;
+      holder.setBanks(banks);
+      success(deps, 'Project opened');
+    } catch (e, s) {
+      catchException(deps, e, stackTrace: s);
+    } finally {
+      setLoading(false);
     }
-
-    holder.setBanks(banks);
-    success(deps, 'Project opened');
-  } catch (e, s) {
-    catchException(deps, e, stackTrace: s);
-  } finally {
-    setLoading(false);
   }
-}
 }

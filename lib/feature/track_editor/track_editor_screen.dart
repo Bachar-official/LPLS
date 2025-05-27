@@ -5,6 +5,7 @@ import 'package:lpls/domain/di.dart';
 import 'package:lpls/domain/enum/mode.dart';
 import 'package:lpls/feature/project/project_holder.dart';
 import 'package:lpls/feature/project/project_state.dart';
+import 'package:lpls/feature/track_editor/components/sample_widget.dart';
 import 'package:lpls/feature/track_editor/track_holder.dart';
 import 'package:lpls/feature/track_editor/track_state.dart';
 
@@ -26,6 +27,8 @@ class TrackEditorScreen extends ConsumerWidget {
 
     return state.bank == null
         ? const Center(child: Text('No files attached yet'))
+        : state.isLoading
+        ? const Center(child: CircularProgressIndicator())
         : ScaffoldPage(
           header: PageHeader(
             leading: IconButton(
@@ -45,26 +48,35 @@ class TrackEditorScreen extends ConsumerWidget {
                 children:
                     mode == Mode.audio
                         ? state.bank!.audioFiles
+                            .asMap()
                             .map(
-                              (file) => Expanded(
-                                key: ValueKey(file.path),
-                                child: Container(
-                                  color: Colors.red,
-                                  child: Text(file.path),
+                              (index, file) => MapEntry(
+                                index,
+                                SampleWidget(
+                                  key: ValueKey(file.path),
+                                  index: index,
+                                  file: file,
+                                  onRemove: manager.removeFile,
                                 ),
                               ),
                             )
+                            .values
                             .toList()
                         : state.bank!.midiFiles
+                            .asMap()
                             .map(
-                              (file) => Expanded(
-                                key: ValueKey(file.path),
-                                child: Container(
-                                  color: Colors.green,
-                                  child: Text(file.path),
+                              (index, file) => MapEntry(
+                                index,
+                                SampleWidget(
+                                  key: ValueKey(file.path),
+                                  index: index,
+                                  file: file,
+                                  isMidi: true,
+                                  onRemove: manager.removeFile,
                                 ),
                               ),
                             )
+                            .values
                             .toList(),
               ),
             ),

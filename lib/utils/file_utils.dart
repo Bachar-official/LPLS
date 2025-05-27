@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:archive/archive.dart';
+import 'package:path/path.dart';
 
 abstract class FileUtils {
   static String getBasePath(String path) {
@@ -22,5 +23,9 @@ abstract class FileUtils {
         await Directory(filePath).create(recursive: true);
       }
     }
+  }
+
+  static String getBaseName(String path) {
+    return basename(path);
   }
 }

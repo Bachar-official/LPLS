@@ -19,4 +19,8 @@ class TrackHolder extends StateNotifier<TrackState> {
   void clearState() {
     state = TrackState.initial();
   }
+
+  void setLoading(bool isLoading) {
+    state = state.copyWith(isLoading: isLoading);
+  }
 }
