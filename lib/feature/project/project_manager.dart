@@ -180,7 +180,7 @@ class ProjectManager {
         warning(
           deps,
           'File saving cancelled',
-          showScaffold: true,
+          
           scaffoldMessage: 'Cancelled saving file',
         );
         return;
@@ -254,7 +254,7 @@ class ProjectManager {
         await tempDir.delete(recursive: true);
       }
 
-      success(deps, 'Project file exported', showScaffold: true, scaffoldMessage: 'Successfully saved as $baseName.lpls');
+      success(deps, 'Project file exported',  scaffoldMessage: 'Successfully saved as $baseName.lpls');
     } catch (e, s) {
       catchException(deps, e, stackTrace: s);
     } finally {
@@ -276,7 +276,7 @@ class ProjectManager {
         warning(
           deps,
           'file pick result is null',
-          showScaffold: true,
+          
           scaffoldMessage: 'There is no file to open',
         );
         return;
@@ -308,7 +308,7 @@ class ProjectManager {
         warning(
           deps,
           'Cancelled file saving',
-          showScaffold: true,
+          
           scaffoldMessage: 'File saving cancelled',
         );
         setLoading(false);
@@ -320,7 +320,7 @@ class ProjectManager {
       success(
         deps,
         'Project saved as $path',
-        showScaffold: true,
+        
         scaffoldMessage: 'Sucessfully saved as $path',
       );
     } catch (e, s) {

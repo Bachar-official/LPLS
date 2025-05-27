@@ -213,7 +213,7 @@ class EffectManager {
         warning(
           deps,
           'Effect is null',
-          showScaffold: true,
+          
           scaffoldMessage: 'There is no effect to save',
         );
       } else {
@@ -225,7 +225,7 @@ class EffectManager {
           warning(
             deps,
             'Cancelled file saving',
-            showScaffold: true,
+            
             scaffoldMessage: 'File saving cancelled',
           );
         } else {
@@ -269,8 +269,7 @@ class EffectManager {
       if (result == null) {
         warning(
           deps,
-          'file pick result is null',
-          showScaffold: true,
+          'file pick result is null',          
           scaffoldMessage: 'There is no file to open',
         );
       } else {

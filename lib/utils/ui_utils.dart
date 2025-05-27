@@ -5,11 +5,10 @@ void debug(ManagerDeps deps, String message) => deps.logger.d(message);
 void warning(
   ManagerDeps deps,
   String message, {
-  bool showScaffold = false,
   String scaffoldMessage = '',
 }) async {
   deps.logger.w(message);
-  if (showScaffold) {
+  if (scaffoldMessage.isNotEmpty) {
     await displayInfoBar(
       deps.navigatorKey.currentContext!,
       builder:
@@ -28,11 +27,10 @@ void warning(
 void success(
   ManagerDeps deps,
   String message, {
-  bool showScaffold = false,
   String scaffoldMessage = '',
 }) async {
   deps.logger.i(message);
-  if (showScaffold) {
+  if (scaffoldMessage.isNotEmpty) {
     await displayInfoBar(
       deps.navigatorKey.currentContext!,
       builder:
