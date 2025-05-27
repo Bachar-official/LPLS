@@ -1,5 +1,4 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/material.dart' hide IconButton;
 import 'package:lpls/domain/entiy/manager_deps.dart';
 
 void debug(ManagerDeps deps, String message) => deps.logger.d(message);
@@ -11,9 +10,6 @@ void warning(
 }) async {
   deps.logger.w(message);
   if (showScaffold) {
-    // deps.scaffoldKey.currentState?.showSnackBar(
-    //   SnackBar(content: Text(scaffoldMessage), backgroundColor: Colors.yellow),
-    // );
     await displayInfoBar(
       deps.navigatorKey.currentContext!,
       builder:

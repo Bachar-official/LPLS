@@ -9,7 +9,7 @@ class Mk2EffectSerializer implements EffectSerializer<ColorMk2> {
   @override
   Effect<ColorMk2> fromMap(Map<String, dynamic> map) {
     final bpm = map[EffectSerializer.bpm] as int;
-    final frameTime = BpmUtils.bpmToMillis(bpm, map[EffectSerializer.beats]);;
+    final frameTime = BpmUtils.bpmToMillis(bpm, map[EffectSerializer.beats]);
     final List<Frame<ColorMk2>> frames = [];
 
     for (final frame in map[EffectSerializer.frames]) {

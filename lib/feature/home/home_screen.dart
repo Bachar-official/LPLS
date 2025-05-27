@@ -20,7 +20,7 @@ class HomeScreen extends ConsumerWidget {
     final state = ref.watch(provider);
     final manager = di.homeManager;
 
-    Widget _getCurrentScreen() {
+    Widget getCurrentScreen() {
       switch (state.screen) {
         case Screen.project: return const ProjectScreen();
         case Screen.effectEditor: return const EffectScreen();
@@ -56,7 +56,7 @@ class HomeScreen extends ConsumerWidget {
           ],
         ),
       ),
-      content: _getCurrentScreen(),
+      content: getCurrentScreen(),
     );
   }
 }
