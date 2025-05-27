@@ -50,6 +50,16 @@ class EffectScreen extends ConsumerWidget {
                 mode: SpinButtonPlacementMode.none,
               ),
             ),
+            SizedBox(
+              width: 100,
+              child: NumberBox(
+                clearButton: false,
+                min: 0,
+                value: manager.getBeats(),
+                onChanged: manager.setBeats,
+                mode: SpinButtonPlacementMode.none,
+              ),
+            ),
             IconButton(
               icon: const Icon(FluentIcons.previous, size: iconSize),
               onPressed: manager.goToFirstFrame,

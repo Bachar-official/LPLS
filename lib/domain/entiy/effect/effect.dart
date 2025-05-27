@@ -55,7 +55,7 @@ class Effect<T extends LPColor> {
       newFrames.add({});
     } else {
       newFrames.add(frames.last);
-    }    
+    }
     return copyWith(frames: newFrames);
   }
 
@@ -111,9 +111,9 @@ class Effect<T extends LPColor> {
   }
 
   Effect<T> withBeats(int newBeats, {required int bpm}) {
-  return copyWith(
-    beats: newBeats,
-    frameTime: BpmUtils.bpmToMillis(bpm, newBeats),
-  );
-}
+    return copyWith(
+      beats: newBeats,
+      frameTime: BpmUtils.bpmToMillis(bpm, newBeats),
+    );
+  }
 }

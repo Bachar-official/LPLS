@@ -50,10 +50,17 @@ class EffectManager {
   }
 
   num? getBPMValue() {
-    if (state.effect == null) {
+    if (!state.hasEffect) {
       return null;
     }
     return BpmUtils.millisToBpm(state.effect!.frameTime, state.effect!.beats);
+  }
+
+  num? getBeats() {
+    if (!state.hasEffect) {
+      return null;
+    }
+    return state.effect!.beats;
   }
 
   String formatBPM(num? value) {
@@ -71,15 +78,12 @@ class EffectManager {
 
   void setBeats(num? value) {
     if (value != null && state.hasEffect) {
-      holder.setEffect(
-        state.effect?.withBeats(
-          value.toInt(),
-          bpm: BpmUtils.millisToBpm(
-            state.effect?.frameTime ?? 120,
-            value.toInt(),
-          ),
-        ),
+      final currentBpm = BpmUtils.millisToBpm(
+        state.effect!.frameTime,
+        state.effect!.beats,
       );
+
+      holder.setEffect(state.effect?.withBeats(value.toInt(), bpm: currentBpm));
     }
   }
 
@@ -149,11 +153,15 @@ class EffectManager {
   }
 
   void play() {
-    if (state.effect == null || isPlaying) return;
+    if (!state.hasEffect || isPlaying) return;
 
-    isPlaying = true;
-    _currentFrameIndex = state.frameNumber;
-    _startPlaybackTimer();
+    if (_remainingTime != Duration.zero) {
+      resume();
+    } else {
+      isPlaying = true;
+      _currentFrameIndex = state.frameNumber;
+      _startPlaybackTimer();
+    }
   }
 
   void pause() {
@@ -167,7 +175,7 @@ class EffectManager {
   }
 
   void resume() {
-    if (isPlaying || state.effect == null) return;
+    if (isPlaying || !state.hasEffect) return;
 
     isPlaying = true;
     _startPlaybackTimer(initialDelay: _remainingTime);
@@ -213,7 +221,7 @@ class EffectManager {
         warning(
           deps,
           'Effect is null',
-          
+
           scaffoldMessage: 'There is no effect to save',
         );
       } else {
@@ -225,7 +233,7 @@ class EffectManager {
           warning(
             deps,
             'Cancelled file saving',
-            
+
             scaffoldMessage: 'File saving cancelled',
           );
         } else {
@@ -269,7 +277,7 @@ class EffectManager {
       if (result == null) {
         warning(
           deps,
-          'file pick result is null',          
+          'file pick result is null',
           scaffoldMessage: 'There is no file to open',
         );
       } else {
