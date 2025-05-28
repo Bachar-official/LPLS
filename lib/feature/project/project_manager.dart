@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -27,6 +28,7 @@ class ProjectManager {
   final TrackManager trackManager;
   final HomeManager homeManager;
   final MidiCommand midi = MidiCommand();
+  StreamSubscription<MidiPacket>? _midiSubscription;
   bool get isConnected => holder.rState.device != null;
 
   ProjectManager({
@@ -65,10 +67,16 @@ class ProjectManager {
 
   Future<void> setDevice(MidiDevice? device) async {
     debug(deps, 'Trying to set device to ${device?.name ?? 'Unnamed device'}');
+    _midiSubscription?.cancel();
     holder.setDevice(device, midi);
     if (device != null) {
       await midi.connectToDevice(device);
-      state.lpDevice?.midi.onMidiDataReceived?.listen(_handleMidiMessage);
+      final stream = state.lpDevice?.midi.onMidiDataReceived;
+      if (stream == null) {
+        warning(deps, 'No stream from device', scaffoldMessage: 'Error while getting commands from Launchpad.');
+        return;
+      }
+      _midiSubscription = stream.listen(_handleMidiMessage);
       effectManager.setEffect(state.lpDevice!.createEffect());
       success(deps, 'Device set to ${state.lpDevice}');
     }
@@ -108,6 +116,7 @@ class ProjectManager {
 
   Future<void> disconnect() async {
     debug(deps, 'Disconnecting from device ${state.device}');
+    _midiSubscription?.cancel();
     if (state.device != null) {
       midi.disconnectDevice(state.device!);
       holder.setDevice(null, midi);

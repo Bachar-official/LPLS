@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -9,7 +10,6 @@ import 'package:lpls/domain/entiy/pad_bank.dart';
 import 'package:lpls/domain/enum/pad.dart';
 import 'package:lpls/feature/mobile_project/mobile_project_holder.dart';
 import 'package:lpls/feature/mobile_project/mobile_project_state.dart';
-import 'package:lpls/feature/project/utils/check_file_extension.dart';
 import 'package:lpls/utils/file_utils.dart';
 import 'package:lpls/utils/ui_utils.dart';
 
@@ -17,6 +17,7 @@ class MobileProjectManager {
   final MobileProjectHolder holder;
   final MobileManagerDeps deps;
   final MidiCommand midi = MidiCommand();
+  StreamSubscription<MidiPacket>? _midiSubscription;
   bool get isConnected => holder.rState.device != null;
 
   MobileProjectManager({required this.holder, required this.deps});
@@ -27,6 +28,7 @@ class MobileProjectManager {
 
   Future<void> disconnect() async {
     mobileDebug(deps, 'Disconnecting from device ${state.device}');
+    _midiSubscription?.cancel();
     if (state.device != null) {
       midi.disconnectDevice(state.device!);
       holder.setDevice(null, midi);

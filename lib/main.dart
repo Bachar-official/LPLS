@@ -10,11 +10,11 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (PlatformUtils.isMobile) {
     await mobileDI.init();
-    runApp(const ProviderScope(child: MobileApp(),));
+    runApp(const ProviderScope(child: MobileApp()));
   } else if (PlatformUtils.isDesktop) {
     await di.init();
     runApp(const ProviderScope(child: App()));
   } else {
     throw UnimplementedError('Unsupported platform');
-  }  
+  }
 }
