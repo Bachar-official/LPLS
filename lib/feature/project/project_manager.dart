@@ -376,7 +376,6 @@ class ProjectManager {
       final jsonString = await file.readAsString();
       final Map<String, dynamic> decoded = jsonDecode(jsonString);
 
-      // Получаем директорию, в которой находится .lpp
       final baseDir = FileUtils.getBasePath(filePath);
 
       final banks = <int, Map<Pad, PadBank>>{};

@@ -17,6 +17,7 @@ class MobileApp extends ConsumerWidget {
     return MaterialApp(
       home: MobileProjectScreen(),
       scaffoldMessengerKey: mobileDI.scaffoldKey,
+      theme: ThemeData.from(colorScheme: ColorScheme.fromSeed(seedColor: Colors.red)),
     );
   }
 }

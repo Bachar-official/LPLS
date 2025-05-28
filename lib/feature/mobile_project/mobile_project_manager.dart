@@ -106,12 +106,12 @@ class MobileProjectManager {
         // type: FileType.custom,
         // allowedExtensions: [FileExtensions.project],
       );
-      if (result == null) {
+      if (result == null || !result.files.first.name.endsWith('.lpls')) {
         mobileWarning(
           deps,
           'file pick result is null',
 
-          scaffoldMessage: 'There is no file to open',
+          scaffoldMessage: 'There is no project to open',
         );
         return;
       }
@@ -145,8 +145,8 @@ class MobileProjectManager {
           path == null
               ? await FilePicker.platform.pickFiles(
                 allowMultiple: false,
-                type: FileType.custom,
-                allowedExtensions: [FileExtensions.tempProject],
+                // type: FileType.custom,
+                // allowedExtensions: [FileExtensions.tempProject],
               )
               : null;
 
@@ -157,7 +157,6 @@ class MobileProjectManager {
       final jsonString = await file.readAsString();
       final Map<String, dynamic> decoded = jsonDecode(jsonString);
 
-      // Получаем директорию, в которой находится .lpp
       final baseDir = FileUtils.getBasePath(filePath);
 
       final banks = <int, Map<Pad, PadBank>>{};
@@ -194,6 +193,22 @@ class MobileProjectManager {
       mobileCatchException(deps, e, stackTrace: s);
     } finally {
       setLoading(false);
+    }
+  }
+
+  Future<void> checkLights() async {
+    mobileDebug(deps, 'Try to check lights');
+    try {
+      for (final pad in Pad.regularPads) {
+        state.lpDevice?.sendCheckSignal(pad);
+      }
+      await Future.delayed(const Duration(seconds: 2), () {
+        for (final pad in Pad.regularPads) {
+        state.lpDevice?.sendCheckSignal(pad, stop: true);
+      }
+      });
+    } catch(e, s) {
+      mobileCatchException(deps, e, stackTrace: s);
     }
   }
 }
