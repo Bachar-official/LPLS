@@ -16,3 +16,5 @@ PadStructure fillInitialBanks() {
 
   return result;
 }
+
+bool isPadStructureEmpty(PadStructure structure) => structure.values.every((grid) => grid.values.every((pad) => pad.isEmpty));

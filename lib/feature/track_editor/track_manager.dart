@@ -1,4 +1,4 @@
-import 'package:lpls/domain/di.dart';
+import 'package:lpls/domain/di/di.dart';
 import 'package:lpls/domain/entiy/manager_deps.dart';
 import 'package:lpls/domain/entiy/pad_bank.dart';
 import 'package:lpls/domain/enum/mode.dart';

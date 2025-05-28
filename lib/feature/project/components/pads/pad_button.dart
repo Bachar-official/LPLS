@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lpls/domain/di.dart';
+import 'package:lpls/domain/di/di.dart';
 import 'package:lpls/domain/enum/mode.dart';
 import 'package:lpls/domain/entiy/pad_bank.dart';
 import 'package:lpls/domain/enum/pad.dart';

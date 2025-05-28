@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:archive/archive.dart';
 import 'package:archive/archive_io.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
 import 'package:lpls/constants/pad_structure.dart';
 import 'package:lpls/constants/paging_pads.dart';
 import 'package:lpls/domain/entiy/manager_deps.dart';
@@ -28,7 +27,6 @@ class ProjectManager {
   final TrackManager trackManager;
   final HomeManager homeManager;
   final MidiCommand midi = MidiCommand();
-  final TextEditingController vText = TextEditingController();
   bool get isConnected => holder.rState.device != null;
 
   ProjectManager({

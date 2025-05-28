@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:lpls/domain/di.dart';
+import 'package:lpls/domain/di/di.dart';
 import 'package:lpls/domain/entiy/manager_deps.dart';
 import 'package:lpls/domain/enum/screen.dart';
 import 'package:lpls/feature/home/home_holder.dart';

@@ -59,7 +59,9 @@ class DI {
   }
 
   Future<void> init() async {
-    await projectManager.getDevices();
+    if (deps.navigatorKey.currentState != null && deps.navigatorKey.currentState!.context.mounted) {
+      await projectManager.getDevices();
+    }    
   }
 }
 

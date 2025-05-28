@@ -1,6 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lpls/domain/di.dart';
+import 'package:lpls/domain/di/di.dart';
 import 'package:lpls/feature/effect_editor/effect_holder.dart';
 import 'package:lpls/feature/effect_editor/effect_state.dart';
 import 'package:lpls/feature/effect_editor/utils/palettes.dart';

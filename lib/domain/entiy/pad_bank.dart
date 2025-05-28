@@ -30,6 +30,7 @@ class PadBank {
       midiIndex = 0;
 
   Effect? get currentEffect => effects.isEmpty ? null : effects[midiIndex];
+  bool get isEmpty => midiFiles.isEmpty && audioFiles.isEmpty;
 
   Future<void> addFile(File file, bool isMidi) async {
     if (isMidi) {
