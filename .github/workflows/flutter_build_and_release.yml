@@ -107,6 +107,11 @@ jobs:
         with:
           path: artifacts
 
+      - name: Check artifact structure
+        run: |
+          echo "Listing downloaded artifacts..."
+          find artifacts -type f
+
       - name: Set release name
         id: release_name
         run: echo "name=release-${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
@@ -123,27 +128,27 @@ jobs:
           prerelease: false
 
       - name: Upload Linux release
-        uses: actions/upload-release-asset@v1
+        uses: actions/upload-release-asset@v2
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: artifacts/linux-release.zip
+          asset_path: artifacts/linux-release/linux-release.zip
           asset_name: linux-release.zip
           asset_content_type: application/zip
 
       - name: Upload Windows release
-        uses: actions/upload-release-asset@v1
+        uses: actions/upload-release-asset@v2
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: artifacts/windows-release.zip
+          asset_path: artifacts/windows-release/windows-release.zip
           asset_name: windows-release.zip
           asset_content_type: application/zip
 
       - name: Upload Android release
-        uses: actions/upload-release-asset@v1
+        uses: actions/upload-release-asset@v2
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
