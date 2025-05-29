@@ -93,17 +93,20 @@ class PadBank {
   }
 
   Future<PadBank> trigger() async {
-    if (audioFiles.isNotEmpty && audioIndex < audioFiles.length) {
-      await audioPlayers[audioIndex].resume();
-      final newIndex = (audioIndex + 1) % audioPlayers.length;
-      return await copyWith(audioIndex: newIndex);
-    } else if (midiFiles.isNotEmpty && midiIndex < midiFiles.length) {
-      final newIndex = (midiIndex + 1) % midiFiles.length;
-      return await copyWith(midiIndex: newIndex);
-    }
-
-    return this;
+  if (audioFiles.isNotEmpty && audioIndex < audioFiles.length) {
+    final player = audioPlayers[audioIndex];
+    final path = audioFiles[audioIndex].path;
+    await player.stop();
+    await player.play(DeviceFileSource(path));
+    final newIndex = (audioIndex + 1) % audioPlayers.length;
+    return await copyWith(audioIndex: newIndex);
+  } else if (midiFiles.isNotEmpty && midiIndex < midiFiles.length) {
+    final newIndex = (midiIndex + 1) % midiFiles.length;
+    return await copyWith(midiIndex: newIndex);
   }
+
+  return this;
+}
 
   void dispose() {
     for (var player in audioPlayers) {

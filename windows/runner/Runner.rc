@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "bachar-official" "\0"
-            VALUE "FileDescription", "flutter_application_1" "\0"
+            VALUE "FileDescription", "LPLS" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "flutter_application_1" "\0"
+            VALUE "InternalName", "LPLS" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2025 bachar-official. All rights reserved." "\0"
-            VALUE "OriginalFilename", "flutter_application_1.exe" "\0"
-            VALUE "ProductName", "flutter_application_1" "\0"
+            VALUE "OriginalFilename", "lpls.exe" "\0"
+            VALUE "ProductName", "LPLS" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
