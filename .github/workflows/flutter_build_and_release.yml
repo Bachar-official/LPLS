@@ -33,16 +33,6 @@ jobs:
       - name: Flutter doctor
         run: flutter doctor
 
-      - name: Cache pub dependencies
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.pub-cache
-            .dart_tool
-          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pub-
-
       - name: Install dependencies
         run: flutter pub get
 
