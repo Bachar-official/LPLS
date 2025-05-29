@@ -136,11 +136,7 @@ class EffectManager {
     if (state.hasEffect && state.effect!.frames.length >= frame - 1) {
       final effect = state.effect;
       holder.setEffect(
-        effect?.withPadColored(frame, pad, color, (
-          state.effect is Effect<ColorMk1> ? ColorMk1.off : ColorMk2.off,
-          null,
-        )),
-      );
+        effect?.withPadColored(frame, pad, color));
     }
   }
 

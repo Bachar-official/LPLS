@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/services.dart';
 import 'package:flutter_midi_command/flutter_midi_command.dart';
 import 'package:lpls/domain/entiy/effect/effect.dart';
@@ -13,6 +12,9 @@ abstract class LaunchpadDevice<T extends LPColor> {
   late final String deviceId;
   late final String name;
   Map<Pad, int> get mapping;
+
+  // Состояние пэдов в предыдущем кадре
+  Map<Pad, (T, Btness?)> previousFrame = {};
 
   LaunchpadDevice({
     required this.midi,
@@ -35,6 +37,7 @@ abstract class LaunchpadDevice<T extends LPColor> {
       Btness.light => color?.light,
       Btness.middle => color?.middle,
     };
+
     midi.sendData(
       Uint8List.fromList([144, mapping[pad]!, value ?? 0]),
       deviceId: deviceId,
@@ -49,45 +52,42 @@ abstract class LaunchpadDevice<T extends LPColor> {
   }
 
   Future<void> playEffect(Effect<T>? effect) async {
-  if (effect == null || effect.frames.isEmpty) return;
+    if (effect == null || effect.frames.isEmpty) return;
 
-  Map<Pad, (T, Btness?)> previousFrame = {};
+    previousFrame = {};
+
+    renderFrame(effect.frames.first);
+
+    int index = 1;
+    Timer.periodic(Duration(milliseconds: effect.frameTime), (timer) async {
+      if (index >= effect.frames.length) {
+        timer.cancel();
+        return;
+      }
+
+      final frame = effect.frames[index];
+      renderFrame(frame);
+      index++;
+    });
+  }
 
   void renderFrame(Map<Pad, (T, Btness?)> currentFrame) {
-    // Пэды, которые были, но теперь отсутствуют — очистить
-    for (var pad in previousFrame.keys) {
-      if (!currentFrame.containsKey(pad)) {
-        sendData(pad, null, brightness: Btness.light);
-      }
+    Set<Pad> currentPads = currentFrame.keys.toSet();
+
+    Set<Pad> previousPads = previousFrame.keys.toSet();
+
+    Set<Pad> padsToClear = previousPads.difference(currentPads);
+
+    for (var pad in padsToClear) {
+      sendData(pad, null, brightness: Btness.light);
     }
 
-    // Отрисовать текущие пэды
-    for (var entry in currentFrame.entries) {
-      var (color, btness) = entry.value;
-      sendData(entry.key, color, brightness: btness ?? Btness.light);
+    for (var pad in currentPads) {
+      var (color, btness) = currentFrame[pad]!;
+
+      sendData(pad, color, brightness: btness ?? Btness.light);
     }
 
     previousFrame = currentFrame;
   }
-
-  // Отрисовать первый кадр
-  renderFrame(effect.frames.first);
-
-  int index = 1;
-  Timer.periodic(Duration(milliseconds: effect.frameTime), (timer) {
-    if (index >= effect.frames.length) {
-      timer.cancel();
-      // Очистить всё, что было в последнем кадре
-      for (var pad in previousFrame.keys) {
-        sendData(pad, null, brightness: Btness.light);
-      }
-      return;
-    }
-
-    final frame = effect.frames[index];
-    renderFrame(frame);
-    index++;
-  });
-}
-
 }

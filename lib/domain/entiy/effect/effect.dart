@@ -35,7 +35,6 @@ class Effect<T extends LPColor> {
     int frameIndex,
     Pad pad,
     FullColor<T>? color,
-    FullColor<T> offColor,
   ) {
     if (frameIndex >= frames.length) {
       throw RangeError('Frame $frameIndex does not exist.');
@@ -43,7 +42,15 @@ class Effect<T extends LPColor> {
 
     final newFrames = List<Frame<T>>.from(frames);
     final newFrame = Map<Pad, FullColor<T>>.from(newFrames[frameIndex]);
-    newFrame[pad] = color ?? offColor;
+
+    //  Не добавляем пэд, если цвет равен null
+    if (color != null) {
+      newFrame[pad] = color;
+    } else {
+      // Если цвет null, удаляем пэд из кадра, если он там есть
+      newFrame.remove(pad);
+    }
+
     newFrames[frameIndex] = newFrame;
 
     return copyWith(frames: newFrames);
@@ -54,7 +61,7 @@ class Effect<T extends LPColor> {
     if (frames.isEmpty) {
       newFrames.add({});
     } else {
-      newFrames.add(frames.last);
+      newFrames.add(Map.from(frames.last)); // Создаем копию предыдущего кадра
     }
     return copyWith(frames: newFrames);
   }
