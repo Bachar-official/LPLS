@@ -60,8 +60,9 @@ class MobileProjectScreen extends ConsumerWidget {
                           icon: const Icon(Icons.refresh, size: 24),
                           onPressed: manager.getDevices,
                         ),
-                      ],
+                      ],                      
                     ),
+                    ElevatedButton(onPressed: state.lpDevice == null ? null : manager.checkLights, child: const Text('Check connection')),
                     const Spacer(),
                     state.isProjectEmpty
                         ? const Text(
@@ -74,9 +75,6 @@ class MobileProjectScreen extends ConsumerWidget {
                         onPressed: manager.importProject,
                         child: const Text('Import project'),
                       ),
-
-                      if (!state.isProjectEmpty && state.lpDevice != null)
-                      ElevatedButton(onPressed: manager.checkLights, child: const Text('Check Launchpad lights')),
                     const Spacer(),
                   ],
                 ),

@@ -9,7 +9,7 @@ class LPMiniMk3 extends LaunchpadDevice<ColorMk2> {
   String toString() => 'Launchpad Mini Mk3';
 
   @override
-  Map<Pad, int> mapping = {
+  Map<Pad, int> get mapping => {
     Pad.a1: 64,
     Pad.a2: 65,
     Pad.a3: 66,

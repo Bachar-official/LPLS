@@ -60,10 +60,16 @@ class MobileProjectManager {
 
   Future<void> setDevice(MidiDevice? device) async {
     mobileDebug(deps, 'Trying to set device to ${device?.name ?? 'Unnamed device'}');
+    _midiSubscription?.cancel();
     holder.setDevice(device, midi);
     if (device != null) {
       await midi.connectToDevice(device);
-      state.lpDevice?.midi.onMidiDataReceived?.listen(_handleMidiMessage);
+      final stream = state.lpDevice?.midi.onMidiDataReceived;
+      if (stream == null) {
+        mobileWarning(deps, 'No stream from device', scaffoldMessage: 'Error while getting MIDI commands from device');
+        return;
+      }
+      _midiSubscription = stream.listen(_handleMidiMessage);
       mobileSuccess(deps, 'Device set to ${state.lpDevice}');
     }
   }

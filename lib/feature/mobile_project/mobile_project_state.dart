@@ -44,7 +44,7 @@ class MobileProjectState {
     device: nullableDevice ? null : device ?? this.device,
     devices: devices ?? this.devices,
     isLoading: isLoading ?? this.isLoading,
-    lpDevice: lpDevice,
+    lpDevice: nullableLpDevice ? null : lpDevice ?? this.lpDevice,
     page: page ?? this.page,
   );
 }
