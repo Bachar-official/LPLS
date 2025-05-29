@@ -10,18 +10,17 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.build_target.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        include:
-          - os: ubuntu-latest
-            platform: linux
-          - os: ubuntu-latest
-            platform: android
-          - os: windows-latest
-            platform: windows
-    
+        build_target:
+          - { os: ubuntu-latest, platform: linux }
+          - { os: ubuntu-latest, platform: android }
+          - { os: windows-latest, platform: windows }
+
+    env:
+      PLATFORM: ${{ matrix.build_target.platform }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -30,6 +29,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
+          flutter-version: '3.x.x'
 
       - name: Flutter doctor
         run: flutter doctor
@@ -37,62 +37,71 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      # Build commands
-      - name: Build Linux
-        if: matrix.platform == 'linux'
-        run: flutter build linux --release
+      - name: Build App
+        run: |
+          if [ "$PLATFORM" == "linux" ]; then
+            flutter build linux --release
+          elif [ "$PLATFORM" == "android" ]; then
+            flutter build apk --release
+          elif [ "$PLATFORM" == "windows" ]; then
+            flutter build windows --release
+          fi
 
-      - name: Build Windows
-        if: matrix.platform == 'windows'
-        run: flutter build windows --release
+      - name: Check Linux build output
+        if: env.PLATFORM == 'linux'
+        run: ls -la build/linux/x64/release/bundle/
 
-      - name: Build Android
-        if: matrix.platform == 'android'
-        run: flutter build apk --release
+      - name: Check Android build output
+        if: env.PLATFORM == 'android'
+        run: ls -la build/app/outputs/flutter-apk/
 
-      # Archive outputs
-      - name: Zip Linux release
-        if: matrix.platform == 'linux'
+      - name: Check Windows build output
+        if: env.PLATFORM == 'windows'
+        run: dir build/windows/x64/runner/Release/
+
+      - name: Archive Linux release
+        if: env.PLATFORM == 'linux'
         run: |
           cd build/linux/x64/release/
           zip -r ../../../linux-release.zip bundle
 
-      - name: Zip Windows release
-        if: matrix.platform == 'windows'
-        run: powershell Compress-Archive -Path build/windows/runner/Release/* -DestinationPath windows-release.zip
+      - name: Archive Windows release
+        if: env.PLATFORM == 'windows'
+        run: |
+          cd build/windows/x64/runner/Release/
+          zip -r ../../../../../windows-release.zip *
 
-      # Upload artifacts
       - name: Upload Linux Artifact
-        if: matrix.platform == 'linux'
+        if: env.PLATFORM == 'linux'
         uses: actions/upload-artifact@v4
         with:
-          name: linux
+          name: linux-release
           path: build/linux-release.zip
 
       - name: Upload Windows Artifact
-        if: matrix.platform == 'windows'
+        if: env.PLATFORM == 'windows'
         uses: actions/upload-artifact@v4
         with:
-          name: windows
+          name: windows-release
           path: windows-release.zip
 
       - name: Upload Android APK
-        if: matrix.platform == 'android'
+        if: env.PLATFORM == 'android'
         uses: actions/upload-artifact@v4
         with:
-          name: android
+          name: android-release
           path: build/app/outputs/flutter-apk/app-release.apk
 
   release:
-    name: Create GitHub release
+    name: Create GitHub Release
     needs: build
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Download all build artifacts
+      - name: Download all artifacts
         uses: actions/download-artifact@v3
         with:
           path: artifacts
@@ -105,7 +114,7 @@ jobs:
         id: create_release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ steps.release_name.outputs.name }}
           release_name: Release ${{ steps.release_name.outputs.name }}
@@ -115,29 +124,29 @@ jobs:
       - name: Upload Linux Release
         uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: artifacts/linux/build/linux-release.zip
+          asset_path: artifacts/linux-release/build/linux-release.zip
           asset_name: linux-release.zip
           asset_content_type: application/zip
 
       - name: Upload Windows Release
         uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: artifacts/windows/windows-release.zip
+          asset_path: artifacts/windows-release/windows-release.zip
           asset_name: windows-release.zip
           asset_content_type: application/zip
 
       - name: Upload Android APK
         uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: artifacts/android/app-release.apk
+          asset_path: artifacts/android-release/app-release.apk
           asset_name: app-release.apk
           asset_content_type: application/vnd.android.package-archive
