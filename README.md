@@ -4,12 +4,20 @@ A Flutter project for creating and performing lightshows on different platforms 
 
 ## Why?
 
-Ableton Live is good enough but it's unable to perform lightshows on smartphones.
+Ableton Live is good enough but it's unable to perform lightshows on smartphones. Also, there are no Ableton Live releases on Linux.
+
+## Tested OS
+
+- Windows
+- Linux
+- Android
 
 ## Features
 
-- Import/export (`.lpls`) and opening/saving (`.lpp`) projects.
-- Creating/editing effects (`.lpe`).
+- Import `.lpls` projects.
+- Export `.lpls` projects (only on desktop).
+- Opening/saving unpacked projects `.lpp` (only on desktop).
+- Creating/editing effects `.lpe` (only on desktop).
 
 ## Launchpad Compability
 

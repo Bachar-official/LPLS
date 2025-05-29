@@ -1,0 +1,143 @@
+name: Flutter Build and Release
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            platform: linux
+          - os: ubuntu-latest
+            platform: android
+          - os: windows-latest
+            platform: windows
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Flutter doctor
+        run: flutter doctor
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      # Build commands
+      - name: Build Linux
+        if: matrix.platform == 'linux'
+        run: flutter build linux --release
+
+      - name: Build Windows
+        if: matrix.platform == 'windows'
+        run: flutter build windows --release
+
+      - name: Build Android
+        if: matrix.platform == 'android'
+        run: flutter build apk --release
+
+      # Archive outputs
+      - name: Zip Linux release
+        if: matrix.platform == 'linux'
+        run: |
+          cd build/linux/x64/release/
+          zip -r ../../../linux-release.zip bundle
+
+      - name: Zip Windows release
+        if: matrix.platform == 'windows'
+        run: powershell Compress-Archive -Path build/windows/runner/Release/* -DestinationPath windows-release.zip
+
+      # Upload artifacts
+      - name: Upload Linux Artifact
+        if: matrix.platform == 'linux'
+        uses: actions/upload-artifact@v3
+        with:
+          name: linux
+          path: build/linux-release.zip
+
+      - name: Upload Windows Artifact
+        if: matrix.platform == 'windows'
+        uses: actions/upload-artifact@v3
+        with:
+          name: windows
+          path: windows-release.zip
+
+      - name: Upload Android APK
+        if: matrix.platform == 'android'
+        uses: actions/upload-artifact@v3
+        with:
+          name: android
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+  release:
+    name: Create GitHub release
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: artifacts
+
+      - name: Set release name
+        id: release_name
+        run: echo "name=release-${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        with:
+          tag_name: ${{ steps.release_name.outputs.name }}
+          release_name: Release ${{ steps.release_name.outputs.name }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Linux Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: artifacts/linux/build/linux-release.zip
+          asset_name: linux-release.zip
+          asset_content_type: application/zip
+
+      - name: Upload Windows Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: artifacts/windows/windows-release.zip
+          asset_name: windows-release.zip
+          asset_content_type: application/zip
+
+      - name: Upload Android APK
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: artifacts/android/app-release.apk
+          asset_name: app-release.apk
+          asset_content_type: application/vnd.android.package-archive
