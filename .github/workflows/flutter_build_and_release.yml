@@ -57,16 +57,18 @@ jobs:
             gstreamer1.0-plugins-good \
             gstreamer1.0-plugins-ugly
 
+      - name: Build Linux
+        if: env.PLATFORM == 'linux'
+        run: flutter build linux --release
+        shell: bash
 
-      - name: Build Flutter app
-        run: |
-          if [ "$PLATFORM" == "linux" ]; then
-            flutter build linux --release
-          elif [ "$PLATFORM" == "android" ]; then
-            flutter build apk --release
-          elif [ "$PLATFORM" == "windows" ]; then
-            flutter build windows --release
-          fi
+      - name: Build Android
+        if: env.PLATFORM == 'android'
+        run: flutter build apk --release
+
+      - name: Build Windows
+        if: env.PLATFORM == 'windows'
+        run: flutter build windows --release
 
       - name: Archive Linux build
         if: env.PLATFORM == 'linux'
