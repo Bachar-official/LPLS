@@ -64,21 +64,21 @@ jobs:
       # Upload artifacts
       - name: Upload Linux Artifact
         if: matrix.platform == 'linux'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: linux
           path: build/linux-release.zip
 
       - name: Upload Windows Artifact
         if: matrix.platform == 'windows'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: windows
           path: windows-release.zip
 
       - name: Upload Android APK
         if: matrix.platform == 'android'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: android
           path: build/app/outputs/flutter-apk/app-release.apk
