@@ -142,6 +142,12 @@ class EffectManager {
     }
   }
 
+  void pickColor(Pad pad, int frame) {
+    if (state.hasEffect && state.effect!.frames.isNotEmpty) {
+      selectColor(state.effect!.frames[frame][pad]);
+    }
+  }
+
   void selectColor(FullColor? color) {
     holder.setSelectedColor(color);
   }

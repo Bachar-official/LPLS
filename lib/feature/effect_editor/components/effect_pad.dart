@@ -2,6 +2,7 @@ import 'package:fluent_ui/fluent_ui.dart' hide Colors;
 import 'package:flutter/material.dart' show Theme, Colors;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lpls/domain/di/di.dart';
+import 'package:lpls/domain/enum/effect_instrument.dart';
 import 'package:lpls/domain/enum/pad.dart';
 import 'package:lpls/feature/effect_editor/effect_holder.dart';
 import 'package:lpls/feature/effect_editor/effect_state.dart';
@@ -28,7 +29,11 @@ class EffectPad extends ConsumerWidget {
         child: Listener(
           onPointerDown: (event) {
             if (event.buttons == 1) {
-              manager.draw(pad, state.frameNumber, state.selectedColor);
+              if (state.instrument == EffectInstrument.brush) {
+                manager.draw(pad, state.frameNumber, state.selectedColor);
+              } else if (state.instrument == EffectInstrument.pipette) {
+                manager.pickColor(pad, state.frameNumber);
+              }
             } else if (event.buttons == 2) {
               manager.draw(pad, state.frameNumber, manager.offColor);
             }          
