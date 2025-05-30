@@ -33,6 +33,8 @@ class EffectPad extends ConsumerWidget {
                 manager.draw(pad, state.frameNumber, state.selectedColor);
               } else if (state.instrument == EffectInstrument.pipette) {
                 manager.pickColor(pad, state.frameNumber);
+              } else if (state.instrument == EffectInstrument.filling) {
+                manager.floodfill(pad, state.frameNumber);
               }
             } else if (event.buttons == 2) {
               manager.draw(pad, state.frameNumber, manager.offColor);

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 
@@ -11,7 +12,9 @@ import 'package:lpls/domain/entiy/manager_deps.dart';
 import 'package:lpls/domain/enum/color_mk1.dart';
 import 'package:lpls/domain/enum/color_mk2.dart';
 import 'package:lpls/domain/enum/effect_instrument.dart';
+import 'package:lpls/domain/enum/lp_color.dart';
 import 'package:lpls/domain/enum/pad.dart';
+import 'package:lpls/domain/type/frame.dart';
 import 'package:lpls/domain/type/full_color.dart';
 import 'package:lpls/feature/effect_editor/effect_holder.dart';
 import 'package:lpls/feature/effect_editor/effect_state.dart';
@@ -39,7 +42,10 @@ class EffectManager {
 
   EffectState get state => holder.rState;
   bool get isFramesEmpty => state.effect?.frames.isEmpty ?? false;
-  FullColor get offColor => state.effect is Effect<ColorMk1> ? (ColorMk1.off, null) : (ColorMk2.off, null);
+  FullColor get offColor =>
+      state.effect is Effect<ColorMk1>
+          ? (ColorMk1.off, null)
+          : (ColorMk2.off, null);
 
   List<FullColor> get generatedPalette {
     if (state.effect is Effect<ColorMk1>) {
@@ -137,8 +143,7 @@ class EffectManager {
   void draw(Pad pad, int frame, FullColor? color) {
     if (state.hasEffect && state.effect!.frames.length >= frame - 1) {
       final effect = state.effect;
-      holder.setEffect(
-        effect?.withPadColored(frame, pad, color));
+      holder.setEffect(effect?.withPadColored(frame, pad, color));
     }
   }
 
@@ -297,7 +302,8 @@ class EffectManager {
 
   void goBack() => homeManager.toTrackScreen();
 
-  void setInstrument(Set<EffectInstrument> instruments) => holder.setInstrument(instruments.first);
+  void setInstrument(Set<EffectInstrument> instruments) =>
+      holder.setInstrument(instruments.first);
 
   void clearEffect() {
     if (state.hasEffect) {
@@ -307,5 +313,81 @@ class EffectManager {
         holder.setEffect(Effect<ColorMk2>.initial());
       }
     }
+  }
+
+  void floodfill(Pad pad, int frame) {
+    if (!state.hasEffect ||
+        state.effect!.frames.isEmpty ||
+        state.selectedColor == null) {
+      return;
+    }
+
+    final effect = state.effect!;
+    final currentColor = effect.frames[frame][pad];
+    if (currentColor == state.selectedColor) {
+      return;
+    }
+
+    // Создаем копию текущего эффекта с правильным типом
+    if (effect is Effect<ColorMk1>) {
+      _floodfillImpl<ColorMk1>(effect as Effect<ColorMk1>, pad, frame);
+    } else if (effect is Effect<ColorMk2>) {
+      _floodfillImpl<ColorMk2>(effect as Effect<ColorMk2>, pad, frame);
+    }
+  }
+
+  void _floodfillImpl<T extends LPColor>(Effect<T> effect, Pad pad, int frame) {
+    final currentColor = effect.frames[frame][pad];
+    final selectedColor = state.selectedColor as FullColor<T>?;
+
+    if (selectedColor == null || currentColor == selectedColor) {
+      return;
+    }
+
+    final frames = List<Frame<T>>.from(effect.frames);
+    final currentFrame = Map<Pad, FullColor<T>>.from(frames[frame]);
+
+    final queue = Queue<Pad>();
+    final visited = <Pad>{};
+
+    queue.add(pad);
+    visited.add(pad);
+
+    while (queue.isNotEmpty) {
+      final currentPad = queue.removeFirst();
+      currentFrame[currentPad] = selectedColor;
+
+      for (final neighbor in _findNeighbors(currentPad)) {
+        if (!visited.contains(neighbor) &&
+            currentFrame[neighbor] == currentColor) {
+          visited.add(neighbor);
+          queue.add(neighbor);
+        }
+      }
+    }
+
+    frames[frame] = currentFrame;
+    holder.setEffect(effect.copyWith(frames: frames));
+  }
+
+  Iterable<Pad> _findNeighbors(Pad pad) {
+    final result = <Pad>[];
+
+    final coords = pad.coordinates;
+    if (coords == null) {
+      return [];
+    }
+
+    for (final (dx, dy) in const [(0, 1), (0, -1), (1, 0), (-1, 0)]) {
+      final nx = coords.x + dx;
+      final ny = coords.y + dy;
+
+      final neighbor = Pad.fromCoordinates(x: nx, y: ny);
+      if (neighbor != null && Pad.regularPads.contains(neighbor)) {
+        result.add(neighbor);
+      }
+    }
+
+    return result;
   }
 }
