@@ -315,7 +315,7 @@ class EffectManager {
     }
   }
 
-  void floodfill(Pad pad, int frame) {
+  void floodfill(Pad pad, int frame, {isErase = false}) {
     if (!state.hasEffect ||
         state.effect!.frames.isEmpty ||
         state.selectedColor == null) {
@@ -324,21 +324,23 @@ class EffectManager {
 
     final effect = state.effect!;
     final currentColor = effect.frames[frame][pad];
-    if (currentColor == state.selectedColor) {
+    final selectedColor = isErase ? null : state.selectedColor;
+    if (currentColor == selectedColor) {
       return;
     }
 
     // Создаем копию текущего эффекта с правильным типом
     if (effect is Effect<ColorMk1>) {
-      _floodfillImpl<ColorMk1>(effect as Effect<ColorMk1>, pad, frame);
+      _floodfillImpl<ColorMk1>(effect as Effect<ColorMk1>, pad, frame, isErase: isErase);
     } else if (effect is Effect<ColorMk2>) {
-      _floodfillImpl<ColorMk2>(effect as Effect<ColorMk2>, pad, frame);
+      _floodfillImpl<ColorMk2>(effect as Effect<ColorMk2>, pad, frame, isErase: isErase);
     }
   }
 
-  void _floodfillImpl<T extends LPColor>(Effect<T> effect, Pad pad, int frame) {
+  void _floodfillImpl<T extends LPColor>(Effect<T> effect, Pad pad, int frame, {isErase = false}) {
     final currentColor = effect.frames[frame][pad];
-    final selectedColor = state.selectedColor as FullColor<T>?;
+    final offColor = T is ColorMk1 ? (ColorMk1.off, null) as FullColor<T> : (ColorMk2.off, null) as FullColor<T>;
+    final selectedColor = isErase ? offColor : state.selectedColor as FullColor<T>?;
 
     if (selectedColor == null || currentColor == selectedColor) {
       return;
