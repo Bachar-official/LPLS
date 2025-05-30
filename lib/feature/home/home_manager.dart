@@ -47,16 +47,19 @@ class HomeManager {
     await di.projectManager.importProject();
   }
 
+  void onClearEffect() => di.effectManager.clearEffect();
+
   List<MenuFlyoutItem> _getFileMenuItems() {
     final openItem = MenuFlyoutItem(text: const Text('Open...'), onPressed: onOpen);
     final saveItem = MenuFlyoutItem(text: const Text('Save'), onPressed: onSave);
     final exitItem = MenuFlyoutItem(text: const Text('Exit'), onPressed: () => exit(0));
     final exportItem = MenuFlyoutItem(text: const Text('Export'), onPressed: onExport);
     final importItem = MenuFlyoutItem(text: const Text('Import'), onPressed: onImport);
+    final clearEffectItem = MenuFlyoutItem(text: const Text('Clear effect'), onPressed: onClearEffect);
 
     if (state.screen == Screen.project) {
       return [openItem, saveItem, exportItem, importItem, exitItem];
     }
-    return [openItem, saveItem, exitItem];
+    return [openItem, saveItem, clearEffectItem, exitItem];
   }
 }

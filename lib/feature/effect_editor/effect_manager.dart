@@ -291,5 +291,15 @@ class EffectManager {
 
   void goBack() => homeManager.toTrackScreen();
 
-  void setInstrument(EffectInstrument instrument) => holder.setInstrument(instrument);
+  void setInstrument(Set<EffectInstrument> instruments) => holder.setInstrument(instruments.first);
+
+  void clearEffect() {
+    if (state.hasEffect) {
+      if (state.effect is Effect<ColorMk1>) {
+        holder.setEffect(Effect<ColorMk1>.initial());
+      } else {
+        holder.setEffect(Effect<ColorMk2>.initial());
+      }
+    }
+  }
 }

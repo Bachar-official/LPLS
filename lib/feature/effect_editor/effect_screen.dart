@@ -3,6 +3,7 @@ import 'package:flutter/material.dart' show Icons hide IconButton;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lpls/domain/di/di.dart';
 import 'package:lpls/feature/effect_editor/components/effect_grid.dart';
+import 'package:lpls/feature/effect_editor/components/instrument_panel.dart';
 import 'package:lpls/feature/effect_editor/components/palette_widget.dart';
 import 'package:lpls/feature/effect_editor/effect_holder.dart';
 import 'package:lpls/feature/effect_editor/effect_state.dart';
@@ -108,7 +109,7 @@ class EffectScreen extends ConsumerWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      if (state.effect != null) const PaletteWidget(),
+                      if (state.effect?.frames.isNotEmpty ?? false) const PaletteWidget(),
                       SizedBox(
                         width: size,
                         height: size,
@@ -122,6 +123,7 @@ class EffectScreen extends ConsumerWidget {
                                 )
                                 : const EffectGrid(),
                       ),
+                      if (state.effect?.frames.isNotEmpty ?? false) const InstrumentPanel(),
                     ],
                   ),
                 ),

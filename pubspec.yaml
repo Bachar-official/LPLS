@@ -29,5 +29,5 @@ flutter:
   assets:
     - assets/audio/
     - assets/images/
-    - assets/cursors/
+    - assets/icons/
   
