@@ -23,20 +23,23 @@ class EffectPad extends ConsumerWidget {
 
     return Padding(
       padding: const EdgeInsets.all(2.0),
-      child: Listener(
-        onPointerDown: (event) {
-          if (event.buttons == 1) {
-            manager.draw(pad, state.frameNumber, state.selectedColor);
-          } else if (event.buttons == 2) {
-            manager.draw(pad, state.frameNumber, manager.offColor);
-          }          
-        },
-        child: Container(
-          width: 10,
-          height: 10,
-          decoration: BoxDecoration(
-            color: padColor,
-            border: Border.all(color: brightness == Brightness.dark ? Colors.white : Colors.black),
+      child: MouseRegion(
+        cursor: MouseCursor.defer,
+        child: Listener(
+          onPointerDown: (event) {
+            if (event.buttons == 1) {
+              manager.draw(pad, state.frameNumber, state.selectedColor);
+            } else if (event.buttons == 2) {
+              manager.draw(pad, state.frameNumber, manager.offColor);
+            }          
+          },
+          child: Container(
+            width: 10,
+            height: 10,
+            decoration: BoxDecoration(
+              color: padColor,
+              border: Border.all(color: brightness == Brightness.dark ? Colors.white : Colors.black),
+            ),
           ),
         ),
       ),

@@ -1,0 +1,1 @@
+enum EffectInstrument {brush, pipette, filling, line}
