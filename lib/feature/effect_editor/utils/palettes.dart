@@ -16,8 +16,11 @@ List<FullColor<T>> generatePalette<T extends LPColor>(List<T> values) {
 }
 
 Color resolveColor<T extends LPColor>(FullColor<T>? color) {
-  if (color == null || color.$1.colorName == 'off') {
+  if (color == null) {
     return Colors.grey.shade400;
+  }
+  if (color.$1.colorName == 'off') {
+    return Colors.black;
   }
 
   const baseColors = {

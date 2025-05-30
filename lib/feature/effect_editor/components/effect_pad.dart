@@ -28,7 +28,7 @@ class EffectPad extends ConsumerWidget {
           if (event.buttons == 1) {
             manager.draw(pad, state.frameNumber, state.selectedColor);
           } else if (event.buttons == 2) {
-            manager.draw(pad, state.frameNumber, null);
+            manager.draw(pad, state.frameNumber, manager.offColor);
           }          
         },
         child: Container(

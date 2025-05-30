@@ -38,6 +38,7 @@ class EffectManager {
 
   EffectState get state => holder.rState;
   bool get isFramesEmpty => state.effect?.frames.isEmpty ?? false;
+  FullColor get offColor => state.effect is Effect<ColorMk1> ? (ColorMk1.off, null) : (ColorMk2.off, null);
 
   List<FullColor> get generatedPalette {
     if (state.effect is Effect<ColorMk1>) {
