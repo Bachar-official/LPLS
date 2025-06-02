@@ -1,24 +1,20 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:lpls/domain/entiy/effect/effect.dart';
-import 'package:lpls/domain/entiy/effect/effect_factory.dart';
-import 'package:lpls/domain/entiy/effect/mk1_effect_serializer.dart';
-import 'package:lpls/domain/entiy/effect/mk2_effect_serializer.dart';
-import 'package:lpls/domain/entiy/manager_deps.dart';
-import 'package:lpls/domain/enum/color_mk1.dart';
-import 'package:lpls/domain/enum/color_mk2.dart';
-import 'package:lpls/domain/enum/pad.dart';
-import 'package:lpls/domain/type/full_color.dart';
+import 'package:lpls/domain/entiy/entity.dart';
+import 'package:lpls/domain/enum/enum.dart';
+import 'package:lpls/domain/type/type.dart';
+
 import 'package:lpls/feature/effect_editor/effect_holder.dart';
 import 'package:lpls/feature/effect_editor/effect_state.dart';
 import 'package:lpls/feature/effect_editor/utils/palettes.dart';
 import 'package:lpls/feature/home/home_manager.dart';
 import 'package:lpls/feature/project/utils/check_file_extension.dart';
-import 'package:lpls/utils/bpm_utils.dart';
-import 'package:lpls/utils/ui_utils.dart';
+
+import 'package:lpls/utils/utils.dart';
 
 class EffectManager {
   final EffectHolder holder;
@@ -38,7 +34,10 @@ class EffectManager {
 
   EffectState get state => holder.rState;
   bool get isFramesEmpty => state.effect?.frames.isEmpty ?? false;
-  FullColor get offColor => state.effect is Effect<ColorMk1> ? (ColorMk1.off, null) : (ColorMk2.off, null);
+  FullColor get offColor =>
+      state.effect is Effect<ColorMk1>
+          ? (ColorMk1.off, null)
+          : (ColorMk2.off, null);
 
   List<FullColor> get generatedPalette {
     if (state.effect is Effect<ColorMk1>) {
@@ -136,8 +135,13 @@ class EffectManager {
   void draw(Pad pad, int frame, FullColor? color) {
     if (state.hasEffect && state.effect!.frames.length >= frame - 1) {
       final effect = state.effect;
-      holder.setEffect(
-        effect?.withPadColored(frame, pad, color));
+      holder.setEffect(effect?.withPadColored(frame, pad, color));
+    }
+  }
+
+  void pickColor(Pad pad, int frame) {
+    if (state.hasEffect && state.effect!.frames.isNotEmpty) {
+      selectColor(state.effect!.frames[frame][pad]);
     }
   }
 
@@ -289,4 +293,80 @@ class EffectManager {
   }
 
   void goBack() => homeManager.toTrackScreen();
+
+  void setInstrument(Set<EffectInstrument> instruments) =>
+      holder.setInstrument(instruments.first);
+
+  void clearEffect() {
+    if (state.hasEffect) {
+      if (state.effect is Effect<ColorMk1>) {
+        holder.setEffect(Effect<ColorMk1>.initial());
+      } else {
+        holder.setEffect(Effect<ColorMk2>.initial());
+      }
+    }
+  }
+
+  void floodfill(Pad pad, int frame, {isErase = false}) {
+    if (!state.hasEffect ||
+        state.effect!.frames.isEmpty ||
+        state.selectedColor == null) {
+      return;
+    }
+
+    final effect = state.effect!;
+    final currentColor = effect.frames[frame][pad];
+    final selectedColor = isErase ? null : state.selectedColor;
+    if (currentColor == selectedColor) {
+      return;
+    }
+
+    if (effect is Effect<ColorMk1>) {
+      _floodfillImpl<ColorMk1>(effect as Effect<ColorMk1>, pad, frame, isErase: isErase);
+    } else if (effect is Effect<ColorMk2>) {
+      _floodfillImpl<ColorMk2>(effect as Effect<ColorMk2>, pad, frame, isErase: isErase);
+    }
+  }
+
+  void _floodfillImpl<T extends LPColor>(Effect<T> effect, Pad pad, int frame, {isErase = false}) {
+    final currentColor = effect.frames[frame][pad];
+    final offColor = T is ColorMk1 ? (ColorMk1.off, null) as FullColor<T> : (ColorMk2.off, null) as FullColor<T>;
+    final selectedColor = isErase ? offColor : state.selectedColor as FullColor<T>?;
+
+    if (selectedColor == null || currentColor == selectedColor) {
+      return;
+    }
+
+    final frames = List<Frame<T>>.from(effect.frames);
+    final currentFrame = Map<Pad, FullColor<T>>.from(frames[frame]);
+
+    final queue = Queue<Pad>();
+    final visited = <Pad>{};
+
+    queue.add(pad);
+    visited.add(pad);
+
+    while (queue.isNotEmpty) {
+      final currentPad = queue.removeFirst();
+      currentFrame[currentPad] = selectedColor;
+
+      for (final neighbor in currentPad.neighbors) {
+        if (!visited.contains(neighbor) &&
+            currentFrame[neighbor] == currentColor) {
+          visited.add(neighbor);
+          queue.add(neighbor);
+        }
+      }
+    }
+
+    frames[frame] = currentFrame;
+    holder.setEffect(effect.copyWith(frames: frames));
+  }
+
+  void shiftFrame(Direction direction) {
+    debug(deps, 'Trying to shift current frame to ${direction.name}');
+    if (state.hasEffect) {
+      holder.setEffect(state.effect!.shift(state.frameNumber, direction));
+    }
+  }
 }

@@ -41,7 +41,6 @@ class HomeScreen extends ConsumerWidget {
               title: 'Screen',
               items: [
                 RadioMenuFlyoutItem<Screen>(text: const Text('Project'), value: Screen.project, groupValue: state.screen, onChanged: manager.setScreen),
-                RadioMenuFlyoutItem<Screen>(text: const Text('Track editor'), value: Screen.trackEditor, groupValue: state.screen, onChanged: manager.setScreen),
                 RadioMenuFlyoutItem<Screen>(text: const Text('Effect editor'), value: Screen.effectEditor, groupValue: state.screen, onChanged: manager.setScreen),
               ],
             ),

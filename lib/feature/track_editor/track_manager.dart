@@ -1,12 +1,12 @@
 import 'package:lpls/domain/di/di.dart';
-import 'package:lpls/domain/entiy/manager_deps.dart';
-import 'package:lpls/domain/entiy/pad_bank.dart';
-import 'package:lpls/domain/enum/mode.dart';
-import 'package:lpls/domain/enum/pad.dart';
+import 'package:lpls/domain/entiy/entity.dart';
+import 'package:lpls/domain/enum/enum.dart';
+
 import 'package:lpls/feature/home/home_manager.dart';
 import 'package:lpls/feature/track_editor/track_holder.dart';
 import 'package:lpls/feature/track_editor/track_state.dart';
-import 'package:lpls/utils/ui_utils.dart';
+
+import 'package:lpls/utils/utils.dart';
 
 class TrackManager {
   final TrackHolder holder;
