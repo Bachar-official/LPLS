@@ -7,6 +7,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:lpls/domain/entiy/effect/direction.dart';
 import 'package:lpls/domain/entiy/effect/effect.dart';
 import 'package:lpls/domain/entiy/effect/effect_factory.dart';
+import 'package:lpls/domain/entiy/effect/generated/line_effect.dart';
 import 'package:lpls/domain/entiy/effect/mk1_effect_serializer.dart';
 import 'package:lpls/domain/entiy/effect/mk2_effect_serializer.dart';
 import 'package:lpls/domain/entiy/manager_deps.dart';
