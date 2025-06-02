@@ -13,8 +13,6 @@ abstract class LaunchpadDevice<T extends LPColor> {
   late final String name;
   Map<Pad, int> get mapping;
 
-  Map<Pad, (T, Btness?)> _previousFrame = {};
-
   Map<Pad, (T, Btness?)> _globalFrame = {};
 
   final List<_ActiveEffect<T>> _activeEffects = [];
@@ -137,7 +135,6 @@ abstract class LaunchpadDevice<T extends LPColor> {
       sendData(pad, color, brightness: btness ?? Btness.light);
     }
 
-    _previousFrame = Map.of(currentFrame);
   }
 
   Effect<T> createEffect() => Effect<T>.initial();

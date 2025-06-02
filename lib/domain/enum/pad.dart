@@ -75,6 +75,7 @@ enum Pad {
   const Pad();
 
   static List<Pad> get regularPads => Pad.values.where((p) => p.name.length == 2).toList();
+  Iterable<Pad> get neighbors => _findNeighbors();
 
   factory Pad.fromString(String val) => Pad.values.firstWhere((pad) => pad.name == val);
 
@@ -96,5 +97,26 @@ enum Pad {
     return Pad.values.firstWhere(
       (p) => p.name == '$rowChar$col',
     );
+  }
+
+  Iterable<Pad> _findNeighbors() {
+    final result = <Pad>[];
+
+    final coords = coordinates;
+    if (coords == null) {
+      return [];
+    }
+
+    for (final (dx, dy) in const [(0, 1), (0, -1), (1, 0), (-1, 0)]) {
+      final nx = coords.x + dx;
+      final ny = coords.y + dy;
+
+      final neighbor = Pad.fromCoordinates(x: nx, y: ny);
+      if (neighbor != null && Pad.regularPads.contains(neighbor)) {
+        result.add(neighbor);
+      }
+    }
+
+    return result;
   }
 }

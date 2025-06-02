@@ -32,6 +32,8 @@ enum ColorMk2 implements LPColor {
   int get middle => value.middle;
   @override
   String get colorName => name;
+  @override
+  ColorMk2 get offColor => off;
 
   String serialize(Btness brightness) => '$name.${brightness.name}';
 
