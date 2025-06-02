@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:lpls/domain/entiy/effect/direction.dart';
 import 'package:lpls/domain/entiy/effect/mk1_effect_serializer.dart';
 import 'package:lpls/domain/entiy/effect/mk2_effect_serializer.dart';
 import 'package:lpls/domain/enum/color_mk1.dart';
@@ -31,11 +32,7 @@ class Effect<T extends LPColor> {
         beats: beats ?? this.beats,
       );
 
-  Effect withPadColored(
-    int frameIndex,
-    Pad pad,
-    FullColor<T>? color,
-  ) {
+  Effect withPadColored(int frameIndex, Pad pad, FullColor<T>? color) {
     if (frameIndex >= frames.length) {
       throw RangeError('Frame $frameIndex does not exist.');
     }
@@ -43,11 +40,9 @@ class Effect<T extends LPColor> {
     final newFrames = List<Frame<T>>.from(frames);
     final newFrame = Map<Pad, FullColor<T>>.from(newFrames[frameIndex]);
 
-    //  Не добавляем пэд, если цвет равен null
     if (color != null) {
       newFrame[pad] = color;
     } else {
-      // Если цвет null, удаляем пэд из кадра, если он там есть
       newFrame.remove(pad);
     }
 
@@ -61,7 +56,7 @@ class Effect<T extends LPColor> {
     if (frames.isEmpty) {
       newFrames.add({});
     } else {
-      newFrames.add(Map.from(frames.last)); // Создаем копию предыдущего кадра
+      newFrames.add(Map.from(frames.last));
     }
     return copyWith(frames: newFrames);
   }
@@ -122,5 +117,54 @@ class Effect<T extends LPColor> {
       beats: newBeats,
       frameTime: BpmUtils.bpmToMillis(bpm, newBeats),
     );
+  }
+
+  Effect<T> shift(Direction direction) {
+    if (frames.isEmpty) return this;
+
+    final shiftedFrames =
+        frames.map((frame) {
+          final shiftedFrame = <Pad, FullColor<T>>{};
+
+          for (final entry in frame.entries) {
+            final newPad = _getShiftedPad(entry.key, direction);
+            if (newPad != null) {
+              shiftedFrame[newPad] = entry.value;
+            }
+          }
+
+          return shiftedFrame;
+        }).toList();
+
+    return copyWith(frames: shiftedFrames);
+  }
+
+  Pad? _getShiftedPad(Pad pad, Direction direction) {
+    final coords = pad.coordinates;
+    if (coords == null) return null;
+
+    int newX = coords.x;
+    int newY = coords.y;
+
+    switch (direction) {
+      case Direction.left:
+        newX--;
+        break;
+      case Direction.right:
+        newX++;
+        break;
+      case Direction.up:
+        newY--;
+        break;
+      case Direction.down:
+        newY++;
+        break;
+    }
+
+    if (newX >= 0 && newX < 8 && newY >= 0 && newY < 8) {
+      return Pad.fromCoordinates(x: newX, y: newY);
+    }
+
+    return null;
   }
 }

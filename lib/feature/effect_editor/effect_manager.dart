@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:lpls/domain/entiy/effect/direction.dart';
 import 'package:lpls/domain/entiy/effect/effect.dart';
 import 'package:lpls/domain/entiy/effect/effect_factory.dart';
 import 'package:lpls/domain/entiy/effect/mk1_effect_serializer.dart';
@@ -329,7 +330,6 @@ class EffectManager {
       return;
     }
 
-    // Создаем копию текущего эффекта с правильным типом
     if (effect is Effect<ColorMk1>) {
       _floodfillImpl<ColorMk1>(effect as Effect<ColorMk1>, pad, frame, isErase: isErase);
     } else if (effect is Effect<ColorMk2>) {
@@ -391,5 +391,12 @@ class EffectManager {
     }
 
     return result;
+  }
+
+  void shiftFrame(Direction direction) {
+    debug(deps, 'Trying to shift current frame to ${direction.name}');
+    if (state.hasEffect) {
+      holder.setEffect(state.effect!.shift(direction));
+    }
   }
 }
