@@ -4,14 +4,14 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_midi_command/flutter_midi_command.dart';
-import 'package:lpls/constants/paging_pads.dart';
-import 'package:lpls/domain/entiy/manager_deps.dart';
-import 'package:lpls/domain/entiy/pad_bank.dart';
-import 'package:lpls/domain/enum/pad.dart';
+import 'package:lpls/constants/constants.dart';
+import 'package:lpls/domain/entiy/entity.dart';
+import 'package:lpls/domain/enum/enum.dart';
+
 import 'package:lpls/feature/mobile_project/mobile_project_holder.dart';
 import 'package:lpls/feature/mobile_project/mobile_project_state.dart';
-import 'package:lpls/utils/file_utils.dart';
-import 'package:lpls/utils/ui_utils.dart';
+
+import 'package:lpls/utils/utils.dart';
 
 class MobileProjectManager {
   final MobileProjectHolder holder;

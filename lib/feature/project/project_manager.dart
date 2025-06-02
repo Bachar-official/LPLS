@@ -5,21 +5,21 @@ import 'dart:io';
 import 'package:archive/archive.dart';
 import 'package:archive/archive_io.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:lpls/constants/pad_structure.dart';
-import 'package:lpls/constants/paging_pads.dart';
-import 'package:lpls/domain/entiy/manager_deps.dart';
-import 'package:lpls/domain/entiy/pad_bank.dart';
-import 'package:lpls/domain/enum/mode.dart';
-import 'package:lpls/domain/enum/pad.dart';
+import 'package:lpls/constants/constants.dart';
+import 'package:lpls/domain/entiy/entity.dart';
+import 'package:lpls/domain/enum/enum.dart';
+
 import 'package:lpls/feature/effect_editor/effect_manager.dart';
 import 'package:lpls/feature/home/home_manager.dart';
 import 'package:lpls/feature/project/project_holder.dart';
+
 import 'package:flutter_midi_command/flutter_midi_command.dart';
+
 import 'package:lpls/feature/project/project_state.dart';
 import 'package:lpls/feature/project/utils/check_file_extension.dart';
 import 'package:lpls/feature/track_editor/track_manager.dart';
-import 'package:lpls/utils/file_utils.dart';
-import 'package:lpls/utils/ui_utils.dart';
+
+import 'package:lpls/utils/utils.dart';
 
 class ProjectManager {
   final ProjectHolder holder;

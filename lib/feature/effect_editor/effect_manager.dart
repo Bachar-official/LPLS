@@ -4,27 +4,17 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:lpls/domain/entiy/effect/direction.dart';
-import 'package:lpls/domain/entiy/effect/effect.dart';
-import 'package:lpls/domain/entiy/effect/effect_factory.dart';
-import 'package:lpls/domain/entiy/effect/generated/line_effect.dart';
-import 'package:lpls/domain/entiy/effect/mk1_effect_serializer.dart';
-import 'package:lpls/domain/entiy/effect/mk2_effect_serializer.dart';
-import 'package:lpls/domain/entiy/manager_deps.dart';
-import 'package:lpls/domain/enum/color_mk1.dart';
-import 'package:lpls/domain/enum/color_mk2.dart';
-import 'package:lpls/domain/enum/effect_instrument.dart';
-import 'package:lpls/domain/enum/lp_color.dart';
-import 'package:lpls/domain/enum/pad.dart';
-import 'package:lpls/domain/type/frame.dart';
-import 'package:lpls/domain/type/full_color.dart';
+import 'package:lpls/domain/entiy/entity.dart';
+import 'package:lpls/domain/enum/enum.dart';
+import 'package:lpls/domain/type/type.dart';
+
 import 'package:lpls/feature/effect_editor/effect_holder.dart';
 import 'package:lpls/feature/effect_editor/effect_state.dart';
 import 'package:lpls/feature/effect_editor/utils/palettes.dart';
 import 'package:lpls/feature/home/home_manager.dart';
 import 'package:lpls/feature/project/utils/check_file_extension.dart';
-import 'package:lpls/utils/bpm_utils.dart';
-import 'package:lpls/utils/ui_utils.dart';
+
+import 'package:lpls/utils/utils.dart';
 
 class EffectManager {
   final EffectHolder holder;
