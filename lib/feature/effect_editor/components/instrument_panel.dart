@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lpls/domain/di/di.dart';
 import 'package:lpls/domain/entiy/effect/direction.dart';
-import 'package:lpls/domain/enum/brightness.dart';
 import 'package:lpls/domain/enum/effect_instrument.dart';
 import 'package:lpls/feature/effect_editor/effect_holder.dart';
 import 'package:lpls/feature/effect_editor/effect_state.dart';

@@ -119,24 +119,23 @@ class Effect<T extends LPColor> {
     );
   }
 
-  Effect<T> shift(Direction direction) {
+  Effect<T> shift(int frameIndex, Direction direction) {
     if (frames.isEmpty) return this;
 
-    final shiftedFrames =
-        frames.map((frame) {
-          final shiftedFrame = <Pad, FullColor<T>>{};
+    final newFrames = List<Frame<T>>.from(frames);
+    final frameToShift = newFrames[frameIndex];
+    final shiftedFrame = <Pad, FullColor<T>>{};
 
-          for (final entry in frame.entries) {
-            final newPad = _getShiftedPad(entry.key, direction);
-            if (newPad != null) {
-              shiftedFrame[newPad] = entry.value;
-            }
-          }
+    for (final entry in frameToShift.entries) {
+      final newPad = _getShiftedPad(entry.key, direction);
 
-          return shiftedFrame;
-        }).toList();
+      if (newPad != null) {
+        shiftedFrame[newPad] = entry.value;
+      }
+    }
 
-    return copyWith(frames: shiftedFrames);
+    newFrames[frameIndex] = shiftedFrame;
+    return copyWith(frames: newFrames);
   }
 
   Pad? _getShiftedPad(Pad pad, Direction direction) {

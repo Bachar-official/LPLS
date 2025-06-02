@@ -396,7 +396,7 @@ class EffectManager {
   void shiftFrame(Direction direction) {
     debug(deps, 'Trying to shift current frame to ${direction.name}');
     if (state.hasEffect) {
-      holder.setEffect(state.effect!.shift(direction));
+      holder.setEffect(state.effect!.shift(state.frameNumber, direction));
     }
   }
 }
