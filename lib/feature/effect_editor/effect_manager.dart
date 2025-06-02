@@ -360,7 +360,7 @@ class EffectManager {
       final currentPad = queue.removeFirst();
       currentFrame[currentPad] = selectedColor;
 
-      for (final neighbor in _findNeighbors(currentPad)) {
+      for (final neighbor in currentPad.neighbors) {
         if (!visited.contains(neighbor) &&
             currentFrame[neighbor] == currentColor) {
           visited.add(neighbor);
@@ -371,27 +371,6 @@ class EffectManager {
 
     frames[frame] = currentFrame;
     holder.setEffect(effect.copyWith(frames: frames));
-  }
-
-  Iterable<Pad> _findNeighbors(Pad pad) {
-    final result = <Pad>[];
-
-    final coords = pad.coordinates;
-    if (coords == null) {
-      return [];
-    }
-
-    for (final (dx, dy) in const [(0, 1), (0, -1), (1, 0), (-1, 0)]) {
-      final nx = coords.x + dx;
-      final ny = coords.y + dy;
-
-      final neighbor = Pad.fromCoordinates(x: nx, y: ny);
-      if (neighbor != null && Pad.regularPads.contains(neighbor)) {
-        result.add(neighbor);
-      }
-    }
-
-    return result;
   }
 
   void shiftFrame(Direction direction) {
