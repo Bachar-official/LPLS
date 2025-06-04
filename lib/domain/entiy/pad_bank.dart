@@ -36,15 +36,15 @@ class PadBank {
   Effect? get currentEffect => effects.isEmpty ? null : effects[midiIndex];
   bool get isEmpty => midiFiles.isEmpty && audioFiles.isEmpty;
 
-  Future<void> addFile(File file, bool isMidi) async {
+  Future<PadBank> addFile(File file, bool isMidi) async {
     if (isMidi) {
-      midiFiles.add(file);
-      effects.add(await EffectFactory.readFile(file));
-    } else {
-      audioFiles.add(file);
-      final sound = await audioEngine.loadSoundFile(file.path);
-      audioPlayers.add(sound);
+      final newMidiFiles = List<File>.from(midiFiles);
+      newMidiFiles.add(file);
+      return copyWith(midiFiles: newMidiFiles);
     }
+    final newAudioFiles = List<File>.from(audioFiles);
+    newAudioFiles.add(file);
+    return copyWith(audioFiles: newAudioFiles);
   }
 
   Future<PadBank> removeFile(int index, bool isMidi) async {
