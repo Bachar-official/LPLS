@@ -249,4 +249,35 @@ class ProjectManager {
       setLoading(false);
     }
   }
+
+  Future<void> setVolume(double volume) async {
+  if (isPadStructureEmpty(state.banks)) {
+    return;
+  }
+  
+  final updatedBanks = <int, Map<Pad, PadBank>>{};
+  
+  for (final entry in state.banks.entries) {
+    final page = entry.key;
+    final pageBanks = entry.value;
+    
+    final updatedPageBanks = <Pad, PadBank>{};
+    
+    for (final padEntry in pageBanks.entries) {
+      final pad = padEntry.key;
+      final bank = padEntry.value;
+      
+      // Создаём копию банка с обновлённой громкостью
+      final updatedBank = await bank.copyWith();
+      updatedBank.allVolume = volume;
+      
+      updatedPageBanks[pad] = updatedBank;
+    }
+    
+    updatedBanks[page] = updatedPageBanks;
+  }
+  
+  holder.setBanks(updatedBanks);
+  holder.setVolume(volume);
+}
 }

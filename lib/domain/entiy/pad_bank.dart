@@ -13,6 +13,15 @@ class PadBank {
   late List<minisound.LoadedSound> audioPlayers;
   late List<Effect> effects;
   late minisound.Engine audioEngine;
+  double volume = 0.5;
+
+  set allVolume(double value) {
+    volume = value;
+    for (final sound in audioPlayers) {
+      sound.volume = value;
+    }
+    print(volume);
+  }
 
   PadBank({
     required this.audioFiles,
@@ -97,10 +106,6 @@ class PadBank {
 
   Future<PadBank> trigger() async {
     if (audioFiles.isNotEmpty && audioIndex < audioFiles.length) {
-      // final player = audioPlayers[audioIndex];
-      // final path = audioFiles[audioIndex].path;
-      // await player.stop();
-      // await player.play(DeviceFileSource(path));
       final sound = audioPlayers[audioIndex];
       sound.play();
       final newIndex = (audioIndex + 1) % audioPlayers.length;
@@ -169,20 +174,11 @@ class PadBank {
         if (existingIndex != -1) {
           newAudioPlayers.add(audioPlayers[existingIndex]);
         } else {
-          // final player = AudioPlayer();
-          // await player.setSourceDeviceFile(file.path);
           final sound = await audioEngine.loadSoundFile(file.path);
+          sound.volume = volume;
           newAudioPlayers.add(sound);
         }
       }
-
-      // for (int i = 0; i < this.audioFiles.length; i++) {
-      //   final oldPath = this.audioFiles[i].path;
-      //   final isUsed = updatedAudioFiles.any((f) => f.path == oldPath);
-      //   if (!isUsed) {
-      //     await audioPlayers[i].dispose();
-      //   }
-      // }
     }
 
     if (midiChanged) {

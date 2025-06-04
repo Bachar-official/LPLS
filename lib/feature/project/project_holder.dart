@@ -51,4 +51,8 @@ class ProjectHolder extends StateNotifier<ProjectState> {
   void setBanks(PadStructure banks) {
     state = state.copyWith(banks: banks);
   }
+
+  void setVolume(double volume) {
+    state = state.copyWith(volume: volume.clamp(0.0, 1.0));
+  }
 }

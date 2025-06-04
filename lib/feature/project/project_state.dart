@@ -13,6 +13,7 @@ class ProjectState {
   final Mode mode;
   final bool isLoading;
   final PadStructure banks;
+  final double volume;
 
   ProjectState({
     required this.device,
@@ -22,6 +23,7 @@ class ProjectState {
     required this.isLoading,
     required this.banks,
     required this.lpDevice,
+    required this.volume,
   });
 
   ProjectState.initial(minisound.Engine engine)
@@ -31,7 +33,8 @@ class ProjectState {
       page = 0,
       mode = Mode.audio,
       isLoading = false,
-      banks = fillInitialBanks(engine);
+      banks = fillInitialBanks(engine),
+      volume = 0.5;
 
   ProjectState copyWith({
     MidiDevice? device,
@@ -43,6 +46,7 @@ class ProjectState {
     PadStructure? banks,
     LaunchpadDevice? lpDevice,
     bool nullableLpDevice = false,
+    double? volume,
   }) {
     return ProjectState(
       device: nullableDevice ? null : device ?? this.device,
@@ -52,6 +56,7 @@ class ProjectState {
       isLoading: isLoading ?? this.isLoading,
       banks: banks ?? this.banks,
       lpDevice: nullableLpDevice ? null : lpDevice ?? this.lpDevice,
+      volume: volume ?? this.volume,
     );
   }
 }
