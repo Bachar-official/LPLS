@@ -7,6 +7,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:lpls/domain/entiy/entity.dart';
 import 'package:lpls/domain/enum/enum.dart';
 import 'package:lpls/domain/type/type.dart';
+import 'package:lpls/feature/effect_editor/effect_file_manager.dart';
 
 import 'package:lpls/feature/effect_editor/effect_holder.dart';
 import 'package:lpls/feature/effect_editor/effect_state.dart';
@@ -25,6 +26,7 @@ class EffectManager {
   bool isPlaying = false;
   Stopwatch? _stopwatch;
   Duration _remainingTime = Duration.zero;
+  final effectFileManager = EffectFileManager();
 
   EffectManager({
     required this.deps,
@@ -215,53 +217,13 @@ class EffectManager {
     }
   }
 
-  Future<void> saveEffect() async {
+  Future<void> saveEffect({bool saveAs = false}) async {
     debug(deps, 'Try to save effect at file');
     try {
-      if (state.effect == null) {
-        warning(
-          deps,
-          'Effect is null',
-
-          scaffoldMessage: 'There is no effect to save',
-        );
-      } else {
-        var path = await FilePicker.platform.saveFile(
-          dialogTitle: 'Select output file',
-          fileName: FileExtensions.effectFileName,
-        );
-        if (path == null) {
-          warning(
-            deps,
-            'Cancelled file saving',
-
-            scaffoldMessage: 'File saving cancelled',
-          );
-        } else {
-          if (state.effect is Effect<ColorMk1>) {
-            final map = Mk1EffectSerializer().toMap(
-              state.effect as Effect<ColorMk1>,
-              bpm: BpmUtils.millisToBpm(
-                state.effect?.frameTime ?? 0,
-                state.effect?.beats ?? 1,
-              ),
-              palette: 'mk1',
-            );
-            await File(path).writeAsString(jsonEncode(map));
-          } else {
-            final map = Mk2EffectSerializer().toMap(
-              state.effect as Effect<ColorMk2>,
-              bpm: BpmUtils.millisToBpm(
-                state.effect?.frameTime ?? 0,
-                state.effect?.beats ?? 1,
-              ),
-              palette: 'mk2',
-            );
-            await File(path).writeAsString(jsonEncode(map));
-          }
-          success(deps, 'File saved at $path');
-        }
-      }
+      await effectFileManager.save(state.effect, saveAs: saveAs);
+      success(deps, 'saved', scaffoldMessage: 'Effect saved');
+    } on ConditionException catch (e) {
+      warning(deps, e.message, scaffoldMessage: e.notificationMessage);
     } catch (e, s) {
       catchException(deps, e, stackTrace: s);
     }
@@ -270,23 +232,11 @@ class EffectManager {
   Future<void> openEffect() async {
     debug(deps, 'Try to open effect from file');
     try {
-      final result = await FilePicker.platform.pickFiles(
-        allowMultiple: false,
-        type: FileType.custom,
-        allowedExtensions: [FileExtensions.effect],
-      );
-      if (result == null) {
-        warning(
-          deps,
-          'file pick result is null',
-          scaffoldMessage: 'There is no file to open',
-        );
-      } else {
-        final file = File(result.files.first.path!);
-        final effect = await EffectFactory.readFile(file);
-        holder.setEffect(effect);
-        success(deps, 'Effect loaded from file');
-      }
+      final effect = await effectFileManager.open();
+      holder.setEffect(effect);
+      success(deps, 'opened', scaffoldMessage: 'Effect opened!');
+    } on ConditionException catch(e) {
+      warning(deps, e.message, scaffoldMessage: e.notificationMessage);
     } catch (e, s) {
       catchException(deps, e, stackTrace: s);
     }
@@ -304,6 +254,7 @@ class EffectManager {
       } else {
         holder.setEffect(Effect<ColorMk2>.initial());
       }
+      effectFileManager.clear();
     }
   }
 
@@ -322,16 +273,35 @@ class EffectManager {
     }
 
     if (effect is Effect<ColorMk1>) {
-      _floodfillImpl<ColorMk1>(effect as Effect<ColorMk1>, pad, frame, isErase: isErase);
+      _floodfillImpl<ColorMk1>(
+        effect as Effect<ColorMk1>,
+        pad,
+        frame,
+        isErase: isErase,
+      );
     } else if (effect is Effect<ColorMk2>) {
-      _floodfillImpl<ColorMk2>(effect as Effect<ColorMk2>, pad, frame, isErase: isErase);
+      _floodfillImpl<ColorMk2>(
+        effect as Effect<ColorMk2>,
+        pad,
+        frame,
+        isErase: isErase,
+      );
     }
   }
 
-  void _floodfillImpl<T extends LPColor>(Effect<T> effect, Pad pad, int frame, {isErase = false}) {
+  void _floodfillImpl<T extends LPColor>(
+    Effect<T> effect,
+    Pad pad,
+    int frame, {
+    isErase = false,
+  }) {
     final currentColor = effect.frames[frame][pad];
-    final offColor = T is ColorMk1 ? (ColorMk1.off, null) as FullColor<T> : (ColorMk2.off, null) as FullColor<T>;
-    final selectedColor = isErase ? offColor : state.selectedColor as FullColor<T>?;
+    final offColor =
+        T is ColorMk1
+            ? (ColorMk1.off, null) as FullColor<T>
+            : (ColorMk2.off, null) as FullColor<T>;
+    final selectedColor =
+        isErase ? offColor : state.selectedColor as FullColor<T>?;
 
     if (selectedColor == null || currentColor == selectedColor) {
       return;

@@ -40,7 +40,11 @@ class HomeManager {
   }
 
   Future<void> onSaveAs() async {
-    await di.projectManager.saveProject(saveAs: true);
+    if (state.screen == Screen.project) {
+      await di.projectManager.saveProject(saveAs: true);
+    } else if (state.screen == Screen.effectEditor) {
+      await di.effectManager.saveEffect(saveAs: true);
+    }    
   }
 
   Future<void> onExport() async {
@@ -86,6 +90,6 @@ class HomeManager {
     if (state.screen == Screen.project) {
       return [openItem, saveItem, saveAsItem, exportItem, importItem, exitItem];
     }
-    return [openItem, saveItem, clearEffectItem, exitItem];
+    return [openItem, saveItem, saveAsItem, clearEffectItem, exitItem];
   }
 }
