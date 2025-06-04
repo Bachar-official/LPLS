@@ -2,6 +2,7 @@ import 'package:flutter_midi_command/flutter_midi_command.dart';
 import 'package:lpls/constants/pad_structure.dart';
 import 'package:lpls/domain/entiy/launchpad/launchpad_device.dart';
 import 'package:lpls/utils/fill_initial_banks.dart';
+import 'package:minisound/engine.dart' as minisound;
 
 class MobileProjectState {
   final MidiDevice? device;
@@ -22,9 +23,9 @@ class MobileProjectState {
     required this.page,
   });
 
-  MobileProjectState.initial()
+  MobileProjectState.initial(minisound.Engine engine)
     : devices = [],
-      banks = fillInitialBanks(),
+      banks = fillInitialBanks(engine),
       device = null,
       lpDevice = null,
       isLoading = false,

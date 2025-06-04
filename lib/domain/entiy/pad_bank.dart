@@ -1,16 +1,18 @@
 import 'dart:io';
 
-import 'package:audioplayers/audioplayers.dart';
 import 'package:lpls/domain/entiy/effect/effect.dart';
 import 'package:lpls/domain/entiy/effect/effect_factory.dart';
+
+import 'package:minisound/engine_flutter.dart' as minisound;
 
 class PadBank {
   int audioIndex;
   int midiIndex;
   List<File> midiFiles;
   List<File> audioFiles;
-  late List<AudioPlayer> audioPlayers;
+  late List<minisound.LoadedSound> audioPlayers;
   late List<Effect> effects;
+  late minisound.Engine audioEngine;
 
   PadBank({
     required this.audioFiles,
@@ -19,15 +21,17 @@ class PadBank {
     required this.midiIndex,
     required this.audioPlayers,
     required this.effects,
+    required this.audioEngine,
   });
 
-  PadBank.initial()
+  PadBank.initial(minisound.Engine engine)
     : audioFiles = [],
       audioPlayers = [],
       audioIndex = 0,
       midiFiles = [],
       effects = [],
-      midiIndex = 0;
+      midiIndex = 0,
+      audioEngine = engine;
 
   Effect? get currentEffect => effects.isEmpty ? null : effects[midiIndex];
   bool get isEmpty => midiFiles.isEmpty && audioFiles.isEmpty;
@@ -38,9 +42,8 @@ class PadBank {
       effects.add(await EffectFactory.readFile(file));
     } else {
       audioFiles.add(file);
-      final player = AudioPlayer();
-      await player.setSourceDeviceFile(file.path);
-      audioPlayers.add(player);
+      final sound = await audioEngine.loadSoundFile(file.path);
+      audioPlayers.add(sound);
     }
   }
 
@@ -93,25 +96,21 @@ class PadBank {
   }
 
   Future<PadBank> trigger() async {
-  if (audioFiles.isNotEmpty && audioIndex < audioFiles.length) {
-    final player = audioPlayers[audioIndex];
-    final path = audioFiles[audioIndex].path;
-    await player.stop();
-    await player.play(DeviceFileSource(path));
-    final newIndex = (audioIndex + 1) % audioPlayers.length;
-    return await copyWith(audioIndex: newIndex);
-  } else if (midiFiles.isNotEmpty && midiIndex < midiFiles.length) {
-    final newIndex = (midiIndex + 1) % midiFiles.length;
-    return await copyWith(midiIndex: newIndex);
-  }
-
-  return this;
-}
-
-  void dispose() {
-    for (var player in audioPlayers) {
-      player.dispose();
+    if (audioFiles.isNotEmpty && audioIndex < audioFiles.length) {
+      // final player = audioPlayers[audioIndex];
+      // final path = audioFiles[audioIndex].path;
+      // await player.stop();
+      // await player.play(DeviceFileSource(path));
+      final sound = audioPlayers[audioIndex];
+      sound.play();
+      final newIndex = (audioIndex + 1) % audioPlayers.length;
+      return await copyWith(audioIndex: newIndex);
+    } else if (midiFiles.isNotEmpty && midiIndex < midiFiles.length) {
+      final newIndex = (midiIndex + 1) % midiFiles.length;
+      return await copyWith(midiIndex: newIndex);
     }
+
+    return this;
   }
 
   Map<String, dynamic> serialize() => {
@@ -119,7 +118,10 @@ class PadBank {
     'audioFiles': audioFiles.map((file) => file.path).toList(),
   };
 
-  static Future<PadBank> deserialize(Map<String, dynamic> map) async {
+  static Future<PadBank> deserialize(
+    Map<String, dynamic> map,
+    minisound.Engine engine,
+  ) async {
     final midiField = 'midiFiles', audioField = 'audioFiles';
     if (map[midiField] == null) {
       throw Exception('Midi files is missing');
@@ -135,10 +137,9 @@ class PadBank {
           throw Exception('${file.path} not exists');
         }
       }
-      return await PadBank.initial().copyWith(
-        midiFiles: midiFiles,
-        audioFiles: audioFiles,
-      );
+      return await PadBank.initial(
+        engine,
+      ).copyWith(midiFiles: midiFiles, audioFiles: audioFiles);
     }
   }
 
@@ -154,7 +155,7 @@ class PadBank {
     bool audioChanged = !identical(updatedAudioFiles, this.audioFiles);
     bool midiChanged = !identical(updatedMidiFiles, this.midiFiles);
 
-    List<AudioPlayer> newAudioPlayers = audioPlayers;
+    List<minisound.LoadedSound> newAudioPlayers = audioPlayers;
     List<Effect> newEffects = effects;
 
     if (audioChanged) {
@@ -168,19 +169,20 @@ class PadBank {
         if (existingIndex != -1) {
           newAudioPlayers.add(audioPlayers[existingIndex]);
         } else {
-          final player = AudioPlayer();
-          await player.setSourceDeviceFile(file.path);
-          newAudioPlayers.add(player);
+          // final player = AudioPlayer();
+          // await player.setSourceDeviceFile(file.path);
+          final sound = await audioEngine.loadSoundFile(file.path);
+          newAudioPlayers.add(sound);
         }
       }
 
-      for (int i = 0; i < this.audioFiles.length; i++) {
-        final oldPath = this.audioFiles[i].path;
-        final isUsed = updatedAudioFiles.any((f) => f.path == oldPath);
-        if (!isUsed) {
-          await audioPlayers[i].dispose();
-        }
-      }
+      // for (int i = 0; i < this.audioFiles.length; i++) {
+      //   final oldPath = this.audioFiles[i].path;
+      //   final isUsed = updatedAudioFiles.any((f) => f.path == oldPath);
+      //   if (!isUsed) {
+      //     await audioPlayers[i].dispose();
+      //   }
+      // }
     }
 
     if (midiChanged) {
@@ -196,6 +198,7 @@ class PadBank {
       audioFiles: updatedAudioFiles,
       audioPlayers: newAudioPlayers,
       effects: newEffects,
+      audioEngine: audioEngine,
     );
   }
 }

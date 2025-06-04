@@ -6,6 +6,7 @@ import 'package:archive/archive.dart';
 import 'package:archive/archive_io.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:lpls/constants/constants.dart';
+import 'package:lpls/domain/di/di.dart';
 import 'package:lpls/domain/entiy/entity.dart';
 import 'package:lpls/domain/enum/enum.dart';
 
@@ -146,6 +147,7 @@ class ProjectManager {
         effects: [...oldBank.effects],
         audioIndex: oldBank.audioIndex,
         midiIndex: oldBank.midiIndex,
+        audioEngine: oldBank.audioEngine,
       );
 
       await newBank.addFile(file, isMidi);
@@ -406,7 +408,7 @@ class ProjectManager {
                 return File('$baseDir/$relPath');
               }).toList();
 
-          padMap[pad] = await PadBank.initial().copyWith(
+          padMap[pad] = await PadBank.initial(holder.engine).copyWith(
             midiFiles: midiPaths,
             audioFiles: audioPaths,
           );

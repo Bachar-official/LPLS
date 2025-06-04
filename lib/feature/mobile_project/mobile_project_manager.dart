@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_midi_command/flutter_midi_command.dart';
 import 'package:lpls/constants/constants.dart';
+import 'package:lpls/domain/di/di.dart';
 import 'package:lpls/domain/entiy/entity.dart';
 import 'package:lpls/domain/enum/enum.dart';
 
@@ -186,7 +187,7 @@ class MobileProjectManager {
                 return File('$baseDir/$relPath');
               }).toList();
 
-          padMap[pad] = await PadBank.initial().copyWith(
+          padMap[pad] = await PadBank.initial(di.audioEngine).copyWith(
             midiFiles: midiPaths,
             audioFiles: audioPaths,
           );

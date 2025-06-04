@@ -5,9 +5,11 @@ import 'package:lpls/domain/enum/pad.dart';
 import 'package:lpls/feature/project/project_state.dart';
 import 'package:flutter_midi_command/flutter_midi_command.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:minisound/engine.dart' as minisound;
 
 class ProjectHolder extends StateNotifier<ProjectState> {
-  ProjectHolder() : super(ProjectState.initial());
+  final minisound.Engine engine;
+  ProjectHolder({required this.engine}) : super(ProjectState.initial(engine));
 
   ProjectState get rState => super.state;
 

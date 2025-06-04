@@ -10,6 +10,7 @@ import 'package:lpls/feature/project/project_manager.dart';
 import 'package:logger/logger.dart';
 import 'package:lpls/feature/track_editor/track_holder.dart';
 import 'package:lpls/feature/track_editor/track_manager.dart';
+import 'package:minisound/engine_flutter.dart' as minisound;
 
 class DI {
   late final ProjectHolder projectHolder;
@@ -28,7 +29,10 @@ class DI {
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   late final ManagerDeps deps;
 
+  late final minisound.Engine audioEngine;
+
   DI() {
+    audioEngine = minisound.Engine();
     deps = (logger: logger, navigatorKey: navigatorKey);
 
     homeHolder = HomeHolder();
@@ -48,7 +52,7 @@ class DI {
       homeManager: homeManager,
     );
 
-    projectHolder = ProjectHolder();
+    projectHolder = ProjectHolder(engine: audioEngine);
     projectManager = ProjectManager(
       holder: projectHolder,
       deps: deps,
@@ -59,6 +63,8 @@ class DI {
   }
 
   Future<void> init() async {
+    await audioEngine.init();
+    await audioEngine.start();
     await projectManager.getDevices();
   }
 }

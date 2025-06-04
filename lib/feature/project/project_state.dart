@@ -3,6 +3,7 @@ import 'package:lpls/domain/entiy/launchpad/launchpad_device.dart';
 import 'package:lpls/domain/enum/mode.dart';
 import 'package:flutter_midi_command/flutter_midi_command.dart';
 import 'package:lpls/utils/fill_initial_banks.dart';
+import 'package:minisound/engine.dart' as minisound;
 
 class ProjectState {
   final MidiDevice? device;
@@ -23,14 +24,14 @@ class ProjectState {
     required this.lpDevice,
   });
 
-  ProjectState.initial()
+  ProjectState.initial(minisound.Engine engine)
     : device = null,
     lpDevice = null,
       devices = [],
       page = 0,
       mode = Mode.audio,
       isLoading = false,
-      banks = fillInitialBanks();
+      banks = fillInitialBanks(engine);
 
   ProjectState copyWith({
     MidiDevice? device,
