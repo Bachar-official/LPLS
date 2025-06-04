@@ -274,14 +274,14 @@ class EffectManager {
 
     if (effect is Effect<ColorMk1>) {
       _floodfillImpl<ColorMk1>(
-        effect as Effect<ColorMk1>,
+        effect,
         pad,
         frame,
         isErase: isErase,
       );
     } else if (effect is Effect<ColorMk2>) {
       _floodfillImpl<ColorMk2>(
-        effect as Effect<ColorMk2>,
+        effect,
         pad,
         frame,
         isErase: isErase,

@@ -143,7 +143,7 @@ class ProjectFileManager {
       '$baseDirectory/$baseName',
     );
 
-    return await open(engine, path: '$baseDirectory/$baseName/$baseName.lpp');
+    return await open(engine, path: '$baseDirectory${Platform.pathSeparator}$baseName${Platform.pathSeparator}$baseName.lpp');
   }
 
   Future<void> exportProject(PadStructure structure) async {
