@@ -45,13 +45,18 @@ class TrackManager {
   Future<void> removeFile(int index, bool isMidi) async {
     debug(deps, 'Try to remove track number $index from pad ${state.pad}');
     holder.setLoading(true);
-    await di.projectManager.removeFileFromBank(
-      pad: state.pad!,
-      bank: state.bank!,
-      index: index,
-      isMidi: isMidi,
-    );
-    holder.setLoading(false);
+    try {
+      await di.projectManager.removeFileFromBank(
+        pad: state.pad!,
+        bank: state.bank!,
+        index: index,
+        isMidi: isMidi,
+      );
+    } catch (e, s) {
+      catchException(deps, e, stackTrace: s);
+    } finally {
+      holder.setLoading(false);
+    }
   }
 
   void goBack() {

@@ -20,7 +20,6 @@ class PadBank {
     for (final sound in audioPlayers) {
       sound.volume = value;
     }
-    print(volume);
   }
 
   PadBank({
@@ -61,11 +60,10 @@ class PadBank {
       if (index < 0 || index >= midiFiles.length) return this;
       final newMidi = List<File>.from(midiFiles)..removeAt(index);
       return await copyWith(midiFiles: newMidi, midiIndex: 0);
-    } else {
-      if (index < 0 || index >= audioFiles.length) return this;
-      final newAudio = List<File>.from(audioFiles)..removeAt(index);
-      return await copyWith(audioFiles: newAudio, audioIndex: 0);
     }
+    if (index < 0 || index >= audioFiles.length) return this;
+    final newAudio = List<File>.from(audioFiles)..removeAt(index);
+    return await copyWith(audioFiles: newAudio, audioIndex: 0);
   }
 
   Future<PadBank> reorderFiles(
@@ -164,6 +162,10 @@ class PadBank {
     List<Effect> newEffects = effects;
 
     if (audioChanged) {
+      for (final audio in audioPlayers) {
+        audio.unload();
+      }
+      audioPlayers.clear();
       newAudioPlayers = [];
 
       for (var file in updatedAudioFiles) {

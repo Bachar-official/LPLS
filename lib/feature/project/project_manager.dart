@@ -165,9 +165,16 @@ class ProjectManager {
     required int index,
     required bool isMidi,
   }) async {
-    final newBank = await bank.removeFile(index, isMidi);
-    setBank(newBank, pad);
-    selectPad(pad);
+    try {
+      setLoading(true);
+      final newBank = await bank.removeFile(index, isMidi);
+      setBank(newBank, pad);
+      selectPad(pad);
+    } catch (e, s) {
+      catchException(deps, e, stackTrace: s);
+    } finally {
+      setLoading(false);
+    }
   }
 
   void setBank(PadBank bank, Pad pad) {
@@ -251,33 +258,33 @@ class ProjectManager {
   }
 
   Future<void> setVolume(double volume) async {
-  if (isPadStructureEmpty(state.banks)) {
-    return;
-  }
-  
-  final updatedBanks = <int, Map<Pad, PadBank>>{};
-  
-  for (final entry in state.banks.entries) {
-    final page = entry.key;
-    final pageBanks = entry.value;
-    
-    final updatedPageBanks = <Pad, PadBank>{};
-    
-    for (final padEntry in pageBanks.entries) {
-      final pad = padEntry.key;
-      final bank = padEntry.value;
-      
-      // Создаём копию банка с обновлённой громкостью
-      final updatedBank = await bank.copyWith();
-      updatedBank.allVolume = volume;
-      
-      updatedPageBanks[pad] = updatedBank;
+    if (isPadStructureEmpty(state.banks)) {
+      return;
     }
-    
-    updatedBanks[page] = updatedPageBanks;
+
+    final updatedBanks = <int, Map<Pad, PadBank>>{};
+
+    for (final entry in state.banks.entries) {
+      final page = entry.key;
+      final pageBanks = entry.value;
+
+      final updatedPageBanks = <Pad, PadBank>{};
+
+      for (final padEntry in pageBanks.entries) {
+        final pad = padEntry.key;
+        final bank = padEntry.value;
+
+        // Создаём копию банка с обновлённой громкостью
+        final updatedBank = await bank.copyWith();
+        updatedBank.allVolume = volume;
+
+        updatedPageBanks[pad] = updatedBank;
+      }
+
+      updatedBanks[page] = updatedPageBanks;
+    }
+
+    holder.setBanks(updatedBanks);
+    holder.setVolume(volume);
   }
-  
-  holder.setBanks(updatedBanks);
-  holder.setVolume(volume);
-}
 }
