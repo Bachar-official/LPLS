@@ -40,7 +40,7 @@ class EffectFileManager {
       throw ConditionException('effect is null', 'Effect is empty');
     }
     String? pickerResult;
-    if (effectPath == null) {
+    if (effectPath == null || saveAs) {
       pickerResult = await FilePicker.platform.saveFile(
         dialogTitle: 'Select output file',
         fileName: FileExtensions.effectFileName,
