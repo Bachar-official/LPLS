@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lpls/domain/di/di.dart';
 import 'package:lpls/domain/entiy/effect/direction.dart';
 import 'package:lpls/domain/enum/effect_instrument.dart';
+import 'package:lpls/domain/enum/enum.dart';
 import 'package:lpls/feature/effect_editor/effect_holder.dart';
 import 'package:lpls/feature/effect_editor/effect_state.dart';
 import 'package:lpls/feature/effect_editor/utils/palettes.dart';
@@ -10,6 +11,8 @@ import 'package:lpls/feature/effect_editor/utils/palettes.dart';
 final provider = StateNotifierProvider<EffectHolder, EffectState>(
   (ref) => di.effectHolder,
 );
+
+
 
 class InstrumentPanel extends ConsumerWidget {
   const InstrumentPanel({super.key});
@@ -20,21 +23,35 @@ class InstrumentPanel extends ConsumerWidget {
     final manager = di.effectManager;
     final btness = Theme.of(context).brightness;
 
+    final segmentedButtonStyle = SegmentedButton.styleFrom(
+              side: BorderSide(
+                color: btness == Brightness.dark ? Colors.white : Colors.black,
+              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+            );
+
     return Padding(
       padding: const EdgeInsets.only(left: 8.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Tooltip(
-            message: 'Selected color',
-            child: Container(
-              width: 30,
-              height: 30,
-              decoration: BoxDecoration(
-                color: resolveColor(state.selectedColor),
-                borderRadius: BorderRadius.circular(25),
-              ),
-            ),
+          if (state.selectedColor != null) SegmentedButton<Btness>(
+            emptySelectionAllowed: false,
+            multiSelectionEnabled: false,
+            direction: Axis.vertical,
+            segments:
+                Btness.values
+                    .map(
+                      (btness) => ButtonSegment<Btness>(
+                        value: btness,
+                        icon: getBtnessIcon(state.selectedColor?.$1, btness),
+                      ),
+                    )
+                    .toList(),
+            selected: {manager.selectedBrightness ?? Btness.light},
+            onSelectionChanged: manager.selectBrightness,
+            showSelectedIcon: false,
+            style: segmentedButtonStyle,
           ),
           SegmentedButton<EffectInstrument>(
             emptySelectionAllowed: false,
@@ -53,12 +70,7 @@ class InstrumentPanel extends ConsumerWidget {
             showSelectedIcon: false,
             selected: {state.instrument},
             onSelectionChanged: manager.setInstrument,
-            style: SegmentedButton.styleFrom(
-              side: BorderSide(
-                color: btness == Brightness.dark ? Colors.white : Colors.black,
-              ),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-            ),
+            style: segmentedButtonStyle,
           ),
           DecoratedBox(
             decoration: BoxDecoration(
@@ -72,7 +84,9 @@ class InstrumentPanel extends ConsumerWidget {
                 ...Direction.values.map(
                   (dir) => IconButton(
                     style: IconButton.styleFrom(
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.zero,
+                      ),
                     ),
                     icon: dir.icon,
                     tooltip: dir.tooltip,

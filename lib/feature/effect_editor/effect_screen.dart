@@ -42,23 +42,28 @@ class EffectScreen extends ConsumerWidget {
           children: [
             SizedBox(
               width: 100,
-              child: NumberBox(
-                clearButton: false,
-                min: 0,
-                value: manager.getBPMValue(),
-                onChanged: manager.setBPM,
-                format: manager.formatBPM,
-                mode: SpinButtonPlacementMode.none,
+              child: InfoLabel(
+                label: 'BPM',
+                child: NumberBox(
+                  clearButton: false,
+                  min: 0,
+                  value: manager.getBPMValue(),
+                  onChanged: manager.setBPM,
+                  mode: SpinButtonPlacementMode.none,
+                ),
               ),
             ),
             SizedBox(
               width: 100,
-              child: NumberBox(
-                clearButton: false,
-                min: 0,
-                value: manager.getBeats(),
-                onChanged: manager.setBeats,
-                mode: SpinButtonPlacementMode.none,
+              child: InfoLabel(
+                label: 'FPB',
+                child: NumberBox(
+                  clearButton: false,
+                  min: 0,
+                  value: manager.getBeats(),
+                  onChanged: manager.setBeats,
+                  mode: SpinButtonPlacementMode.none,
+                ),
               ),
             ),
             IconButton(

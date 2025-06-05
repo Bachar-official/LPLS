@@ -51,6 +51,7 @@ class EffectPad extends ConsumerWidget {
               color: padColor,
               border: Border.all(color: brightness == Brightness.dark ? Colors.white : Colors.black),
             ),
+            child: state.effect?.frames[state.frameNumber][pad] == null ? const Placeholder() : null,
           ),
         ),
       ),

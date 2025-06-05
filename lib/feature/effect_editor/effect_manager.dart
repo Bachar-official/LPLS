@@ -13,7 +13,6 @@ import 'package:lpls/feature/effect_editor/effect_holder.dart';
 import 'package:lpls/feature/effect_editor/effect_state.dart';
 import 'package:lpls/feature/effect_editor/utils/palettes.dart';
 import 'package:lpls/feature/home/home_manager.dart';
-import 'package:lpls/feature/project/utils/check_file_extension.dart';
 
 import 'package:lpls/utils/utils.dart';
 
@@ -40,6 +39,7 @@ class EffectManager {
       state.effect is Effect<ColorMk1>
           ? (ColorMk1.off, null)
           : (ColorMk2.off, null);
+  Btness? get selectedBrightness => state.selectedColor == null ? null : state.selectedColor?.$2 ?? Btness.light;
 
   List<FullColor> get generatedPalette {
     if (state.effect is Effect<ColorMk1>) {
@@ -145,6 +145,14 @@ class EffectManager {
     if (state.hasEffect && state.effect!.frames.isNotEmpty) {
       selectColor(state.effect!.frames[frame][pad]);
     }
+  }
+
+  void selectBrightness(Set<Btness> btness) {
+    if (state.selectedColor == null) {
+      return;
+    }
+    final newColor = (state.selectedColor?.$1, btness.first) as FullColor;
+    holder.setSelectedColor(newColor);
   }
 
   void selectColor(FullColor? color) {
