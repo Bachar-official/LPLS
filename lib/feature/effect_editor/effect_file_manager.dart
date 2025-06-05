@@ -61,7 +61,7 @@ class EffectFileManager {
         palette: 'mk1',
       );
       await File(
-        saveAs ? effectPath! : effectPath ?? pickerResult!,
+        saveAs ? pickerResult! : effectPath ?? pickerResult!,
       ).writeAsString(jsonEncode(map));
     } else {
       final map = Mk2EffectSerializer().toMap(
@@ -70,7 +70,7 @@ class EffectFileManager {
         palette: 'mk2',
       );
       await File(
-        saveAs ? effectPath! : effectPath ?? pickerResult!,
+        saveAs ? pickerResult! : effectPath ?? pickerResult!,
       ).writeAsString(jsonEncode(map));
     }
   }

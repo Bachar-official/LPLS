@@ -176,7 +176,7 @@ class PadBank {
         if (existingIndex != -1) {
           newAudioPlayers.add(audioPlayers[existingIndex]);
         } else {
-          final sound = await audioEngine.loadSoundFile(file.path);
+          final sound = await audioEngine.loadSound(await File(file.path).readAsBytes(), doAddToFinalizer: false);
           sound.volume = volume;
           newAudioPlayers.add(sound);
         }
