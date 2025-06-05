@@ -1,9 +1,5 @@
 import 'dart:async';
 import 'dart:collection';
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:lpls/domain/entiy/entity.dart';
 import 'package:lpls/domain/enum/enum.dart';
 import 'package:lpls/domain/type/type.dart';
@@ -63,13 +59,6 @@ class EffectManager {
       return null;
     }
     return state.effect!.beats;
-  }
-
-  String formatBPM(num? value) {
-    if (value == null) {
-      return 'No effect';
-    }
-    return '$value BPM';
   }
 
   void setBPM(num? value) {

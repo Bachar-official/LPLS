@@ -1,4 +1,5 @@
 import 'package:fluent_ui/fluent_ui.dart' hide Colors;
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' show Theme, Colors;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lpls/domain/di/di.dart';
@@ -42,7 +43,9 @@ class EffectPad extends ConsumerWidget {
               } else if (state.instrument == EffectInstrument.filling) {
                 manager.floodfill(pad, state.frameNumber, isErase: true);
               }              
-            }          
+            } else if ((event.buttons & kMiddleMouseButton) != 0) {
+              manager.draw(pad, state.frameNumber, null);
+            }
           },
           child: Container(
             width: 10,
