@@ -329,10 +329,10 @@ packages:
     dependency: transitive
     description:
       name: minisound_ffi
-      sha256: "244349c2ef44e9ff6a869d1b452166bf4bc615f6d93a99f69d67f1e514ec5940"
+      sha256: "382acf7f1152f4c663bb8ed8fedbb8609265a7b107f68fec2b1fc8a60c45ee84"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.4"
+    version: "2.0.5"
   minisound_platform_interface:
     dependency: transitive
     description:
