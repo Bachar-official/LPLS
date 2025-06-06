@@ -17,7 +17,8 @@ class EffectFileManager {
 
   void clear() => effectPath = null;
 
-  Future<Effect<LPColor>> open({String? effectPath}) async {
+  Future<Effect<LPColor>> open({String? path}) async {
+    effectPath = path;
     FilePickerResult? result;
     if (effectPath == null) {
       result = await FilePicker.platform.pickFiles(

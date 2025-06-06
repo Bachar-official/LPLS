@@ -22,6 +22,7 @@ class TrackManager {
 
   void setBank(PadBank? bank) => holder.setBank(bank);
   void setPad(Pad? pad) => holder.setPad(pad);
+  void clear() => holder.clearState();
 
   void reorderTracks(oldIndex, newIndex) async {
     debug(
@@ -59,15 +60,21 @@ class TrackManager {
     }
   }
 
-  Future<void> onClickTrack(int index, bool isMidi) async {
+  void onClickTrack(int index, bool isMidi) {
     if (isMidi && state.bank != null && state.bank!.midiFiles.isNotEmpty) {
       homeManager.toEffectScreen();
       di.effectManager.openEffect(path: state.bank!.midiFiles[index].path);
     }
   }
 
+  void updateBank() {
+    if (state.bank != null && state.pad != null) {
+      di.projectManager.setBank(state.bank!, state.pad!);
+    }    
+  }
+
   void goBack() {
-    holder.clearState();
+    clear();
     homeManager.toProjectScreen();
   }
 }

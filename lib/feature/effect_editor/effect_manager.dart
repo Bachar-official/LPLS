@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
+import 'package:lpls/domain/di/di.dart';
 import 'package:lpls/domain/entiy/entity.dart';
 import 'package:lpls/domain/enum/enum.dart';
 import 'package:lpls/domain/type/type.dart';
@@ -222,6 +223,9 @@ class EffectManager {
     try {
       await effectFileManager.save(state.effect, saveAs: saveAs);
       success(deps, 'saved', scaffoldMessage: 'Effect saved');
+      if (state.fromTrackEditor) {
+        di.trackManager.updateBank();
+      }
     } on ConditionException catch (e) {
       warning(deps, e.message, scaffoldMessage: e.notificationMessage);
     } catch (e, s) {
@@ -232,7 +236,7 @@ class EffectManager {
   Future<void> openEffect({String? path}) async {
     debug(deps, 'Try to open effect from file');
     try {
-      final effect = await effectFileManager.open(effectPath: path);
+      final effect = await effectFileManager.open(path: path);
       holder.setEffect(effect);
       success(deps, 'opened', scaffoldMessage: 'Effect opened!');
     } on ConditionException catch(e) {
@@ -246,6 +250,7 @@ class EffectManager {
     if (state.fromTrackEditor) {
       homeManager.toTrackScreen();
     } else {
+      di.trackManager.clear();
       homeManager.toProjectScreen();
     }    
   }
