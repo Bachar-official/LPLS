@@ -19,25 +19,31 @@ class SampleWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ColoredBox(
-      color: isMidi ?? false ? Colors.green : Colors.red,
-      child: Column(
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          IconButton(
-            icon: const Icon(Icons.close),
-            onPressed: () => onRemove(index, isMidi ?? false),
-          ),
-          const Spacer(),
-          Transform.rotate(
-            angle: -pi / 2,
-            child: Text(
-              FileUtils.getBaseName(file.path),
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+    return SizedBox(
+      width: 50,
+      child: ColoredBox(
+        color: isMidi ?? false ? Colors.green : Colors.red,
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.close),
+              onPressed: () => onRemove(index, isMidi ?? false),
             ),
-          ),
-          const Spacer(),
-        ],
+            const Spacer(flex: 2),
+            Transform.rotate(
+              angle: -pi / 2,
+              child: Text(
+                overflow: TextOverflow.visible,
+                softWrap: false,
+                maxLines: 1,
+                FileUtils.getBaseName(file.path),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+              ),
+            ),
+            const Spacer(),
+          ],
+        ),
       ),
     );
   }
