@@ -12,7 +12,7 @@ jobs:
       matrix:
         build_target:
           - { os: ubuntu-latest, platform: linux }
-          - { os: ubuntu-latest, platform: android }
+#          - { os: ubuntu-latest, platform: android }
           - { os: windows-latest, platform: windows }
 
     env:
