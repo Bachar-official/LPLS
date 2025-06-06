@@ -59,6 +59,13 @@ class TrackManager {
     }
   }
 
+  Future<void> onClickTrack(int index, bool isMidi) async {
+    if (isMidi && state.bank != null && state.bank!.midiFiles.isNotEmpty) {
+      homeManager.toEffectScreen();
+      di.effectManager.openEffect(path: state.bank!.midiFiles[index].path);
+    }
+  }
+
   void goBack() {
     holder.clearState();
     homeManager.toProjectScreen();

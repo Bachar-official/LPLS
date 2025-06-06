@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_midi_command/flutter_midi_command.dart';
@@ -106,45 +107,49 @@ class MobileProjectManager {
   }
 
   Future<void> importProject() async {
-    mobileDebug(deps, 'Try to import project');
-    setLoading(true);
-    // Asking for a project file
-    try {
-      final result = await FilePicker.platform.pickFiles(
-        allowMultiple: false,
-        // type: FileType.custom,
-        // allowedExtensions: [FileExtensions.project],
-      );
-      if (result == null || !result.files.first.name.endsWith('.lpls')) {
-        mobileWarning(
-          deps,
-          'file pick result is null',
+  mobileDebug(deps, 'Try to import project');
+  setLoading(true);
+  try {
+    final result = await FilePicker.platform.pickFiles(
+      allowMultiple: false,
+    );
 
-          scaffoldMessage: 'There is no project to open',
-        );
-        return;
-      }
-      final baseName =
-          result.paths.last != null
-              ? result.paths.last!
-                  .split(Platform.pathSeparator)
-                  .last
-                  .split('.')
-                  .first
-              : 'project';
-
-      final baseDirectory = FileUtils.getBasePath(result.paths.last!);
-      await FileUtils.extractLpls(
-        result.paths.last!,
-        '$baseDirectory/$baseName',
+    if (result == null || !result.files.first.name.endsWith('.lpls')) {
+      mobileWarning(
+        deps,
+        'file pick result is null',
+        scaffoldMessage: 'There is no project to open',
       );
-      await openProject(path: '$baseDirectory/$baseName/$baseName.lpp');
-    } catch (e, s) {
-      mobileCatchException(deps, e, stackTrace: s);
-    } finally {
-      setLoading(false);
+      return;
     }
+
+    final filePath = result.paths.first!;
+    final fileName = filePath.split(Platform.pathSeparator).last;
+    final projectName = fileName.split('.').first;
+
+    // Получаем временную директорию
+    final tempDir = await getTemporaryDirectory();
+    final tempProjectDir = '${tempDir.path}/$projectName';
+
+    // Удалим старую версию, если есть
+    final dir = Directory(tempProjectDir);
+    if (await dir.exists()) {
+      await dir.delete(recursive: true);
+    }
+
+    await FileUtils.extractLpls(
+      filePath,
+      tempProjectDir,
+    );
+
+    final lppPath = '$tempProjectDir/$projectName.lpp';
+    await openProject(path: lppPath);
+  } catch (e, s) {
+    mobileCatchException(deps, e, stackTrace: s);
+  } finally {
+    setLoading(false);
   }
+}
 
   Future<void> openProject({String? path}) async {
     mobileDebug(deps, 'Trying to open project from file');

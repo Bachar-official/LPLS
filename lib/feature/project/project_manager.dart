@@ -44,7 +44,6 @@ class ProjectManager {
   ProjectState get state => holder.rState;
 
   Future<void> getDevices() async {
-    await disconnect();
     setLoading(true);
     try {
       debug(deps, 'Try to get MIDI devices list');
@@ -122,6 +121,7 @@ class ProjectManager {
   Future<void> disconnect() async {
     debug(deps, 'Disconnecting from device ${state.device}');
     _midiSubscription?.cancel();
+    await getDevices();
     if (state.device != null) {
       midi.disconnectDevice(state.device!);
       holder.setDevice(null, midi);

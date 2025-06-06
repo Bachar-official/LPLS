@@ -47,6 +47,8 @@ class EffectManager {
     }
   }
 
+  void setFromTrackEditor(bool fromTrackEditor) => holder.setFromTrackEditor(fromTrackEditor);
+
   num? getBPMValue() {
     if (!state.hasEffect) {
       return null;
@@ -227,10 +229,10 @@ class EffectManager {
     }
   }
 
-  Future<void> openEffect() async {
+  Future<void> openEffect({String? path}) async {
     debug(deps, 'Try to open effect from file');
     try {
-      final effect = await effectFileManager.open();
+      final effect = await effectFileManager.open(effectPath: path);
       holder.setEffect(effect);
       success(deps, 'opened', scaffoldMessage: 'Effect opened!');
     } on ConditionException catch(e) {
@@ -240,7 +242,13 @@ class EffectManager {
     }
   }
 
-  void goBack() => homeManager.toTrackScreen();
+  void goBack() {
+    if (state.fromTrackEditor) {
+      homeManager.toTrackScreen();
+    } else {
+      homeManager.toProjectScreen();
+    }    
+  }
 
   void setInstrument(Set<EffectInstrument> instruments) =>
       holder.setInstrument(instruments.first);

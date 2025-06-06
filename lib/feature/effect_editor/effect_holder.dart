@@ -24,4 +24,8 @@ class EffectHolder extends StateNotifier<EffectState> {
   void setInstrument(EffectInstrument instrument) {
     state = state.copyWith(instrument: instrument);
   }
+
+  void setFromTrackEditor(bool fromTrackEditor) {
+    state = state.copyWith(fromTrackEditor: fromTrackEditor);
+  }
 }

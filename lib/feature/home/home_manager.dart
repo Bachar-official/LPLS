@@ -21,7 +21,10 @@ class HomeManager {
 
   void toProjectScreen() => setScreen(Screen.project);
   void toTrackScreen() => setScreen(Screen.trackEditor);
-  void toEffectScreen() => setScreen(Screen.effectEditor);
+  void toEffectScreen() {
+    di.effectManager.setFromTrackEditor(state.screen == Screen.trackEditor);
+    setScreen(Screen.effectEditor);
+  }
 
   Future<void> onOpen() async {
     if (state.screen == Screen.effectEditor) {
@@ -44,7 +47,7 @@ class HomeManager {
       await di.projectManager.saveProject(saveAs: true);
     } else if (state.screen == Screen.effectEditor) {
       await di.effectManager.saveEffect(saveAs: true);
-    }    
+    }
   }
 
   Future<void> onExport() async {

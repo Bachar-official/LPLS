@@ -67,12 +67,15 @@ class TrackEditorScreen extends ConsumerWidget {
                             .map(
                               (index, file) => MapEntry(
                                 index,
-                                SampleWidget(
+                                GestureDetector(
                                   key: ValueKey(file.path),
-                                  index: index,
-                                  file: file,
-                                  isMidi: true,
-                                  onRemove: manager.removeFile,
+                                  onTap: () => manager.onClickTrack(index, true),
+                                  child: SampleWidget(                                    
+                                    index: index,
+                                    file: file,
+                                    isMidi: true,
+                                    onRemove: manager.removeFile,
+                                  ),
                                 ),
                               ),
                             )

@@ -17,21 +17,25 @@ class EffectFileManager {
 
   void clear() => effectPath = null;
 
-  Future<Effect<LPColor>> open() async {
-    final result = await FilePicker.platform.pickFiles(
-      allowMultiple: false,
-      type: FileType.custom,
-      allowedExtensions: [FileExtensions.effect],
-    );
-    if (result == null) {
+  Future<Effect<LPColor>> open({String? effectPath}) async {
+    FilePickerResult? result;
+    if (effectPath == null) {
+      result = await FilePicker.platform.pickFiles(
+        allowMultiple: false,
+        type: FileType.custom,
+        allowedExtensions: [FileExtensions.effect],
+      );
+    }
+
+    if (effectPath == null && result == null) {
       throw ConditionException(
         'picker result is null',
         'Effect open flow is cancelled',
       );
     }
-    final file = File(result.files.first.path!);
+    final file = File(effectPath ?? result!.files.first.path!);
     final effect = await EffectFactory.readFile(file);
-    effectPath = result.files.first.path!;
+    effectPath = effectPath ?? result!.files.first.path!;
     return effect;
   }
 

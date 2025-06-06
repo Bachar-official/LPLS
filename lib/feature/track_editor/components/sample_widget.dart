@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:lpls/utils/file_utils.dart';
@@ -21,13 +22,21 @@ class SampleWidget extends StatelessWidget {
     return ColoredBox(
       color: isMidi ?? false ? Colors.green : Colors.red,
       child: Column(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize: MainAxisSize.max,
         children: [
           IconButton(
             icon: const Icon(Icons.close),
             onPressed: () => onRemove(index, isMidi ?? false),
           ),
-          Text(FileUtils.getBaseName(file.path)),
+          const Spacer(),
+          Transform.rotate(
+            angle: -pi / 2,
+            child: Text(
+              FileUtils.getBaseName(file.path),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+            ),
+          ),
+          const Spacer(),
         ],
       ),
     );
