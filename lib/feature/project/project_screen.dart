@@ -93,7 +93,7 @@ class ProjectScreen extends ConsumerWidget {
                         state.device == null
                             ? Center(
                               child: Text(
-                                locale.no_device,
+                                locale.no_connected,
                               ),
                             )
                             : PadGrid(
