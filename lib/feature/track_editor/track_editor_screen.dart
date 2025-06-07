@@ -8,6 +8,7 @@ import 'package:lpls/feature/project/project_state.dart';
 import 'package:lpls/feature/track_editor/components/sample_widget.dart';
 import 'package:lpls/feature/track_editor/track_holder.dart';
 import 'package:lpls/feature/track_editor/track_state.dart';
+import 'package:lpls/l10n/app_localizations.dart';
 
 final provider = StateNotifierProvider<TrackHolder, TrackState>(
   (ref) => di.trackHolder,
@@ -24,9 +25,10 @@ class TrackEditorScreen extends ConsumerWidget {
     final state = ref.watch(provider);
     final mode = ref.watch(projectProvider).mode;
     final manager = di.trackManager;
+    final locale = AppLocalizations.of(context);
 
     return state.bank == null
-        ? const Center(child: Text('No files attached yet'))
+        ? Center(child: Text(locale.no_files))
         : state.isLoading
         ? const Center(child: CircularProgressIndicator())
         : ScaffoldPage(
@@ -35,7 +37,7 @@ class TrackEditorScreen extends ConsumerWidget {
               icon: const Icon(Icons.arrow_back),
               onPressed: manager.goBack,
             ),
-            title: Text('Track editor (${mode.name})'),
+            title: Text(locale.track_editor(mode.name)),
           ),
           content: Center(
             child: Padding(
