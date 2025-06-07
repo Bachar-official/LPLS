@@ -1,0 +1,64 @@
+{
+    "@@locale": "ru",
+
+    "file": "Файл",
+    "screen": "Экран",
+    "project": "Проект",
+    "effect": "Редактор эффекта",
+    "theme": "Тема",
+    "theme_light": "Светлая",
+    "theme_dark": "Тёмная",
+    "theme_system": "Системная",
+    "open": "Открыть...",
+    "save": "Сохранить",
+    "save_as": "Сохранить как...",
+    "exit": "Выйти",
+    "export": "Экспортировать",
+    "import": "Импортировать",
+    "effect_clear": "Очистить эффект",
+
+    "locale": "Язык",
+    "locale_en": "English",
+    "locale_ru": "Русский",
+
+    "no_device": "Нет устройства",
+    "current_page": "Текущая страница: {pageNumber}",
+    "@current_page": {
+        "description": "Индикатор текущей страницы",
+        "placeholders": {
+            "pageNumber": {
+                "type": "int"
+            }
+        }
+    },
+    "select_midi": "Выбрать устройство MIDI",
+    "no_devices": "Устройства не найдены",
+    "audio": "Аудио",
+    "midi": "MIDI",
+    "no_connected": "Нет подключённых устройств или соединено несовместимое устройство",
+
+    "no_effect": "Нет эффекта",
+    "frame_number": "Редкатор эффекта - кадр №{frameNumber}",
+    "@frame_number": {
+        "description": "Заголовок редактора эффекта",
+        "placeholders": {
+            "frameNumber": {
+                "type": "int"
+            }
+        }
+    },
+    "no_effect_body": "Эффекта пока нет\nПожалуйста, откройте существующий эффект или создайте первый кадр, нажав на кнопку \"+\"",
+    "no_frames": "Нет кадров",
+
+    "no_files": "Пока что нет файлов",
+    "track_editor": "Редактор трека ({mode})",
+    "@track_editor": {
+        "description": "Заголовок редактора трека",
+        "placeholders": {
+            "mode": {
+                "type": "String"
+            }
+        }
+    }
+    
+}

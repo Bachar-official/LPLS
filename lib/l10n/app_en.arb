@@ -1,0 +1,64 @@
+{
+    "@@locale": "en",
+
+    "file": "File",
+    "screen": "Screen",
+    "project": "Project",
+    "effect": "Effect editor",
+    "theme": "Theme",
+    "theme_light": "Light",
+    "theme_dark": "Dark",
+    "theme_system": "System",
+    "open": "Open...",
+    "save": "Save",
+    "save_as": "Save as...",
+    "exit": "Exit",
+    "export": "Export",
+    "import": "Import",
+    "effect_clear": "Clear effect",
+
+    "locale": "Language",
+    "locale_en": "English",
+    "locale_ru": "Русский",
+
+    "no_device": "No device",
+    "current_page": "Current page: {pageNumber}",
+    "@current_page": {
+        "description": "Current page indicator",
+        "placeholders": {
+            "pageNumber": {
+                "type": "int"
+            }
+        }
+    },
+    "select_midi": "Select MIDI Device",
+    "no_devices": "Devices not found",
+    "audio": "Audio",
+    "midi": "MIDI",
+    "no_connected": "No devices connected or incompatible device connected",
+
+    "no_effect": "No effect",
+    "frame_number": "Effect editor - frame #{frameNumber}",
+    "@frame_number": {
+        "description": "Effect editor header",
+        "placeholders": {
+            "frameNumber": {
+                "type": "int"
+            }
+        }
+    },
+    "no_effect_body": "There is no effect yet.\nPlease edit effect from Project screen, or create one by clicking on the \"+\" icon.",
+    "no_frames": "No frames for this effect",
+
+    "no_files": "No files attached yet",
+    "track_editor": "Track editor ({mode})",
+    "@track_editor": {
+        "description": "Track editor header",
+        "placeholders": {
+            "mode": {
+                "type": "String"
+            }
+        }
+    }
+    
+}

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lpls/domain/entiy/entity.dart';
 import 'package:lpls/domain/enum/screen.dart';
 import 'package:lpls/feature/home/home_state.dart';
 
@@ -14,5 +15,9 @@ class HomeHolder extends StateNotifier<HomeState> {
 
   void setTheme(ThemeMode theme) {
     state = state.copyWith(theme: theme);
+  }
+
+  void setLocale(AppLocales locale) {
+    state = state.copyWith(locale: locale);
   }
 }

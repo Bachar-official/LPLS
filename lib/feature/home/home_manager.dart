@@ -2,10 +2,12 @@ import 'dart:io';
 
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:lpls/domain/di/di.dart';
+import 'package:lpls/domain/entiy/app_locales.dart';
 import 'package:lpls/domain/entiy/manager_deps.dart';
 import 'package:lpls/domain/enum/screen.dart';
 import 'package:lpls/feature/home/home_holder.dart';
 import 'package:lpls/feature/home/home_state.dart';
+import 'package:lpls/l10n/app_localizations.dart';
 
 class HomeManager {
   final HomeHolder holder;
@@ -60,33 +62,38 @@ class HomeManager {
 
   void onClearEffect() => di.effectManager.clearEffect();
 
+  void setLocale(AppLocales locale) => holder.setLocale(locale);
+
   List<MenuFlyoutItem> _getFileMenuItems() {
+    final ctx = deps.navigatorKey.currentContext!;
+    final locale = AppLocalizations.of(ctx);
+
     final openItem = MenuFlyoutItem(
-      text: const Text('Open...'),
+      text: Text(locale.open),
       onPressed: onOpen,
     );
     final saveItem = MenuFlyoutItem(
-      text: const Text('Save'),
+      text: Text(locale.save),
       onPressed: onSave,
     );
     final saveAsItem = MenuFlyoutItem(
-      text: const Text('Save as...'),
+      text: Text(locale.save_as),
       onPressed: onSaveAs,
     );
     final exitItem = MenuFlyoutItem(
-      text: const Text('Exit'),
+      text: Text(locale.exit),
       onPressed: () => exit(0),
     );
     final exportItem = MenuFlyoutItem(
-      text: const Text('Export'),
+      text: Text(locale.export),
       onPressed: onExport,
     );
     final importItem = MenuFlyoutItem(
-      text: const Text('Import'),
+      text: Text(locale.import),
       onPressed: onImport,
     );
     final clearEffectItem = MenuFlyoutItem(
-      text: const Text('Clear effect'),
+      text: Text(locale.effect_clear),
       onPressed: onClearEffect,
     );
 

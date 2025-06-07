@@ -13,8 +13,11 @@ dependencies:
   fluent_ui: ^4.11.3
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
   flutter_midi_command: ^0.5.3
   flutter_riverpod: ^2.6.1
+  intl: any
   minisound: ^2.0.2
   path: ^1.9.1
   path_provider: ^2.1.5
@@ -26,6 +29,7 @@ dev_dependencies:
   logger: ^2.5.0
 
 flutter:
+  generate: true
   uses-material-design: true
   assets:
     - assets/images/

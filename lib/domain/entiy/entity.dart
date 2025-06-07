@@ -1,5 +1,6 @@
 export './pad_bank.dart';
 export './manager_deps.dart';
+export './app_locales.dart';
 
 export './launchpad/launchpad_device.dart';
 export './launchpad/launchpad_factory.dart';
