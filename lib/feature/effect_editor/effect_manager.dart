@@ -24,6 +24,18 @@ class EffectManager {
   Duration _remainingTime = Duration.zero;
   final effectFileManager = EffectFileManager();
 
+  // Flag for indicating is user holds LMB
+  bool _isDrawing = false;
+  bool get isDrawing => _isDrawing;
+
+  void startDrawing() {
+    _isDrawing = true;
+  }
+
+  void stopDrawing() {
+    _isDrawing = false;
+  }
+
   EffectManager({
     required this.deps,
     required this.holder,
