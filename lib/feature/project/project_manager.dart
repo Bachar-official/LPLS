@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:lpls/constants/constants.dart';
+import 'package:lpls/domain/di/di.dart';
 import 'package:lpls/domain/entiy/entity.dart';
 import 'package:lpls/domain/enum/enum.dart';
 
@@ -31,6 +32,15 @@ class ProjectManager {
   bool get isConnected => holder.rState.device != null;
   bool get isSaveAvailable => fileManager.isSaveAvailable;
   bool get isSaveAsAvailable => !isPadStructureEmpty(holder.rState.banks);
+
+  Pad? _hoveredPad;
+  Pad? get hoveredPad => _hoveredPad;
+
+  void hoverPad(Pad pad) {
+    debug(deps, 'Hovered pad $pad');
+    _hoveredPad = pad;
+  }
+  void leavePad() => _hoveredPad = null;
 
   ProjectManager({
     required this.holder,
@@ -174,6 +184,24 @@ class ProjectManager {
       catchException(deps, e, stackTrace: s);
     } finally {
       setLoading(false);
+    }
+  }
+
+  Future<void> clearBank() async {
+    if (_hoveredPad != null) {
+      debug(deps, 'Clearing bank fron pad $_hoveredPad');
+      final newBanks = PadStructure.from(state.banks);
+      final pageBanks = Map<Pad, PadBank>.from(newBanks[state.page] ?? {});
+      var bank = pageBanks[_hoveredPad] ?? PadBank.initial(di.audioEngine);
+      if (state.mode == Mode.audio) {
+        bank = await bank.copyWith(audioFiles: []);
+      } else {
+        bank = await bank.copyWith(midiFiles: []);
+      }
+
+      pageBanks[_hoveredPad!] = bank;
+      newBanks[state.page] = pageBanks;
+      holder.setBanks(newBanks);
     }
   }
 

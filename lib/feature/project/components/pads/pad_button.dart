@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lpls/domain/di/di.dart';
 import 'package:lpls/domain/enum/mode.dart';
@@ -44,37 +45,52 @@ class PadButton extends ConsumerWidget {
     final bank = state.banks[page]?[pad]!;
     final brightness = Theme.of(context).brightness;
 
-    return Listener(
-      onPointerDown: (event) {
-        if (event.buttons == 2) {
-          manager.sendCheckSignal(pad);
-        }
-        if (event.buttons == 1) {
-          manager.selectPad(pad);
-        }
-      },
-      onPointerUp: (event) {
-        manager.sendCheckSignal(pad, stop: true);
-      },
-      child: Padding(
-        padding: const EdgeInsets.all(2.0),
-        child: Container(
-          width: 10,
-          height: 10,
-          decoration: BoxDecoration(
-            color: _getPadColor(bank),
-            border: Border.all(color: brightness == Brightness.dark ? Colors.white : Colors.black),
-          ),
-          child: DropTarget(
-            onDragDone: (details) async {
-              if (bank != null) {
-                  manager.addFileToPad(page, pad, File(details.files.first.path), isMidi: mode == Mode.midi);
-              }
-            },
-            child: Text(
-              mode == Mode.audio
-                  ? (bank?.audioFiles.length ?? 0).toString()
-                  : (bank?.midiFiles.length ?? 0).toString(),
+    return MouseRegion(
+      onEnter: (_) => manager.hoverPad(pad),
+      onExit: (_) => manager.leavePad(),
+      child: KeyboardListener(
+        focusNode: FocusNode()..requestFocus(),
+        autofocus: true,
+        onKeyEvent: (event) {
+          if (event is KeyDownEvent) {
+            if(event.logicalKey == LogicalKeyboardKey.delete) {
+              manager.clearBank();
+            }
+          }          
+        },
+        child: Listener(
+          onPointerDown: (event) {
+            if (event.buttons == 2) {
+              manager.sendCheckSignal(pad);
+            }
+            if (event.buttons == 1) {
+              manager.selectPad(pad);
+            }
+          },
+          onPointerUp: (event) {
+            manager.sendCheckSignal(pad, stop: true);
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(2.0),
+            child: Container(
+              width: 10,
+              height: 10,
+              decoration: BoxDecoration(
+                color: _getPadColor(bank),
+                border: Border.all(color: brightness == Brightness.dark ? Colors.white : Colors.black),
+              ),
+              child: DropTarget(
+                onDragDone: (details) async {
+                  if (bank != null) {
+                      manager.addFileToPad(page, pad, File(details.files.first.path), isMidi: mode == Mode.midi);
+                  }
+                },
+                child: Text(
+                  mode == Mode.audio
+                      ? (bank?.audioFiles.length ?? 0).toString()
+                      : (bank?.midiFiles.length ?? 0).toString(),
+                ),
+              ),
             ),
           ),
         ),
