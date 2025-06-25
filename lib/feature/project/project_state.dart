@@ -3,6 +3,7 @@ import 'package:lpls/domain/entiy/launchpad/launchpad_device.dart';
 import 'package:lpls/domain/enum/mode.dart';
 import 'package:flutter_midi_command/flutter_midi_command.dart';
 import 'package:lpls/utils/fill_initial_banks.dart';
+import 'package:minisound/engine.dart' as minisound;
 
 class ProjectState {
   final MidiDevice? device;
@@ -12,6 +13,7 @@ class ProjectState {
   final Mode mode;
   final bool isLoading;
   final PadStructure banks;
+  final double volume;
 
   ProjectState({
     required this.device,
@@ -21,16 +23,18 @@ class ProjectState {
     required this.isLoading,
     required this.banks,
     required this.lpDevice,
+    required this.volume,
   });
 
-  ProjectState.initial()
+  ProjectState.initial(minisound.Engine engine)
     : device = null,
     lpDevice = null,
       devices = [],
       page = 0,
       mode = Mode.audio,
       isLoading = false,
-      banks = fillInitialBanks();
+      banks = fillInitialBanks(engine),
+      volume = 0.5;
 
   ProjectState copyWith({
     MidiDevice? device,
@@ -42,6 +46,7 @@ class ProjectState {
     PadStructure? banks,
     LaunchpadDevice? lpDevice,
     bool nullableLpDevice = false,
+    double? volume,
   }) {
     return ProjectState(
       device: nullableDevice ? null : device ?? this.device,
@@ -51,6 +56,7 @@ class ProjectState {
       isLoading: isLoading ?? this.isLoading,
       banks: banks ?? this.banks,
       lpDevice: nullableLpDevice ? null : lpDevice ?? this.lpDevice,
+      volume: volume ?? this.volume,
     );
   }
 }

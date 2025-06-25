@@ -25,62 +25,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.13.0"
-  audioplayers:
-    dependency: "direct main"
-    description:
-      name: audioplayers
-      sha256: c05c6147124cd63e725e861335a8b4d57300b80e6e92cea7c145c739223bbaef
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.2.1"
-  audioplayers_android:
-    dependency: transitive
-    description:
-      name: audioplayers_android
-      sha256: b00e1a0e11365d88576320ec2d8c192bc21f1afb6c0e5995d1c57ae63156acb5
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.0.3"
-  audioplayers_darwin:
-    dependency: transitive
-    description:
-      name: audioplayers_darwin
-      sha256: "3034e99a6df8d101da0f5082dcca0a2a99db62ab1d4ddb3277bed3f6f81afe08"
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.0.2"
-  audioplayers_linux:
-    dependency: transitive
-    description:
-      name: audioplayers_linux
-      sha256: "60787e73fefc4d2e0b9c02c69885402177e818e4e27ef087074cf27c02246c9e"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.1.0"
-  audioplayers_platform_interface:
-    dependency: transitive
-    description:
-      name: audioplayers_platform_interface
-      sha256: "365c547f1bb9e77d94dd1687903a668d8f7ac3409e48e6e6a3668a1ac2982adb"
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.1.0"
-  audioplayers_web:
-    dependency: transitive
-    description:
-      name: audioplayers_web
-      sha256: "22cd0173e54d92bd9b2c80b1204eb1eb159ece87475ab58c9788a70ec43c2a62"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.1.0"
-  audioplayers_windows:
-    dependency: transitive
-    description:
-      name: audioplayers_windows
-      sha256: "9536812c9103563644ada2ef45ae523806b0745f7a78e89d1b5fb1951de90e1a"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.1.0"
   bluez:
     dependency: transitive
     description:
@@ -169,14 +113,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.4"
-  file:
-    dependency: transitive
-    description:
-      name: file
-      sha256: a3b4f84adafef897088c160faf7dfffb7696046cb13ae90b508c2cbc95d3b8d4
-      url: "https://pub.dev"
-    source: hosted
-    version: "7.0.1"
   file_picker:
     dependency: "direct main"
     description:
@@ -185,14 +121,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "10.1.9"
-  fixnum:
-    dependency: transitive
-    description:
-      name: fixnum
-      sha256: b6dc7065e46c974bc7c5f143080a6764ec7a4be6da1285ececdc37be96de53be
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.1"
   fluent_ui:
     dependency: "direct main"
     description:
@@ -215,7 +143,7 @@ packages:
     source: hosted
     version: "5.0.0"
   flutter_localizations:
-    dependency: transitive
+    dependency: "direct main"
     description: flutter
     source: sdk
     version: "0.0.0"
@@ -285,24 +213,8 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  http:
-    dependency: transitive
-    description:
-      name: http
-      sha256: "2c11f3f94c687ee9bad77c171151672986360b2b001d109814ee7140b2cf261b"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.4.0"
-  http_parser:
-    dependency: transitive
-    description:
-      name: http_parser
-      sha256: "178d74305e7866013777bab2c3d8726205dc5a4dd935297175b19a23a2e66571"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.1.2"
   intl:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: intl
       sha256: "3df61194eb431efc39c4ceba583b95633a403f46c9fd341e550ce0bfa50e9aa5"
@@ -405,6 +317,38 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.1.0"
+  minisound:
+    dependency: "direct main"
+    description:
+      name: minisound
+      sha256: dbbd342cac3e94c6797e821ac48358438abbfffba6a5b6998681a21c68e2e846
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.2"
+  minisound_ffi:
+    dependency: transitive
+    description:
+      name: minisound_ffi
+      sha256: "382acf7f1152f4c663bb8ed8fedbb8609265a7b107f68fec2b1fc8a60c45ee84"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.5"
+  minisound_platform_interface:
+    dependency: transitive
+    description:
+      name: minisound_platform_interface
+      sha256: b346450fd79ad58a0f179e47f4dcb7c155b815eb0cbf0014091c38443d840668
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.1"
+  minisound_web:
+    dependency: transitive
+    description:
+      name: minisound_web
+      sha256: a68089e66f239626728ec4827664c1aee166a1622e85cfc3a21b427a55891f2b
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.2"
   path:
     dependency: "direct main"
     description:
@@ -414,7 +358,7 @@ packages:
     source: hosted
     version: "1.9.1"
   path_provider:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: path_provider
       sha256: "50c5dd5b6e1aaf6fb3a78b33f6aa3afca52bf903a8a5298f53101fdaee55bbcd"
@@ -530,14 +474,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.10.1"
-  sprintf:
-    dependency: transitive
-    description:
-      name: sprintf
-      sha256: "1fc9ffe69d4df602376b52949af107d8f5703b77cda567c4d7d86a0693120f23"
-      url: "https://pub.dev"
-    source: hosted
-    version: "7.0.0"
   stack_trace:
     dependency: transitive
     description:
@@ -570,14 +506,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.1"
-  synchronized:
-    dependency: transitive
-    description:
-      name: synchronized
-      sha256: "0669c70faae6270521ee4f05bffd2919892d42d1276e6c495be80174b6bc0ef6"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.3.1"
   term_glyph:
     dependency: transitive
     description:
@@ -626,14 +554,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.0"
-  uuid:
-    dependency: transitive
-    description:
-      name: uuid
-      sha256: a5be9ef6618a7ac1e964353ef476418026db906c4facdedaa299b7a2e71690ff
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.5.1"
   vector_math:
     dependency: transitive
     description:

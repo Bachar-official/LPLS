@@ -7,11 +7,11 @@ class EffectState {
   final FullColor? selectedColor;
   final int frameNumber;
   final EffectInstrument instrument;
+  final bool fromTrackEditor;
 
   bool get hasEffect => effect != null;
   bool get isFirstFrame => frameNumber == 0;
-  bool get isLastFrame =>
-      hasEffect && frameNumber == effect!.frames.length - 1;
+  bool get isLastFrame => hasEffect && frameNumber == effect!.frames.length - 1;
   bool get isSingleFrame => effect!.frames.length < 2;
 
   bool get isRemoveAvailable => hasEffect && !isSingleFrame;
@@ -22,9 +22,15 @@ class EffectState {
     required this.frameNumber,
     required this.selectedColor,
     required this.instrument,
+    required this.fromTrackEditor,
   });
 
-  EffectState.initial() : effect = null, frameNumber = 0, selectedColor = null, instrument = EffectInstrument.brush;
+  EffectState.initial()
+    : effect = null,
+      frameNumber = 0,
+      selectedColor = null,
+      instrument = EffectInstrument.brush,
+      fromTrackEditor = false;
 
   EffectState copyWith({
     Effect? effect,
@@ -33,7 +39,9 @@ class EffectState {
     FullColor? selectedColor,
     bool nullableColor = false,
     EffectInstrument? instrument,
+    bool? fromTrackEditor,
   }) => EffectState(
+    fromTrackEditor: fromTrackEditor ?? this.fromTrackEditor,
     effect: nullableEffect ? null : effect ?? this.effect,
     frameNumber: frameNumber ?? this.frameNumber,
     selectedColor: nullableColor ? null : selectedColor ?? this.selectedColor,

@@ -7,6 +7,7 @@ import 'package:lpls/feature/effect_editor/components/instrument_panel.dart';
 import 'package:lpls/feature/effect_editor/components/palette_widget.dart';
 import 'package:lpls/feature/effect_editor/effect_holder.dart';
 import 'package:lpls/feature/effect_editor/effect_state.dart';
+import 'package:lpls/l10n/app_localizations.dart';
 
 final provider = StateNotifierProvider<EffectHolder, EffectState>(
   (ref) => di.effectHolder,
@@ -29,36 +30,42 @@ class EffectScreen extends ConsumerWidget {
   Widget build(context, ref) {
     final state = ref.watch(provider);
     final manager = di.effectManager;
+    final locale = AppLocalizations.of(context);
 
     return ScaffoldPage(
       header: PageHeader(
         leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: manager.goBack),
         title: Text(
           state.effect == null
-              ? 'No effect'
-              : 'Effect editor - frame #${state.frameNumber + 1}',
+              ? locale.no_effect
+              : locale.frame_number(state.frameNumber + 1),
         ),
         commandBar: Wrap(
           children: [
             SizedBox(
               width: 100,
-              child: NumberBox(
-                clearButton: false,
-                min: 0,
-                value: manager.getBPMValue(),
-                onChanged: manager.setBPM,
-                format: manager.formatBPM,
-                mode: SpinButtonPlacementMode.none,
+              child: InfoLabel(
+                label: 'BPM',
+                child: NumberBox(
+                  clearButton: false,
+                  min: 0,
+                  value: manager.getBPMValue(),
+                  onChanged: manager.setBPM,
+                  mode: SpinButtonPlacementMode.none,
+                ),
               ),
             ),
             SizedBox(
               width: 100,
-              child: NumberBox(
-                clearButton: false,
-                min: 0,
-                value: manager.getBeats(),
-                onChanged: manager.setBeats,
-                mode: SpinButtonPlacementMode.none,
+              child: InfoLabel(
+                label: 'FPB',
+                child: NumberBox(
+                  clearButton: false,
+                  min: 0,
+                  value: manager.getBeats(),
+                  onChanged: manager.setBeats,
+                  mode: SpinButtonPlacementMode.none,
+                ),
               ),
             ),
             IconButton(
@@ -115,9 +122,9 @@ class EffectScreen extends ConsumerWidget {
                         height: size,
                         child:
                             state.effect == null || state.effect!.frames.isEmpty
-                                ? const Center(
+                                ? Center(
                                   child: Text(
-                                    'There is no effect yet.\nPlease edit effect from Project screen, or create one by clicking on the "+" icon.',
+                                    locale.no_effect_body,
                                     textAlign: TextAlign.center,
                                   ),
                                 )
@@ -133,7 +140,7 @@ class EffectScreen extends ConsumerWidget {
                       horizontal: 5,
                       vertical: 4,
                     ),
-                    child: manager.isFramesEmpty ? const Text('No frames for this effect') : Slider(
+                    child: manager.isFramesEmpty ? Text(locale.no_frames) : Slider(
                       min: 0,
                       max: (state.effect!.frames.length - 1).toDouble(),
                       value: state.frameNumber.toDouble().clamp(

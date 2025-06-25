@@ -1,3 +1,4 @@
+import 'package:lpls/domain/di/di.dart';
 import 'package:lpls/domain/entiy/pad_bank.dart';
 import 'package:lpls/domain/enum/pad.dart';
 
@@ -23,7 +24,7 @@ abstract class PadStructureSerializer {
 
       for (final padEntry in padsData.entries) {
         final pad = Pad.fromString(padEntry.key);
-        final padBank = await PadBank.deserialize(Map<String, dynamic>.from(padEntry.value));
+        final padBank = await PadBank.deserialize(Map<String, dynamic>.from(padEntry.value), di.audioEngine);
         padMap[pad] = padBank;
       }
 

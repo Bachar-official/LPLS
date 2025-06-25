@@ -1,16 +1,26 @@
 import 'dart:io';
 
-import 'package:audioplayers/audioplayers.dart';
 import 'package:lpls/domain/entiy/effect/effect.dart';
 import 'package:lpls/domain/entiy/effect/effect_factory.dart';
+
+import 'package:minisound/engine_flutter.dart' as minisound;
 
 class PadBank {
   int audioIndex;
   int midiIndex;
   List<File> midiFiles;
   List<File> audioFiles;
-  late List<AudioPlayer> audioPlayers;
+  late List<minisound.LoadedSound> audioPlayers;
   late List<Effect> effects;
+  late minisound.Engine audioEngine;
+  double volume = 0.5;
+
+  set allVolume(double value) {
+    volume = value;
+    for (final sound in audioPlayers) {
+      sound.volume = value;
+    }
+  }
 
   PadBank({
     required this.audioFiles,
@@ -19,29 +29,30 @@ class PadBank {
     required this.midiIndex,
     required this.audioPlayers,
     required this.effects,
+    required this.audioEngine,
   });
 
-  PadBank.initial()
+  PadBank.initial(minisound.Engine engine)
     : audioFiles = [],
       audioPlayers = [],
       audioIndex = 0,
       midiFiles = [],
       effects = [],
-      midiIndex = 0;
+      midiIndex = 0,
+      audioEngine = engine;
 
   Effect? get currentEffect => effects.isEmpty ? null : effects[midiIndex];
   bool get isEmpty => midiFiles.isEmpty && audioFiles.isEmpty;
 
-  Future<void> addFile(File file, bool isMidi) async {
+  Future<PadBank> addFile(File file, bool isMidi) async {
     if (isMidi) {
-      midiFiles.add(file);
-      effects.add(await EffectFactory.readFile(file));
-    } else {
-      audioFiles.add(file);
-      final player = AudioPlayer();
-      await player.setSourceDeviceFile(file.path);
-      audioPlayers.add(player);
+      final newMidiFiles = List<File>.from(midiFiles);
+      newMidiFiles.add(file);
+      return copyWith(midiFiles: newMidiFiles);
     }
+    final newAudioFiles = List<File>.from(audioFiles);
+    newAudioFiles.add(file);
+    return copyWith(audioFiles: newAudioFiles);
   }
 
   Future<PadBank> removeFile(int index, bool isMidi) async {
@@ -49,11 +60,10 @@ class PadBank {
       if (index < 0 || index >= midiFiles.length) return this;
       final newMidi = List<File>.from(midiFiles)..removeAt(index);
       return await copyWith(midiFiles: newMidi, midiIndex: 0);
-    } else {
-      if (index < 0 || index >= audioFiles.length) return this;
-      final newAudio = List<File>.from(audioFiles)..removeAt(index);
-      return await copyWith(audioFiles: newAudio, audioIndex: 0);
     }
+    if (index < 0 || index >= audioFiles.length) return this;
+    final newAudio = List<File>.from(audioFiles)..removeAt(index);
+    return await copyWith(audioFiles: newAudio, audioIndex: 0);
   }
 
   Future<PadBank> reorderFiles(
@@ -93,25 +103,17 @@ class PadBank {
   }
 
   Future<PadBank> trigger() async {
-  if (audioFiles.isNotEmpty && audioIndex < audioFiles.length) {
-    final player = audioPlayers[audioIndex];
-    final path = audioFiles[audioIndex].path;
-    await player.stop();
-    await player.play(DeviceFileSource(path));
-    final newIndex = (audioIndex + 1) % audioPlayers.length;
-    return await copyWith(audioIndex: newIndex);
-  } else if (midiFiles.isNotEmpty && midiIndex < midiFiles.length) {
-    final newIndex = (midiIndex + 1) % midiFiles.length;
-    return await copyWith(midiIndex: newIndex);
-  }
-
-  return this;
-}
-
-  void dispose() {
-    for (var player in audioPlayers) {
-      player.dispose();
+    if (audioFiles.isNotEmpty && audioIndex < audioFiles.length) {
+      final sound = audioPlayers[audioIndex];
+      sound.play();
+      final newIndex = (audioIndex + 1) % audioPlayers.length;
+      return await copyWith(audioIndex: newIndex);
+    } else if (midiFiles.isNotEmpty && midiIndex < midiFiles.length) {
+      final newIndex = (midiIndex + 1) % midiFiles.length;
+      return await copyWith(midiIndex: newIndex);
     }
+
+    return this;
   }
 
   Map<String, dynamic> serialize() => {
@@ -119,7 +121,10 @@ class PadBank {
     'audioFiles': audioFiles.map((file) => file.path).toList(),
   };
 
-  static Future<PadBank> deserialize(Map<String, dynamic> map) async {
+  static Future<PadBank> deserialize(
+    Map<String, dynamic> map,
+    minisound.Engine engine,
+  ) async {
     final midiField = 'midiFiles', audioField = 'audioFiles';
     if (map[midiField] == null) {
       throw Exception('Midi files is missing');
@@ -135,10 +140,9 @@ class PadBank {
           throw Exception('${file.path} not exists');
         }
       }
-      return await PadBank.initial().copyWith(
-        midiFiles: midiFiles,
-        audioFiles: audioFiles,
-      );
+      return await PadBank.initial(
+        engine,
+      ).copyWith(midiFiles: midiFiles, audioFiles: audioFiles);
     }
   }
 
@@ -154,10 +158,14 @@ class PadBank {
     bool audioChanged = !identical(updatedAudioFiles, this.audioFiles);
     bool midiChanged = !identical(updatedMidiFiles, this.midiFiles);
 
-    List<AudioPlayer> newAudioPlayers = audioPlayers;
+    List<minisound.LoadedSound> newAudioPlayers = audioPlayers;
     List<Effect> newEffects = effects;
 
     if (audioChanged) {
+      for (final audio in audioPlayers) {
+        audio.unload();
+      }
+      audioPlayers.clear();
       newAudioPlayers = [];
 
       for (var file in updatedAudioFiles) {
@@ -168,17 +176,9 @@ class PadBank {
         if (existingIndex != -1) {
           newAudioPlayers.add(audioPlayers[existingIndex]);
         } else {
-          final player = AudioPlayer();
-          await player.setSourceDeviceFile(file.path);
-          newAudioPlayers.add(player);
-        }
-      }
-
-      for (int i = 0; i < this.audioFiles.length; i++) {
-        final oldPath = this.audioFiles[i].path;
-        final isUsed = updatedAudioFiles.any((f) => f.path == oldPath);
-        if (!isUsed) {
-          await audioPlayers[i].dispose();
+          final sound = await audioEngine.loadSound(await File(file.path).readAsBytes(), doAddToFinalizer: false);
+          sound.volume = volume;
+          newAudioPlayers.add(sound);
         }
       }
     }
@@ -196,6 +196,7 @@ class PadBank {
       audioFiles: updatedAudioFiles,
       audioPlayers: newAudioPlayers,
       effects: newEffects,
+      audioEngine: audioEngine,
     );
   }
 }

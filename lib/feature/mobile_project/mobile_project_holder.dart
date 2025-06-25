@@ -4,9 +4,11 @@ import 'package:lpls/constants/pad_structure.dart';
 import 'package:lpls/domain/entiy/launchpad/launchpad_factory.dart';
 import 'package:lpls/domain/enum/pad.dart';
 import 'package:lpls/feature/mobile_project/mobile_project_state.dart';
+import 'package:minisound/engine.dart' as minisound;
 
 class MobileProjectHolder extends StateNotifier<MobileProjectState> {
-  MobileProjectHolder() : super(MobileProjectState.initial());
+  final minisound.Engine engine;
+  MobileProjectHolder({required this.engine}) : super(MobileProjectState.initial(engine));
 
   MobileProjectState get rState => state;
 

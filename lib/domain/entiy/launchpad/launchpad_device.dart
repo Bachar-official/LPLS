@@ -14,7 +14,6 @@ abstract class LaunchpadDevice<T extends LPColor> {
   Map<Pad, int> get mapping;
 
   Map<Pad, (T, Btness?)> _globalFrame = {};
-
   final List<_ActiveEffect<T>> _activeEffects = [];
 
   Timer? _effectTimer;
@@ -28,12 +27,10 @@ abstract class LaunchpadDevice<T extends LPColor> {
     deviceId = device.id;
   }
 
-  /// Returns pad by it coords
   Pad pressedPad(int coords) {
     return mapping.entries.firstWhere((entry) => entry.value == coords).key;
   }
 
-  /// Sends command to Launchpad from color and brightness
   void sendData(Pad pad, T? color, {Btness brightness = Btness.light}) {
     final value = switch (brightness) {
       Btness.dark => color?.dark,
@@ -58,18 +55,18 @@ abstract class LaunchpadDevice<T extends LPColor> {
     if (effect == null || effect.frames.isEmpty) return;
 
     _activeEffects.add(_ActiveEffect(effect: effect));
-    _startTimer(effect.frameTime);
+    _startTimer();
   }
 
-  void _startTimer(int frameTime) {
+  void _startTimer() {
     if (_effectTimer != null) return;
 
-    _effectTimer = Timer.periodic(
-      Duration(milliseconds: frameTime),
-      (_) => _onFrameTick(),
-    );
+    const tickDuration = Duration(milliseconds: 10); // 10ms tick
+    _effectTimer = Timer.periodic(tickDuration, (timer) {
+      _onFrameTick(tickDuration.inMilliseconds);
+    });
 
-    _onFrameTick();
+    _onFrameTick(0); // Immediate first update
   }
 
   void _stopTimer() {
@@ -77,7 +74,7 @@ abstract class LaunchpadDevice<T extends LPColor> {
     _effectTimer = null;
   }
 
-  void _onFrameTick() {
+  void _onFrameTick(int deltaMs) {
     if (_activeEffects.isEmpty) {
       _stopTimer();
       return;
@@ -87,24 +84,33 @@ abstract class LaunchpadDevice<T extends LPColor> {
     Map<Pad, (T, Btness?)> combinedEffectsFrame = {};
 
     for (final active in _activeEffects) {
-      if (active.frameIndex < active.effect.frames.length) {
-        active.lastFrame = active.effect.frames[active.frameIndex];
+      active.elapsedMs += deltaMs;
+
+      // Advance frame if enough time passed
+      while (
+        active.frameIndex < active.effect.frames.length &&
+        active.elapsedMs >= active.effect.frameTime
+      ) {
+        active.elapsedMs -= active.effect.frameTime;
         active.frameIndex++;
+
+        if (active.frameIndex < active.effect.frames.length) {
+          active.lastFrame = active.effect.frames[active.frameIndex];
+        }
       }
 
+      // Mark effect as done
       if (active.frameIndex >= active.effect.frames.length) {
         completedEffects.add(active);
-      }
-
-      for (final entry in active.lastFrame.entries) {
-        combinedEffectsFrame[entry.key] = entry.value;
+      } else {
+        for (final entry in active.lastFrame.entries) {
+          combinedEffectsFrame[entry.key] = entry.value;
+        }
       }
     }
 
     for (final done in completedEffects) {
       _activeEffects.remove(done);
-
-      // Remove donw frames from global state
       for (final pad in done.lastFrame.keys) {
         if (!combinedEffectsFrame.containsKey(pad)) {
           _globalFrame.remove(pad);
@@ -112,12 +118,12 @@ abstract class LaunchpadDevice<T extends LPColor> {
       }
     }
 
-    // Updating global state
+    // Update global state
     for (final entry in combinedEffectsFrame.entries) {
       _globalFrame[entry.key] = entry.value;
     }
 
-    // Rendering
+    // Render frame
     _renderFrame(_globalFrame);
 
     if (_activeEffects.isEmpty && _globalFrame.isEmpty) {
@@ -125,23 +131,18 @@ abstract class LaunchpadDevice<T extends LPColor> {
     }
   }
 
-  /// Rendering according to previous state
   void _renderFrame(Map<Pad, (T, Btness?)> currentFrame) {
-    final currentPads = currentFrame.keys.toSet();
-
-
-    for (final pad in currentPads) {
+    for (final pad in currentFrame.keys) {
       final (color, btness) = currentFrame[pad]!;
       sendData(pad, color, brightness: btness ?? Btness.light);
     }
-
   }
 
   Effect<T> createEffect() => Effect<T>.initial();
 
   void clearAllPads() {
     for (var pad in Pad.regularPads) {
-      sendData(pad, null); // Note On + 0
+      sendData(pad, null);
     }
   }
 }
@@ -149,8 +150,10 @@ abstract class LaunchpadDevice<T extends LPColor> {
 class _ActiveEffect<T extends LPColor> {
   final Effect<T> effect;
   int frameIndex = 0;
-
+  int elapsedMs = 0;
   Map<Pad, (T, Btness?)> lastFrame = {};
 
-  _ActiveEffect({required this.effect});
+  _ActiveEffect({required this.effect}) {
+    lastFrame = effect.frames[0];
+  }
 }

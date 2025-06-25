@@ -1,5 +1,5 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/material.dart' hide MenuBar, Colors, IconButton;
+import 'package:flutter/material.dart' hide MenuBar, Colors, IconButton, Slider;
 import 'package:flutter_midi_command/flutter_midi_command.dart';
 import 'package:lpls/domain/di/di.dart';
 import 'package:lpls/domain/enum/mode.dart';
@@ -7,6 +7,8 @@ import 'package:lpls/feature/project/project_holder.dart';
 import 'package:lpls/feature/project/project_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lpls/feature/project/components/pads/pad_grid.dart';
+import 'package:lpls/l10n/app_localizations.dart';
+import 'package:lpls/utils/fill_initial_banks.dart';
 
 final provider = StateNotifierProvider<ProjectHolder, ProjectState>(
   (ref) => di.projectHolder,
@@ -19,23 +21,31 @@ class ProjectScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(provider);
     final manager = di.projectManager;
+    final locale = AppLocalizations.of(context);
 
     return state.isLoading
         ? Center(child: const ProgressRing())
         : ScaffoldPage(
           header: PageHeader(
-            title: Text(
-              state.device == null
-                  ? 'No device'
-                  : 'Current page: ${state.page + 1}',
+            title: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  state.device == null
+                      ? locale.no_device
+                      : locale.current_page(state.page + 1),
+                ),
+                const SizedBox(width: 20),
+                Slider(value: state.volume, onChanged: isPadStructureEmpty(state.banks) ? null : manager.setVolume, min: 0.0, max: 1.0),
+              ],
             ),
             commandBar: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 ComboBox<MidiDevice?>(
                   onChanged: manager.setDevice,
-                  placeholder: const Text('Select MIDI device'),
-                  disabledPlaceholder: const Text('Devices not found'),
+                  placeholder: Text(locale.select_midi),
+                  disabledPlaceholder: Text(locale.no_device),
                   value: state.device,
                   items:
                       state.devices
@@ -58,10 +68,10 @@ class ProjectScreen extends ConsumerWidget {
                 SegmentedButton<Mode>(
                   segments: [
                     ButtonSegment(
-                      label: const Text('Audio'),
+                      label: Text(locale.audio),
                       value: Mode.audio,
                     ),
-                    ButtonSegment(label: const Text('MIDI'), value: Mode.midi),
+                    ButtonSegment(label: Text(locale.midi), value: Mode.midi),
                   ],
                   selected: {state.mode},
                   onSelectionChanged:
@@ -81,9 +91,9 @@ class ProjectScreen extends ConsumerWidget {
                     height: size,
                     child:
                         state.device == null
-                            ? const Center(
+                            ? Center(
                               child: Text(
-                                'No devices connected or incompatible device connected',
+                                locale.no_connected,
                               ),
                             )
                             : PadGrid(
