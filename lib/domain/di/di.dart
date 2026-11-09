@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart'; // <-- ИЗМЕНЕНО: был material.dart
 import 'package:lpls/domain/entiy/manager_deps.dart';
 import 'package:lpls/feature/effect_editor/effect_holder.dart';
 import 'package:lpls/feature/effect_editor/effect_manager.dart';

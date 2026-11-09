@@ -7,11 +7,14 @@
 #include "generated_plugin_registrant.h"
 
 #include <desktop_drop/desktop_drop_plugin.h>
-#include <universal_ble/universal_ble_plugin_c_api.h>
+#include <file_saver/file_saver_plugin.h>
+#include <flutter_midi_command_windows/flutter_midi_command_windows_plugin.h>
 
 void RegisterPlugins(flutter::PluginRegistry* registry) {
   DesktopDropPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("DesktopDropPlugin"));
-  UniversalBlePluginCApiRegisterWithRegistrar(
-      registry->GetRegistrarForPlugin("UniversalBlePluginCApi"));
+  FileSaverPluginRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("FileSaverPlugin"));
+  FlutterMidiCommandWindowsPluginRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("FlutterMidiCommandWindowsPlugin"));
 }

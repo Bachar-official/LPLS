@@ -23,20 +23,15 @@ class App extends ConsumerWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: [
-        Locale('en'),
-        Locale('ru'),
-      ],
+      supportedLocales: [Locale('en'), Locale('ru')],
       locale: Locale(state.locale.name),
       home: HomeScreen(),
       themeMode: state.theme,
       darkTheme: FluentThemeData.dark(),
       navigatorKey: di.navigatorKey,
-      builder: (context, child) => Overlay(
-        initialEntries: [
-          OverlayEntry(builder: (ctx) => child!),
-        ],
-      ),
+      builder:
+          (context, child) =>
+              Overlay(initialEntries: [OverlayEntry(builder: (ctx) => child!)]),
     );
   }
 }

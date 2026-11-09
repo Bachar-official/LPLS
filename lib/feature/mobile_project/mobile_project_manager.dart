@@ -19,7 +19,7 @@ class MobileProjectManager {
   final MobileProjectHolder holder;
   final MobileManagerDeps deps;
   final MidiCommand midi = MidiCommand();
-  StreamSubscription<MidiPacket>? _midiSubscription;
+  StreamSubscription<MidiDataReceivedEvent>? _midiSubscription;
   bool get isConnected => holder.rState.device != null;
 
   MobileProjectManager({required this.holder, required this.deps});
@@ -61,14 +61,21 @@ class MobileProjectManager {
   }
 
   Future<void> setDevice(MidiDevice? device) async {
-    mobileDebug(deps, 'Trying to set device to ${device?.name ?? 'Unnamed device'}');
+    mobileDebug(
+      deps,
+      'Trying to set device to ${device?.name ?? 'Unnamed device'}',
+    );
     _midiSubscription?.cancel();
     holder.setDevice(device, midi);
     if (device != null) {
       await midi.connectToDevice(device);
       final stream = state.lpDevice?.midi.onMidiDataReceived;
       if (stream == null) {
-        mobileWarning(deps, 'No stream from device', scaffoldMessage: 'Error while getting MIDI commands from device');
+        mobileWarning(
+          deps,
+          'No stream from device',
+          scaffoldMessage: 'Error while getting MIDI commands from device',
+        );
         return;
       }
       _midiSubscription = stream.listen(_handleMidiMessage);
@@ -76,10 +83,10 @@ class MobileProjectManager {
     }
   }
 
-  void _handleMidiMessage(MidiPacket event) async {
+  void _handleMidiMessage(MidiDataReceivedEvent event) async {
     // If event in "Note ON"
-    if (event.data[2] == 127) {
-      var pressedPad = state.lpDevice?.pressedPad(event.data[1]);
+    if (event.message.data[2] == 127) {
+      var pressedPad = state.lpDevice?.pressedPad(event.message.data[1]);
       mobileDebug(deps, 'Pressed pad: ${pressedPad?.name}');
       // Check if change page button pressed
       if (managingPads.contains(pressedPad)) {
@@ -102,54 +109,49 @@ class MobileProjectManager {
           }
         }
       }
-      mobileDebug(deps, 'Event in ${event.data}');
+      mobileDebug(deps, 'Event in ${event.message.data}');
     }
   }
 
   Future<void> importProject() async {
-  mobileDebug(deps, 'Try to import project');
-  setLoading(true);
-  try {
-    final result = await FilePicker.platform.pickFiles(
-      allowMultiple: false,
-    );
+    mobileDebug(deps, 'Try to import project');
+    setLoading(true);
+    try {
+      final result = await FilePicker.pickFile();
 
-    if (result == null || !result.files.first.name.endsWith('.lpls')) {
-      mobileWarning(
-        deps,
-        'file pick result is null',
-        scaffoldMessage: 'There is no project to open',
-      );
-      return;
+      if (result == null || !result.name.endsWith('.lpls')) {
+        mobileWarning(
+          deps,
+          'file pick result is null',
+          scaffoldMessage: 'There is no project to open',
+        );
+        return;
+      }
+
+      final filePath = result;
+      final fileName = filePath.path!.split(Platform.pathSeparator).last;
+      final projectName = fileName.split('.').first;
+
+      // Получаем временную директорию
+      final tempDir = await getTemporaryDirectory();
+      final tempProjectDir = '${tempDir.path}/$projectName';
+
+      // Удалим старую версию, если есть
+      final dir = Directory(tempProjectDir);
+      if (await dir.exists()) {
+        await dir.delete(recursive: true);
+      }
+
+      await FileUtils.extractLpls(filePath.path!, tempProjectDir);
+
+      final lppPath = '$tempProjectDir/$projectName.lpp';
+      await openProject(path: lppPath);
+    } catch (e, s) {
+      mobileCatchException(deps, e, stackTrace: s);
+    } finally {
+      setLoading(false);
     }
-
-    final filePath = result.paths.first!;
-    final fileName = filePath.split(Platform.pathSeparator).last;
-    final projectName = fileName.split('.').first;
-
-    // Получаем временную директорию
-    final tempDir = await getTemporaryDirectory();
-    final tempProjectDir = '${tempDir.path}/$projectName';
-
-    // Удалим старую версию, если есть
-    final dir = Directory(tempProjectDir);
-    if (await dir.exists()) {
-      await dir.delete(recursive: true);
-    }
-
-    await FileUtils.extractLpls(
-      filePath,
-      tempProjectDir,
-    );
-
-    final lppPath = '$tempProjectDir/$projectName.lpp';
-    await openProject(path: lppPath);
-  } catch (e, s) {
-    mobileCatchException(deps, e, stackTrace: s);
-  } finally {
-    setLoading(false);
   }
-}
 
   Future<void> openProject({String? path}) async {
     mobileDebug(deps, 'Trying to open project from file');
@@ -157,14 +159,13 @@ class MobileProjectManager {
     try {
       final result =
           path == null
-              ? await FilePicker.platform.pickFiles(
-                allowMultiple: false,
+              ? await FilePicker.pickFile(
                 // type: FileType.custom,
                 // allowedExtensions: [FileExtensions.tempProject],
               )
               : null;
 
-      final filePath = path ?? result?.files.single.path;
+      final filePath = path ?? result?.path;
       if (filePath == null) return;
 
       final file = File(filePath);
@@ -192,10 +193,9 @@ class MobileProjectManager {
                 return File('$baseDir/$relPath');
               }).toList();
 
-          padMap[pad] = await PadBank.initial(di.audioEngine).copyWith(
-            midiFiles: midiPaths,
-            audioFiles: audioPaths,
-          );
+          padMap[pad] = await PadBank.initial(
+            di.audioEngine,
+          ).copyWith(midiFiles: midiPaths, audioFiles: audioPaths);
         }
 
         banks[page] = padMap;
@@ -218,10 +218,10 @@ class MobileProjectManager {
       }
       await Future.delayed(const Duration(seconds: 2), () {
         for (final pad in Pad.regularPads) {
-        state.lpDevice?.sendCheckSignal(pad, stop: true);
-      }
+          state.lpDevice?.sendCheckSignal(pad, stop: true);
+        }
       });
-    } catch(e, s) {
+    } catch (e, s) {
       mobileCatchException(deps, e, stackTrace: s);
     }
   }

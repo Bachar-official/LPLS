@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:fluent_ui/fluent_ui.dart'; // <-- ThemeMode берется отсюда
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lpls/domain/entiy/entity.dart';
 import 'package:lpls/domain/enum/screen.dart';

@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:fluent_ui/fluent_ui.dart'; // <-- ThemeMode берется отсюда
 import 'package:lpls/domain/di/di.dart';
 import 'package:lpls/domain/entiy/app_locales.dart';
 import 'package:lpls/domain/entiy/manager_deps.dart';
@@ -14,6 +14,7 @@ class HomeManager {
   final ManagerDeps deps;
 
   HomeManager({required this.deps, required this.holder});
+
   HomeState get state => holder.rState;
   List<MenuFlyoutItem> get fileMenuItems => _getFileMenuItems();
 
@@ -23,6 +24,7 @@ class HomeManager {
 
   void toProjectScreen() => setScreen(Screen.project);
   void toTrackScreen() => setScreen(Screen.trackEditor);
+
   void toEffectScreen() {
     di.effectManager.setFromTrackEditor(state.screen == Screen.trackEditor);
     setScreen(Screen.effectEditor);
@@ -68,14 +70,8 @@ class HomeManager {
     final ctx = deps.navigatorKey.currentContext!;
     final locale = AppLocalizations.of(ctx);
 
-    final openItem = MenuFlyoutItem(
-      text: Text(locale.open),
-      onPressed: onOpen,
-    );
-    final saveItem = MenuFlyoutItem(
-      text: Text(locale.save),
-      onPressed: onSave,
-    );
+    final openItem = MenuFlyoutItem(text: Text(locale.open), onPressed: onOpen);
+    final saveItem = MenuFlyoutItem(text: Text(locale.save), onPressed: onSave);
     final saveAsItem = MenuFlyoutItem(
       text: Text(locale.save_as),
       onPressed: onSaveAs,

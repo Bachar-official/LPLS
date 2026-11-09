@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:fluent_ui/fluent_ui.dart';
 import 'package:lpls/domain/entiy/app_locales.dart';
 import 'package:lpls/domain/enum/screen.dart';
 

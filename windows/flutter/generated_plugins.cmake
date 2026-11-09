@@ -4,10 +4,12 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   desktop_drop
-  universal_ble
+  file_saver
+  flutter_midi_command_windows
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST
+  jni
   minisound_ffi
 )
 

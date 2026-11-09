@@ -44,7 +44,7 @@ class TrackEditorScreen extends ConsumerWidget {
               padding: const EdgeInsets.all(8.0),
               child: ReorderableListView(
                 scrollDirection: Axis.horizontal,
-                onReorder: (oldIndex, newIndex) {
+                onReorderItem: (oldIndex, newIndex) {
                   manager.reorderTracks(oldIndex, newIndex);
                 },
                 children:
@@ -71,8 +71,9 @@ class TrackEditorScreen extends ConsumerWidget {
                                 index,
                                 GestureDetector(
                                   key: ValueKey(file.path),
-                                  onTap: () => manager.onClickTrack(index, true),
-                                  child: SampleWidget(                                    
+                                  onTap:
+                                      () => manager.onClickTrack(index, true),
+                                  child: SampleWidget(
                                     index: index,
                                     file: file,
                                     isMidi: true,

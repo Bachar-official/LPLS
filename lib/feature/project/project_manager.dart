@@ -27,7 +27,7 @@ class ProjectManager {
   final HomeManager homeManager;
   final MidiCommand midi = MidiCommand();
   final fileManager = ProjectFileManager();
-  StreamSubscription<MidiPacket>? _midiSubscription;
+  StreamSubscription<MidiDataReceivedEvent>? _midiSubscription;
 
   bool get isConnected => holder.rState.device != null;
   bool get isSaveAvailable => fileManager.isSaveAvailable;
@@ -40,6 +40,7 @@ class ProjectManager {
     debug(deps, 'Hovered pad $pad');
     _hoveredPad = pad;
   }
+
   void leavePad() => _hoveredPad = null;
 
   ProjectManager({
@@ -96,10 +97,10 @@ class ProjectManager {
     }
   }
 
-  void _handleMidiMessage(MidiPacket event) async {
+  void _handleMidiMessage(MidiDataReceivedEvent event) async {
     // If event in "Note ON"
-    if (event.data[2] == 127) {
-      var pressedPad = state.lpDevice?.pressedPad(event.data[1]);
+    if (event.message.data[2] == 127) {
+      var pressedPad = state.lpDevice?.pressedPad(event.message.data[1]);
       debug(deps, 'Pressed pad: ${pressedPad?.name}');
       // Check if change page button pressed
       if (managingPads.contains(pressedPad)) {
@@ -122,7 +123,7 @@ class ProjectManager {
           }
         }
       }
-      debug(deps, 'Event in ${event.data}');
+      debug(deps, 'Event in ${event.message.data}');
     }
   }
 
