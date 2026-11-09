@@ -1,25 +1,23 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:path_provider/path_provider.dart';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_midi_command/flutter_midi_command.dart';
 import 'package:lpls/constants/constants.dart';
-import 'package:lpls/domain/di/di.dart';
 import 'package:lpls/domain/entiy/entity.dart';
 import 'package:lpls/domain/enum/enum.dart';
-
 import 'package:lpls/feature/mobile_project/mobile_project_holder.dart';
 import 'package:lpls/feature/mobile_project/mobile_project_state.dart';
-
 import 'package:lpls/utils/utils.dart';
+import 'package:path_provider/path_provider.dart';
 
 class MobileProjectManager {
   final MobileProjectHolder holder;
   final MobileManagerDeps deps;
   final MidiCommand midi = MidiCommand();
   StreamSubscription<MidiDataReceivedEvent>? _midiSubscription;
+
   bool get isConnected => holder.rState.device != null;
 
   MobileProjectManager({required this.holder, required this.deps});
@@ -84,11 +82,10 @@ class MobileProjectManager {
   }
 
   void _handleMidiMessage(MidiDataReceivedEvent event) async {
-    // If event in "Note ON"
     if (event.message.data[2] == 127) {
       var pressedPad = state.lpDevice?.pressedPad(event.message.data[1]);
       mobileDebug(deps, 'Pressed pad: ${pressedPad?.name}');
-      // Check if change page button pressed
+
       if (managingPads.contains(pressedPad)) {
         holder.setPage(pressedPad);
       } else {
@@ -113,13 +110,17 @@ class MobileProjectManager {
     }
   }
 
+  /// === ИСПРАВЛЕННАЯ ЛОГИКА ОТКРЫТИЯ ===
   Future<void> importProject() async {
     mobileDebug(deps, 'Try to import project');
     setLoading(true);
     try {
-      final result = await FilePicker.pickFile();
+      final result = await FilePicker.pickFile(
+        type: FileType.custom,
+        allowedExtensions: ['lpls', 'lpp'],
+      );
 
-      if (result == null || !result.name.endsWith('.lpls')) {
+      if (result == null || result.path == null) {
         mobileWarning(
           deps,
           'file pick result is null',
@@ -128,24 +129,40 @@ class MobileProjectManager {
         return;
       }
 
-      final filePath = result;
-      final fileName = filePath.path!.split(Platform.pathSeparator).last;
-      final projectName = fileName.split('.').first;
+      final filePath = result.path!;
+      final fileName = filePath.split(Platform.pathSeparator).last;
 
-      // Получаем временную директорию
-      final tempDir = await getTemporaryDirectory();
-      final tempProjectDir = '${tempDir.path}/$projectName';
+      // ИСПРАВЛЕНИЕ 1: Используем постоянную директорию приложения, а не временную.
+      // ОС не удалит эти файлы во время выступления.
+      final appDir = await getApplicationDocumentsDirectory();
+      final projectDir = Directory('${appDir.path}/lpls_current_project');
 
-      // Удалим старую версию, если есть
-      final dir = Directory(tempProjectDir);
-      if (await dir.exists()) {
-        await dir.delete(recursive: true);
+      if (await projectDir.exists()) {
+        await projectDir.delete(recursive: true);
+      }
+      await projectDir.create(recursive: true);
+
+      if (fileName.endsWith('.lpls')) {
+        await FileUtils.extractLpls(filePath, projectDir.path);
+      } else {
+        // Если вдруг выбрали .lpp, просто копируем его (ассеты должны быть рядом)
+        await File(filePath).copy('${projectDir.path}/$fileName');
       }
 
-      await FileUtils.extractLpls(filePath.path!, tempProjectDir);
+      // ИСПРАВЛЕНИЕ 2: Ищем .lpp файл динамически.
+      // Имя файла внутри архива может не совпадать с именем самого архива.
+      final lppFiles =
+          await projectDir
+              .list(recursive: true)
+              .where((e) => e.path.endsWith('.lpp'))
+              .toList();
 
-      final lppPath = '$tempProjectDir/$projectName.lpp';
-      await openProject(path: lppPath);
+      if (lppFiles.isEmpty) {
+        throw Exception('No .lpp file found in project');
+      }
+
+      final lppPath = lppFiles.first.path;
+      await _loadProjectFromFile(lppPath);
     } catch (e, s) {
       mobileCatchException(deps, e, stackTrace: s);
     } finally {
@@ -154,20 +171,19 @@ class MobileProjectManager {
   }
 
   Future<void> openProject({String? path}) async {
-    mobileDebug(deps, 'Trying to open project from file');
+    if (path != null) {
+      await _loadProjectFromFile(path);
+    } else {
+      // Если путь не передан, запускаем стандартный процесс выбора и импорта
+      await importProject();
+    }
+  }
+
+  /// Вынесенная логика чтения JSON и инициализации банков
+  Future<void> _loadProjectFromFile(String filePath) async {
+    mobileDebug(deps, 'Trying to open project from file: $filePath');
     setLoading(true);
     try {
-      final result =
-          path == null
-              ? await FilePicker.pickFile(
-                // type: FileType.custom,
-                // allowedExtensions: [FileExtensions.tempProject],
-              )
-              : null;
-
-      final filePath = path ?? result?.path;
-      if (filePath == null) return;
-
       final file = File(filePath);
       final jsonString = await file.readAsString();
       final Map<String, dynamic> decoded = jsonDecode(jsonString);
@@ -193,11 +209,12 @@ class MobileProjectManager {
                 return File('$baseDir/$relPath');
               }).toList();
 
+          // ИСПРАВЛЕНИЕ 3: Используем holder.engine вместо di.audioEngine.
+          // di.audioEngine — это десктопный инстанс, на мобилке он не инициализирован корректно.
           padMap[pad] = await PadBank.initial(
-            di.audioEngine,
+            holder.engine,
           ).copyWith(midiFiles: midiPaths, audioFiles: audioPaths);
         }
-
         banks[page] = padMap;
       }
 
